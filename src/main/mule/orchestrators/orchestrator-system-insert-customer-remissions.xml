@@ -22,5 +22,21 @@ payload map (item)->{
 			</ee:message>
 		</ee:transform>
 		<flow-ref doc:name="Call clients-db-insert-remission-informix" doc:id="b0707d0b-8510-4437-a0b8-bc5a0e1b0ea3" name="clients-db-insert-remission-informix"/>
+		<ee:transform doc:name="Transform Message" doc:id="0127e63d-ed86-48b1-b684-5d887cf06471" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  traxion_response: {
+    completed_succesfully: "true",
+    response: {
+      operation: "The records has been inserted successfully",
+      data: {}
+    }
+  }
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
 	</sub-flow>
 </mule>
