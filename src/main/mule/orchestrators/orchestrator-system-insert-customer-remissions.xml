@@ -17,7 +17,7 @@ payload map (item)->{
 	number_pieces: item.number_pieces default "", 
 	destinations: item.destination default "", 
 	delivery_date: item.delivery_date default "",
-	shipment_number: item.shipment_number default ""
+	operation_account: item.shipment_number default ""
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
