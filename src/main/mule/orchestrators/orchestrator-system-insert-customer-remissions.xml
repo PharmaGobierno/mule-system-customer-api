@@ -11,7 +11,7 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 output application/java
 ---
 payload map (item)->{
-	remision_number: item.remission_number default "", 
+	remision_number: item.remission_number default null, 
 	item_code: item.code default "", 
 	batch: item.batch default "",
 	number_pieces: item.number_pieces default "", 
