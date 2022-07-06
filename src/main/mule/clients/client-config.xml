@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ftp="http://www.mulesoft.org/schema/mule/ftp"
+	xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+	xmlns:x12="http://www.mulesoft.org/schema/mule/x12" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ftp http://www.mulesoft.org/schema/mule/ftp/current/mule-ftp.xsd 
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/x12 http://www.mulesoft.org/schema/mule/x12/current/mule-x12.xsd">
+	<x12:config name="X12_EDI_Config" doc:name="X12 EDI Config" doc:id="9c53de1e-0064-4be7-b796-a4c2f8d9dcd4" interchangeIdQualifierSelf="02" interchangeIdQualifierPartner="ZZ" interchangeIdSelf="LOAL" interchangeIdPartner="TRANSPLACE" requireUniqueInterchanges="false" initialInterchangeNumber="0" groupIdSelf="LOAL" groupIdPartner="TRANSPLACE" truncateExceedingMaxLength="true" ackAllSets="true" acknowledgmentSchemaPath="/x12/004010/997.esl" componentSeparator="`" batchDefaultUsageIndicator="T" batchComponentSeparator="`">
+		<x12:schemas >
+			<x12:schema value="/x12/004010/204.esl" />
+		</x12:schemas>
+	</x12:config>
+	<x12:config name="X12_EDI_Config-wri" doc:name="X12 EDI Config" doc:id="3b8d85e5-8b77-4f2c-8edd-6af4ef43dfb1" interchangeIdQualifierSelf="02" interchangeIdQualifierPartner="ZZ" interchangeIdSelf="LOAL" interchangeIdPartner="TRANSPLACE" initialInterchangeNumber="0" groupIdSelf="LOAL" groupIdPartner="TRANSPLACE" truncateExceedingMaxLength="true" componentSeparator="`" batchDefaultUsageIndicator="T" batchComponentSeparator="`" defaultUsageIndicator="T">
+		<x12:schemas >
+			<x12:schema value="/x12/004010/990.esl" />
+		</x12:schemas>
+	</x12:config>
+	<jms:config name="JMS_Config" doc:name="JMS Config" doc:id="e89735f1-1936-42e9-82d1-1f5458a956b7" >
+		<jms:active-mq-connection username="${jms.settings.user}" password="${jms.settings.passwd}">
+			<reconnection >
+				<reconnect-forever frequency="${jms.reconnection.frequency.ms}" />
+			</reconnection>
+			<jms:factory-configuration brokerUrl="${jms.settings.url}" />
+		</jms:active-mq-connection>
+		<jms:producer-config timeToLive="3" timeToLiveUnit="DAYS" />
+	</jms:config>	
+		<ftp:config name="FTP_Config_effem" doc:name="FTP Config" doc:id="71b0857a-1a7e-4617-b58a-cc1e1828b86d" >
+		<ftp:connection host="${sftp.host}" port="${sftp.port}" username="${sftp.username}" password="${sftp.password}" connectionTimeout="${sftp.connection.timeout.seconds}" responseTimeout="${sftp.response.timeout.seconds}">
+			<reconnection >
+				<reconnect frequency="${sftp.reconnection.strategy.frequency.ms}" count="${sftp.reconnection.strategy.reconnection.attempts.ms}" />
+			</reconnection>
+		</ftp:connection>
+	</ftp:config>
+
+</mule>

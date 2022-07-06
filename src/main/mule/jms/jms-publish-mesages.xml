@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	<sub-flow name="jms-publish-mesages-publish-edi-json" doc:id="87cd07ca-3e51-4249-ac7c-3d2a7abb1496" >
+			<jms:publish doc:name="Publish" doc:id="c84ee44b-1963-42f9-bafd-cf5653586394" config-ref="JMS_Config" destination="${jms.settings.queue.system.effem.to.tms}" persistentDelivery="true">
+			<reconnect-forever frequency="${jms.reconnection.frequency.ms}" />
+			<jms:message correlationId="#[uuid()]">
+				<jms:properties ><![CDATA[#[{
+	"event_name": payload.CISDocument.EventName,
+	"load":payload.CISDocument.SystemLoadID, 
+	"division_code": payload.CISDocument.DivisionCode,
+	"file_name":vars.name,
+	"status": vars.status,
+	"operation_name":vars.operation_name
+}]]]></jms:properties>
+			</jms:message>
+		</jms:publish>
+	</sub-flow>
+</mule>

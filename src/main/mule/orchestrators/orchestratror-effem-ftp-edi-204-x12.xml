@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:x12="http://www.mulesoft.org/schema/mule/x12" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/x12 http://www.mulesoft.org/schema/mule/x12/current/mule-x12.xsd">
+	<sub-flow name="orchestratror-effem-ftp-edi-204-x12-main" doc:id="9c049be4-6d0e-49b1-95c7-5d6cc07d4911" >
+		<flow-ref doc:name="clients-ftp-obtain-files-effem" doc:id="cc30e99a-0a89-48dc-88ef-5f6e349a0a3e" name="clients-ftp-obtain-files-effem"/>
+		<flow-ref doc:name="orchestratror-effem-ftp-edi-204-x12-validate-files" doc:id="82092f34-17e7-459c-9d16-566e585629a9" name="orchestratror-effem-ftp-edi-204-x12-validate-files"/>
+	</sub-flow>
+	<sub-flow name="orchestratror-effem-ftp-edi-204-x12-validate-files" doc:id="12ef57d9-4d52-459b-9ca6-bb64d94fe5c8" >
+		<foreach doc:name="iterate list files" doc:id="228dee09-1b6a-45ac-8239-77dadbf5f15e" collection="#[payload]" >
+			<choice doc:name="Choice" doc:id="47dc721d-a9df-4041-8bee-aece7a5dfd71" >
+				<when expression="#[payload == null or payload == []]" >
+					<logger level="INFO" doc:name="Logger" doc:id="cafa3543-2f78-42e4-9e60-1916aaea47b1" message="#['\n'] ********** NADA QUE PROCESAR ******* #['\n']" />
+				</when>
+				<otherwise>
+					<set-variable value="#[attributes.fileName]" doc:name="Set Variable" doc:id="ff783f48-0942-4869-9713-535a1a94d563" variableName="nombre" />
+					<flow-ref doc:name="orchestratror-effem-ftp-edi-204-x12-read-edi" doc:id="62c7c20a-cb70-4af3-9f3c-4e3763d664e2" name="orchestratror-effem-ftp-edi-204-x12-read-edi"/>
+					<flow-ref doc:name="orchestratror-effem-ftp-edi-204-x12-validate-errors" doc:id="eef40771-ef2a-4362-9e71-7e3713f2c141" name="orchestratror-effem-ftp-edi-204-x12-validate-errors"/>
+				
+</otherwise>
+			</choice>
+		</foreach>	
+	</sub-flow>
+	<sub-flow name="orchestratror-effem-ftp-edi-204-x12-read-edi" doc:id="0c4da49f-0790-42e5-a808-90426f0a3b80" >
+		<x12:read doc:name="Read edi" doc:id="147c5e2d-2e0d-4148-8265-716fc7362a83" config-ref="X12_EDI_Config" />
+		<logger level="INFO" doc:name="print payload" doc:id="1481fa9e-64fc-48e2-b663-ed8570014efa" message="#[payload]" />
+	</sub-flow>
+	<sub-flow name="orchestratror-effem-ftp-edi-204-x12-validate-errors" doc:id="4e5273bc-789a-446e-b629-0b81422b7fa9" >
+		<choice doc:name="Choice" doc:id="4738c2f2-e55f-4623-8c8c-00f65ef2275c" >
+			<when expression="#[isEmpty(payload.Errors)]">
+				<flow-ref doc:name="orchestratror-effem-ftp-edi-204-x12-prepare-payload" doc:id="219ae9a0-bcd2-41a4-9496-c809312b6a38" name="orchestratror-effem-ftp-edi-204-x12-prepare-payload"/>
+				<flow-ref doc:name="jms-publish-mesages-publish-edi-json" doc:id="5ce530ec-7ec7-46c9-b55e-fe0b7e62c3ce" name="jms-publish-mesages-publish-edi-json" />
+			
+</when>
+			<otherwise >
+				<logger level="ERROR" doc:name="Logger" doc:id="6b0d8be4-5ee1-4aae-a54b-c598819fd491" message="#[payload.Errors]" category="EDI ERRORS"/>
+			</otherwise>
+		
+		</choice>
+	</sub-flow>
+	<sub-flow name="orchestratror-effem-ftp-edi-204-x12-prepare-payload" doc:id="718d5510-d44c-474a-a15d-adc4bb2dc6d4" >
+		<ee:transform doc:name="Transform Message" doc:id="8b09dc8c-ecdc-40c8-8b32-ad008d8d8cb9" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload.TransactionSets.v004010."204"[0]]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="status" ><![CDATA[%dw 2.0
+output application/java
+---
+"tender"
+]]></ee:set-variable>
+				<ee:set-variable variableName="operation_name" ><![CDATA[%dw 2.0
+output application/json
+---
+"Motor Carrier Load Tender"
+]]></ee:set-variable>
+				<ee:set-variable variableName="event" ><![CDATA[%dw 2.0
+output application/json
+---
+"204"]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+	</sub-flow>
+</mule>

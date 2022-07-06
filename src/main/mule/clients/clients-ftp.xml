@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ftp="http://www.mulesoft.org/schema/mule/ftp" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ftp http://www.mulesoft.org/schema/mule/ftp/current/mule-ftp.xsd">
+	<sub-flow name="clients-ftp-obtain-files-effem" doc:id="5a53d1f8-4925-4e85-8c58-ae5353f9de76" >
+		<ftp:list doc:name="List files" doc:id="25ec5eb4-7c73-439d-bd31-aef8d608f445" config-ref="FTP_Config_effem" directoryPath="${sftp.directory.path}" recursive="true" >
+			<ftp:matcher timeUnit="MILLISECONDS" filenamePattern="${sftp.matcher.file.name.pattern}" />
+		</ftp:list>
+	</sub-flow>
+	<sub-flow name="clients-ftp-write-file" doc:id="f9ef56a7-aa79-445c-8d0f-ff1fc3f51762" >
+		<ftp:write doc:name="Write" doc:id="0f9650be-9283-4568-a7e7-89774ba78b50" config-ref="FTP_Config_effem" path="${sftp.move.to.directory}"/>
+	</sub-flow>
+	
+</mule>
