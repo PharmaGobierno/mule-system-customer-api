@@ -16,7 +16,7 @@ http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/m
 	<tls:context name="TLS_Context" doc:name="TLS Context" doc:id="d49be2a6-abf1-4439-abd7-e1b0abfff9db" >
 		<tls:key-store type="pkcs12" path="Traxion_Logistics.p12" keyPassword="wWpg9LfX6nxh9Ke3u1L0wxSmYr5y3YKTjAWiTMEa9dww" password="wWpg9LfX6nxh9Ke3u1L0wxSmYr5y3YKTjAWiTMEa9dww" />
 	</tls:context>
-	    <db:config name="Database_Config_informix" doc:name="Database Config" doc:id="77749134-fe26-4bb1-8652-7c23ab48779f">
+	<db:config name="Database_Config_informix" doc:name="Database Config" doc:id="77749134-fe26-4bb1-8652-7c23ab48779f">
         <db:generic-connection url="${db.settings.informix.url}" driverClassName="com.informix.jdbc.IfxDriver" user="${db.settings.informix.user}" password='Xu&lt;VE")\E-h-q8rN' />
     </db:config>
 	<api-gateway:autodiscovery apiId="${anypoint.platform.autodiscovery}" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="a94b9406-08b6-4543-bdf1-17ab596c27bc" flowRef="system-customer-api-main" />
