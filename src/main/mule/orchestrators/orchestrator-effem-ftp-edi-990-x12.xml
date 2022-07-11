@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:x12="http://www.mulesoft.org/schema/mule/x12"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/x12 http://www.mulesoft.org/schema/mule/x12/current/mule-x12.xsd">
+	<sub-flow name="orchestrator-effem-ftp-edi-990-x12-main" doc:id="b7ff4c43-3ed4-4706-88b5-8591643321ea" >
+		<flow-ref doc:name="orchestrator-effem-ftp-edi-990-x12-prepare-doc" doc:id="0256f896-a330-47f5-ab34-53f400afad9b" name="orchestrator-effem-ftp-edi-990-x12-prepare-doc"/>
+		<flow-ref doc:name="orchestrator-effem-ftp-edi-990-x12-write" doc:id="05ece7a8-2645-4857-9b47-dd3efbe156d1" name="orchestrator-effem-ftp-edi-990-x12-write"/>
+		<flow-ref doc:name="clients-ftp-write-file" doc:id="09eb2591-ce7d-40b0-8361-328243a10a0b" name="clients-ftp-write-file"/>
+	</sub-flow>
+	<sub-flow name="orchestrator-effem-ftp-edi-990-x12-prepare-doc" doc:id="edb41679-e211-4401-baae-3cc37aa17c3d" >
+		<ee:transform doc:name="Transform Message" doc:id="a2ff77b4-d887-4eea-a186-f3cf3c2b6b40" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+type BigDecimal = Number {class : "java.math.BigDecimal"}
+ns ns0 http://xmlns.mulesoft.com/enterpriseobjects/finance/purchaseorder/
+ns ns1 http://xmlns.mulesoft.com/enterpriseobjects/core/address/
+---
+{
+  "Errors": [
+    
+  ],
+  "Delimiters": "*`U~",
+  "TransactionSets": {
+    "v004010": {
+      "990": [
+        {
+          "Interchange": {
+            "ISA09": "2005-09-09" as Date,
+            "ISA04": "",
+            "ISA15": "T",
+            "ISA03": "00",
+            "ISA14": "0",
+            "ISA02": "",
+            "ISA13": 4419705,
+            "ISA01": "00",
+            "ISA12": "00401",
+            "ISA08": "LOAL",
+            "ISA07": "02",
+            "ISA06": "TRANSPLACE",
+            "ISA05": "ZZ",
+            "ISA16": "`",
+            "ISA11": "U",
+            "ISA10": 24720000
+          },
+          "Group": {
+            "GS05": 24720000,
+            "GS04": "2005-09-09" as Date,
+            "GS07": "X",
+            "GS06": 979579,
+            "GS08": "004010",
+            "GS01": "GF",
+            "GS03": "LOAL",
+            "GS02": "TRANSPLACE"
+          },
+          "Heading": {
+            "020_B1": {
+              "B103": "2005-09-09" as Date,
+              "B104": "D",
+              "B101": "SCAC",
+              "B102": "2144832"
+            },
+            "060_K1": [
+              {
+                "K101": "PROBLEMS SCHEDULING"
+              }
+            ]
+          },
+          "SetTrailer": {
+            "SE02": "915434",
+            "SE01": 4
+          },
+          "Id": "990",
+          "SetHeader": {
+            "ST01": "990",
+            "ST02": "915434"
+          },
+          "Name": "Response to a Load Tender"
+        }
+      ]
+    }
+  }
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+			
+	</sub-flow>
+	<sub-flow name="orchestrator-effem-ftp-edi-990-x12-write" doc:id="76f648e3-52fd-4e1e-8625-ff6539f404ef" >
+	<x12:write doc:name="Write" doc:id="a06931d0-f2d4-4dff-bd4b-3a1d7d61b637" config-ref="X12_EDI_Config-wri"/>
+	</sub-flow>
+</mule>

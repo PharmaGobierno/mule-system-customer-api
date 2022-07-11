@@ -10,6 +10,8 @@
 			</scheduling-strategy>
 		</scheduler>
 		<logger level="INFO" doc:name="Logger" doc:id="c8d9388a-5b00-48d9-b222-deefb0c6f5d8" message="RED FILES EFFEM"/>
+<!-- -->	 		
 		<flow-ref doc:name="orchestratror-effem-ftp-edi-204-x12-main" doc:id="a4365f30-b92f-4c83-ab85-56f7302b1c23" name="orchestratror-effem-ftp-edi-204-x12-main"/>
+	
 	</flow>
 </mule>
