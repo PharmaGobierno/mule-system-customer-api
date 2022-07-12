@@ -30,54 +30,49 @@ ns ns1 http://xmlns.mulesoft.com/enterpriseobjects/core/address/
       "990": [
         {
           "Interchange": {
-            "ISA09": "2005-09-09" as Date,
-            "ISA04": "",
-            "ISA15": "T",
-            "ISA03": "00",
-            "ISA14": "0",
-            "ISA02": "",
-            "ISA13": 4419705,
-            "ISA01": "00",
-            "ISA12": "00401",
-            "ISA08": "LOAL",
-            "ISA07": "02",
-            "ISA06": "TRANSPLACE",
-            "ISA05": "ZZ",
-            "ISA16": "`",
-            "ISA11": "U",
-            "ISA10": 24720000
+            "ISA09": payload.traxion_response.response.edi.Interchange.ISA09 as Date,
+            "ISA04": payload.traxion_response.response.edi.Interchange.ISA04,
+            "ISA15": payload.traxion_response.response.edi.Interchange.ISA15,
+            "ISA03": payload.traxion_response.response.edi.Interchange.ISA03,
+            "ISA14": payload.traxion_response.response.edi.Interchange.ISA14,
+            "ISA02": payload.traxion_response.response.edi.Interchange.ISA02,
+            "ISA13": payload.traxion_response.response.edi.Interchange.ISA13,
+            "ISA01": payload.traxion_response.response.edi.Interchange.ISA01,
+            "ISA12": payload.traxion_response.response.edi.Interchange.ISA12,
+            "ISA08": payload.traxion_response.response.edi.Interchange.ISA08,
+            "ISA07": payload.traxion_response.response.edi.Interchange.ISA07,
+            "ISA06": payload.traxion_response.response.edi.Interchange.ISA06,
+            "ISA05": payload.traxion_response.response.edi.Interchange.ISA16,
+            "ISA16": payload.traxion_response.response.edi.Interchange.ISA11,
+            "ISA11": payload.traxion_response.response.edi.Interchange.ISA11,
+            "ISA10": payload.traxion_response.response.edi.Interchange.ISA10
           },
           "Group": {
-            "GS05": 24720000,
-            "GS04": "2005-09-09" as Date,
-            "GS07": "X",
-            "GS06": 979579,
-            "GS08": "004010",
-            "GS01": "GF",
-            "GS03": "LOAL",
-            "GS02": "TRANSPLACE"
+            "GS05": payload.traxion_response.response.edi.Group.GS05,
+            "GS04": payload.traxion_response.response.edi.Group.GS04 as Date,
+            "GS07": payload.traxion_response.response.edi.Group.GS07,
+            "GS06": payload.traxion_response.response.edi.Group.GS06,
+            "GS08": payload.traxion_response.response.edi.Group.GS08,
+            "GS01": payload.traxion_response.response.edi.Group.GS01,
+            "GS03": payload.traxion_response.response.edi.Group.GS03,
+            "GS02": payload.traxion_response.response.edi.Group.GS02
           },
           "Heading": {
             "020_B1": {
-              "B103": "2005-09-09" as Date,
-              "B104": "D",
-              "B101": "SCAC",
-              "B102": "2144832"
-            },
-            "060_K1": [
-              {
-                "K101": "PROBLEMS SCHEDULING"
-              }
-            ]
+              "B103":  payload.traxion_response.response.shipment.PickupFromDateTime as Date,
+              "B104": "A",
+              "B101": "",
+              "B102":  payload.traxion_response.response.shipment.ShipmentNumber
+            }
           },
           "SetTrailer": {
-            "SE02": "915434",
-            "SE01": 4
+            "SE02": payload.traxion_response.response.edi.SetTrailer.SE02,
+            "SE01": payload.traxion_response.response.edi.SetTrailer.SE01
           },
           "Id": "990",
           "SetHeader": {
-            "ST01": "990",
-            "ST02": "915434"
+            "ST01": payload.traxion_response.response.edi.SetHeader.ST01,
+            "ST02": payload.traxion_response.response.edi.SetHeader.ST02
           },
           "Name": "Response to a Load Tender"
         }

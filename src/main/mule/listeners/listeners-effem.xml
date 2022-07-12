@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:jms="http://www.mulesoft.org/schema/mule/jms" xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
 	<flow name="listeners-effem-listener-response-shipment" doc:id="9bed8b43-0177-485a-ba36-7dd26f60b934" >
 		<jms:listener doc:name="listener response create shipment effem" doc:id="8e63d3ae-a3f5-4249-ac7c-38916c3fa070" config-ref="JMS_Config" destination="${jms.settings.queue.system.tms.to.effem}" inboundContentType="application/json" >
 			<reconnect-forever frequency="${jms.reconnection.frequency.ms}" />
@@ -12,7 +13,17 @@ http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/
 			</jms:consumer-type>
 			<jms:response sendCorrelationId="ALWAYS"/>
 		</jms:listener>
-		<logger level="INFO" doc:name="Logger" doc:id="ebc0a8c5-6904-46d0-b1d2-cb018fa1ee45" message="#[payload]"/>
+		<ee:transform doc:name="backup payload" doc:id="0a680007-9fc8-4577-85e2-efff351317d3" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="payloadBK" ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="ebc0a8c5-6904-46d0-b1d2-cb018fa1ee45" message="#[vars.payloadBK]"/>
 		<flow-ref doc:name="orchestrator-effem-ftp-edi-990-x12-main" doc:id="54782910-b913-4146-ba47-3b390ec10400" name="orchestrator-effem-ftp-edi-990-x12-main"/>
 	</flow>
 </mule>
