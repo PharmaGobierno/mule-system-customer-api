@@ -12,7 +12,8 @@ output application/java
 ---
 payload map (item)->{
 	remision_number: item.remission_number default null, 
-	item_code: item.code default "", 
+	item_code: item.code default "",
+	load: item.load default "",
 	batch: item.batch default "",
 	number_pieces: item.number_pieces default "", 
 	destinations: item.destination default "",
