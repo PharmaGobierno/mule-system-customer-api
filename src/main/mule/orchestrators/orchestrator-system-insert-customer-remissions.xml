@@ -17,7 +17,7 @@ payload map (item)->{
 	batch: item.batch default "",
 	number_pieces: item.number_pieces default "", 
 	destinations: item.destination default "",
-	destination_code: item.destination_code default "", 
+	destination_description: item.destination_description default "", 
 	delivery_date: item.delivery_date default "",
 	operation_account: item.operation_account default ""
 }]]></ee:set-payload>
