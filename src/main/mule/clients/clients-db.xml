@@ -44,9 +44,9 @@ WHERE
 		</db:delete>
 		<set-payload value="#[vars.payloadBackup]" doc:name="Set Payload" doc:id="de29dc7e-f1f4-4bf3-bbbe-481b274948d5" />
 		<db:bulk-insert doc:name="Bulk insert" doc:id="aaffebcb-ec5b-4d8f-a1e4-8422690f359e" config-ref="Database_Config">
-			<db:sql ><![CDATA[insert into remisions_imss (remision_number,item_code,batch,load,number_pieces,destinations,delivery_date,operation_account,destination_description, insertion_date) 
-values (:remision_number,:item_code,:batch,:load,:number_pieces,:destinations,:delivery_date,:operation_account,:destination_description, NOW())
-ON DUPLICATE KEY UPDATE delivery_date = :delivery_date, item_code = :item_code, batch = :batch, load = :load, number_pieces = :number_pieces, destinations = :destinations, destination_description =:destination_description, operation_account = :operation_account;]]></db:sql>
+			<db:sql ><![CDATA[insert into remisions_imss (remision_number,load_id,item_code,batch,number_pieces,destinations,delivery_date,operation_account,destination_description, insertion_date) 
+ values (:remision_number,:load,:item_code,:batch,:number_pieces,:destinations,:delivery_date,:operation_account,:destination_description, NOW())
+ ON DUPLICATE KEY UPDATE delivery_date = :delivery_date, load_id = :load, item_code = :item_code, batch = :batch, number_pieces = :number_pieces, destinations = :destinations, destination_description =:destination_description, operation_account = :operation_account;]]></db:sql>
 		</db:bulk-insert>
 		<ee:transform doc:name="Change output to Json" doc:id="dc3615c1-c6e7-48f1-b064-98c7aea0a428">
 			<ee:message>
