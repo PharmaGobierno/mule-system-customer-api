@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:x12="http://www.mulesoft.org/schema/mule/x12" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/x12 http://www.mulesoft.org/schema/mule/x12/current/mule-x12.xsd">
+	<sub-flow name="orchestrator-effem-ftp-edi-997-x12-main" doc:id="3cd01441-bb4c-404d-89d0-ad6c75a8145d" >
+		<flow-ref doc:name="orchestrator-effem-ftp-edi-997-x12-prepare-doc" doc:id="3c010898-bda2-45ea-aff8-a94c64dce1b1" name="orchestrator-effem-ftp-edi-997-x12-prepare-doc"/>
+		<flow-ref doc:name="orchestrator-effem-ftp-edi-997-x12-write" doc:id="2afdef42-0ee5-4715-90e6-e6b0cd3f1ffa" name="orchestrator-effem-ftp-edi-997-x12-write"/>
+		<flow-ref doc:name="orchestrator-effem-ftp-edi-997-x12set-edi-name" doc:id="99cab733-4186-4324-b0ad-fb7a47ae87f9" name="orchestrator-effem-ftp-edi-997-x12set-edi-name"/>
+		<flow-ref doc:name="clients-ftp-write-file" doc:id="8379a6fd-b767-4339-84ca-c65326973148" name="clients-ftp-write-file"/>
+	</sub-flow>
+	<sub-flow name="orchestrator-effem-ftp-edi-997-x12-prepare-doc" doc:id="ca518104-a8c6-4d41-ad9a-632fc710e015" >
+		<ee:transform doc:name="Transform Message" doc:id="c51a384d-cf45-41c9-b2ac-217df8cceea4" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+type BigDecimal = Number {class : "java.math.BigDecimal"}
+ns ns0 http://xmlns.mulesoft.com/enterpriseobjects/finance/purchaseorder/
+ns ns1 http://xmlns.mulesoft.com/enterpriseobjects/core/address/
+---
+{
+  "Errors": [
+    
+  ],
+  "Delimiters": "*`U~",
+  "TransactionSets": {
+    "v004010": {
+      "997": [
+        {
+          "Interchange": {
+            "ISA09": payload.CISDocument.EventDateTime as Date,
+            "ISA04": "",
+            "ISA15": "", //properties env
+            "ISA03": "00", //hard code
+            "ISA14": "0",
+            "ISA02": "", //hard code
+            "ISA13": payload.CISDocument.ShipmentLeg.Shipment.ShipmentDescription default 0 as Number, // Load id
+            "ISA01": "00", //hard code
+            "ISA12": "00401", //hard code
+            "ISA08": "LOAL", //hard code
+            "ISA07": "02",
+            "ISA06": "TRAXION",
+            "ISA05": "ZZ", //hard code
+            "ISA16": "`",
+            "ISA11": "U",
+            "ISA10": payload.CISDocument.EventDateTime as DateTime as String {format: "A"}
+          },
+          "Group": {
+            "GS05": payload.CISDocument.LoadStartDateTime as DateTime as String {format: "A"},
+            "GS04": payload.CISDocument.LoadStartDateTime as Date,
+            "GS07": "X",
+            "GS06": payload.CISDocument.SystemLoadID as Number,
+            "GS08": "004010",
+            "GS01": "FA",
+            "GS03": "LOAL",
+            "GS02": "TRAXION"
+          },
+          "Heading": {
+            "030_AK2_Loop": [
+              {
+                "030_AK2": {
+                  "AK202": payload.CISDocument.ShipmentLeg.Shipment.ShipmentNumber,
+                  "AK201": "204"
+                },
+                "060_AK5": {
+                  "AK501": "A"
+                }
+              }
+            ],
+            "020_AK1": {
+              "AK101": "SM",
+              "AK102": payload.CISDocument.SystemLoadID as Number,
+            },
+            "070_AK9": {
+              "AK903": 1,
+              "AK904": 1,
+              "AK901": "1",
+              "AK902": 1
+            }
+          },
+          "SetTrailer": {
+            "SE02": payload.CISDocument.Carrier.CarrierCode,
+            "SE01": 6
+          },
+          "Id": "997",
+          "SetHeader": {
+            "ST01": "997",
+            "ST02": payload.CISDocument.SystemLoadID
+          },
+          "Name": "Functional Acknowledgment"
+        }
+      ]
+    }
+  }
+  
+    }
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="orchestrator-effem-ftp-edi-997-x12-write" doc:id="8f2b458e-c765-496f-b1ab-6e0a4ebe21da" >
+		<x12:write doc:name="Write" doc:id="2d277ad8-14a7-434b-9cd0-1bd4c9842a37" config-ref="X12_EDI_Config-write-997" />
+	</sub-flow>
+	<sub-flow name="orchestrator-effem-ftp-edi-997-x12set-edi-name" doc:id="a382cef2-5e91-42f1-867c-8153f057210e" >
+		<ee:transform doc:name="Transform Message" doc:id="7afd7ad1-e3e2-4a5c-96f2-7f8bfff44c90" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="doc_name" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+	</sub-flow>
+</mule>

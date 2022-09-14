@@ -10,10 +10,8 @@ http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/
 			<reconnect-forever frequency="${jms.reconnection.frequency.ms}" />
 			<jms:message correlationId="#[uuid()]">
 				<jms:properties ><![CDATA[#[{
-	"event_name": payload.CISDocument.EventName,
-	"load":payload.CISDocument.SystemLoadID, 
-	"division_code": payload.CISDocument.DivisionCode,
-	"file_name":vars.name,
+	"event_name": vars.event,
+	"file_name": vars.name,
 	"status": vars.status,
 	"operation_name":vars.operation_name
 }]]]></jms:properties>

@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:x12="http://www.mulesoft.org/schema/mule/x12" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/x12 http://www.mulesoft.org/schema/mule/x12/current/mule-x12.xsd">
+	<sub-flow name="orchestrator-effem-ftp-edi-214-x12-main" doc:id="3033e79b-de6a-4fac-9cb5-24f0b9012aee" >
+		<flow-ref doc:name="orchestrator-effem-ftp-edi-214-x12-prepare-doc" doc:id="0553b6d5-0189-4159-94f8-92cd65059422" name="orchestrator-effem-ftp-edi-214-x12-prepare-doc"/>
+		<flow-ref doc:name="orchestrator-effem-ftp-edi-214-x12-write" doc:id="8665d4a0-3c42-4e7c-b187-b7f5dd44f7f8" name="orchestrator-effem-ftp-edi-214-x12-write"/>
+		<flow-ref doc:name="orchestrator-effem-ftp-edi-214-x12-set-edi-name" doc:id="88c6db45-f2f7-42bf-abad-8b8717dc5838" name="orchestrator-effem-ftp-edi-214-x12-set-edi-name"/>
+		<flow-ref doc:name="clients-ftp-write-file" doc:id="354db119-278e-4c56-a80a-ee7982053e66" name="clients-ftp-write-file"/>
+	</sub-flow>
+	<sub-flow name="orchestrator-effem-ftp-edi-214-x12-prepare-doc" doc:id="14018dcf-9c0f-4a07-a6f3-7dfcb09e87c1" >
+		<ee:transform doc:name="Transform Message" doc:id="8e4b21cc-d2c7-45c3-af7f-a213e2b94f6e">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "Errors": [
+    
+  ],
+  "Delimiters": "*`U~",
+  "TransactionSets": {
+    "v004010": {
+      "214": [
+        {
+          "Interchange": {
+            "ISA09": vars.payloadBK.CISDocument.Load.LoadStartDateTime as Date,
+            "ISA04": "",
+            "ISA15": p('effem.edi.isa.env'),
+            "ISA03": "00",
+            "ISA14": "0",
+            "ISA02": "",
+            "ISA13": vars.payloadBK.CISDocument.Load.ShipmentLeg.Shipment.ShipmentDescription default 0 as Number,
+            "ISA01": "00",
+            "ISA12": "00401",
+            "ISA08": "LOAL",
+            "ISA07": "02",
+            "ISA06": "TRAXION",
+            "ISA05": "ZZ",
+            "ISA16": "`",
+            "ISA11": "U",
+            "ISA10": vars.payloadBK.CISDocument.Load.LoadStartDateTime as DateTime as String {format: "A"}
+          },
+          "Group": {
+            "GS05": vars.payloadBK.CISDocument.Load.LoadStartDateTime as DateTime as String {format: "A"},
+            "GS04": vars.payloadBK.CISDocument.Load.LoadStartDateTime as Date,
+            "GS07": "X",
+            "GS06": vars.payloadBK.CISDocument.Load.SystemLoadID as Number,
+            "GS08": "004010",
+            "GS01": "QM",
+            "GS03": "LOAL",
+            "GS02": "TRAXION"
+          },
+          "Heading": {
+            "0100_Loop": [
+              {
+                "080_N4": {
+                  "N401": "NEW VIENNA",
+                  "N402": "OH",
+                  "N403": "45159",
+                  "N404": "US"
+                },
+                "050_N1": {
+                  "N101": "SH",
+                  "N102": "HUHTAMAKI FSBU"
+                },
+                "070_N3": [
+                  {
+                    "N301": "5566 NEW VIENNA ROAD"
+                  }
+                ]
+              },
+              {
+                "080_N4": {
+                  "N401": "LINCOLN",
+                  "N402": "RI",
+                  "N403": "02865",
+                  "N404": "US"
+                },
+                "050_N1": {
+                  "N101": "CN",
+                  "N102": "HUHTAMAKI"
+                },
+                "070_N3": [
+                  {
+                    "N301": "100 HIGGENSON AVE"
+                  }
+                ]
+              }
+            ],
+            "0200_Loop": [
+              {
+                "0205_Loop": [
+                  {
+                    "143_MS1": {
+                      "MS103": "US",
+                      "MS102": "OH",
+                      "MS101": "NEW VIENNA"
+                    },
+                    "140_AT7": {
+                      "AT706": 57600000,
+                      "AT707": "ET",
+                      "AT704": "NA",
+                      "AT705": "2008-09-03T00:00:00-05:00",
+                      "AT703": "AA"
+                    }
+                  }
+                ],
+                "200_AT8": [
+                  {
+                    "AT803": 6240,
+                    "AT804": 402,
+                    "AT801": "G",
+                    "AT802": "L"
+                  }
+                ],
+                "130_LX": {
+                  "LX01": 1
+                }
+              }
+            ],
+            "030_L11": [
+              {
+                "L1101": "5365205",
+                "L1102": "LO"
+              },
+              {
+                "L1101": "01",
+                "L1102": "QN"
+              },
+              {
+                "L1101": "392651",
+                "L1102": "PO"
+              },
+              {
+                "L1101": "392651",
+                "L1102": "PO"
+              }
+            ],
+            "020_B10": {
+              "B1002": "5365205",
+              "B1001": "4735103",
+              "B1003": "SCAC"
+            }
+          },
+          "SetTrailer": {
+            "SE02": "099510001",
+            "SE01": 17
+          },
+          "Id": "214",
+          "SetHeader": {
+            "ST01": "214",
+            "ST02": vars.payloadBK.CISDocument.Load.ShipmentLeg.Shipment.SystemShipmentID
+          },
+          "Name": "Transportation Carrier Shipment Status Message"
+        }
+      ]
+    }
+  }
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="orchestrator-effem-ftp-edi-214-x12-write" doc:id="bd6ddd82-e35e-40db-ad7e-7e07b59d4ad3" >
+		<x12:write doc:name="Write_EDI_214" doc:id="23ed0fa4-961f-4963-b7b2-6e13d6d1cd80" config-ref="X12_EDI_Config-write-214" />
+	</sub-flow>
+	<sub-flow name="orchestrator-effem-ftp-edi-214-x12-set-edi-name" doc:id="edbcee26-64a7-4dc6-bc80-1b8bed0e4f42" >
+		<ee:transform doc:name="Transform Message" doc:id="e783e267-fa09-4d9d-994c-f79988d75187" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="doc_name" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+	</sub-flow>
+</mule>

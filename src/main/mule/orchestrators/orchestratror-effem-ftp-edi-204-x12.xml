@@ -30,6 +30,10 @@ http://www.mulesoft.org/schema/mule/x12 http://www.mulesoft.org/schema/mule/x12/
 				<flow-ref doc:name="orchestratror-effem-ftp-edi-204-x12-read-edi" doc:id="62c7c20a-cb70-4af3-9f3c-4e3763d664e2" name="orchestratror-effem-ftp-edi-204-x12-read-edi" />
 				<flow-ref doc:name="orchestratror-effem-ftp-edi-204-x12-validate-errors" doc:id="eef40771-ef2a-4362-9e71-7e3713f2c141" name="orchestratror-effem-ftp-edi-204-x12-validate-errors" />
 			</when>
+			<when expression='#[(vars.nombre default "") contains("214")]'>
+				<logger level="INFO" doc:name="Logger" doc:id="804dfe69-4f6d-48c6-b3bc-c8ecd8380987" />
+				<flow-ref doc:name="orchestratror-effem-ftp-edi-204-x12-read-edi" doc:id="90c4c0af-97cf-4244-a9e7-53adc6e27231" name="orchestratror-effem-ftp-edi-204-x12-read-edi"/>
+			</when>
 			<otherwise >
 				<logger level="INFO" doc:name="Logger" doc:id="e0a40408-5d13-487a-adcd-62243e6117ed" message="EDI NOT PROCESS"/>
 			</otherwise>
@@ -52,6 +56,19 @@ http://www.mulesoft.org/schema/mule/x12 http://www.mulesoft.org/schema/mule/x12/
 		
 		</choice>
 	</sub-flow>
+	<sub-flow name="orchestratror-effem-ftp-edi-214-x12-validate-errors" doc:id="f828d4b6-4cec-42da-9b06-3b860ef186a8" >
+		<choice doc:name="Choice" doc:id="ef8df540-9422-4337-b7b5-c525c12e10cc" >
+			<when expression="#[isEmpty(payload.Errors)]">
+				<flow-ref doc:name="orchestratror-effem-ftp-edi-214-x12-prepare-payload" doc:id="0bd45153-7ae0-42ce-9b54-f7cf8e0d0cd9" name="orchestratror-effem-ftp-edi-214-x12-prepare-payload"/>
+				<flow-ref doc:name="jms-publish-mesages-publish-edi-json" doc:id="fe6b0134-37b1-4afb-8d10-cee161ac6219" name="jms-publish-mesages-publish-edi-json" />
+			
+</when>
+			<otherwise >
+				<logger level="ERROR" doc:name="Logger" doc:id="725ac221-b786-44e4-a625-225bc73cd805" message="#[payload.Errors]" category="EDI ERRORS"/>
+			</otherwise>
+		
+		</choice>
+	</sub-flow>	
 	<sub-flow name="orchestratror-effem-ftp-edi-204-x12-prepare-payload" doc:id="718d5510-d44c-474a-a15d-adc4bb2dc6d4" >
 		<ee:transform doc:name="Transform Message" doc:id="8b09dc8c-ecdc-40c8-8b32-ad008d8d8cb9" >
 			<ee:message >
@@ -75,6 +92,32 @@ output application/json
 output application/json
 ---
 "204"]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="orchestratror-effem-ftp-edi-214-x12-prepare-payload" doc:id="858efb1c-01df-4b01-8a3e-2ba03189eacb" >
+		<ee:transform doc:name="Transform Message" doc:id="b9e604af-a298-4f73-9f9f-85acb16928eb">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload.TransactionSets.v004010."214"[0]]]></ee:set-payload>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="status"><![CDATA[%dw 2.0
+output application/java
+---
+"shipment_status"
+]]></ee:set-variable>
+				<ee:set-variable variableName="operation_name"><![CDATA[%dw 2.0
+output application/json
+---
+"Transportation Carrier Shipment Status Message"
+]]></ee:set-variable>
+				<ee:set-variable variableName="event"><![CDATA[%dw 2.0
+output application/json
+---
+"214"]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
 	</sub-flow>

@@ -9,16 +9,14 @@ http://www.mulesoft.org/schema/mule/x12 http://www.mulesoft.org/schema/mule/x12/
 	<sub-flow name="orchestrator-effem-ftp-edi-990-x12-main" doc:id="b7ff4c43-3ed4-4706-88b5-8591643321ea" >
 		<flow-ref doc:name="orchestrator-effem-ftp-edi-990-x12-prepare-doc" doc:id="0256f896-a330-47f5-ab34-53f400afad9b" name="orchestrator-effem-ftp-edi-990-x12-prepare-doc"/>
 		<flow-ref doc:name="orchestrator-effem-ftp-edi-990-x12-write" doc:id="05ece7a8-2645-4857-9b47-dd3efbe156d1" name="orchestrator-effem-ftp-edi-990-x12-write"/>
+		<flow-ref doc:name="orchestrator-effem-ftp-edi-990-x12-set-name" doc:id="f14c70c9-3d89-42d4-897d-561689ab5fe7" name="orchestrator-effem-ftp-edi-990-x12-set-name"/>
 		<flow-ref doc:name="clients-ftp-write-file" doc:id="09eb2591-ce7d-40b0-8361-328243a10a0b" name="clients-ftp-write-file"/>
 	</sub-flow>
 	<sub-flow name="orchestrator-effem-ftp-edi-990-x12-prepare-doc" doc:id="edb41679-e211-4401-baae-3cc37aa17c3d" >
 		<ee:transform doc:name="Transform Message" doc:id="a2ff77b4-d887-4eea-a186-f3cf3c2b6b40" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
-output application/java
-type BigDecimal = Number {class : "java.math.BigDecimal"}
-ns ns0 http://xmlns.mulesoft.com/enterpriseobjects/finance/purchaseorder/
-ns ns1 http://xmlns.mulesoft.com/enterpriseobjects/core/address/
+output application/json
 ---
 {
   "Errors": [
@@ -30,49 +28,49 @@ ns ns1 http://xmlns.mulesoft.com/enterpriseobjects/core/address/
       "990": [
         {
           "Interchange": {
-            "ISA09": payload.traxion_response.response.edi.Interchange.ISA09 as Date,
-            "ISA04": payload.traxion_response.response.edi.Interchange.ISA04,
-            "ISA15": payload.traxion_response.response.edi.Interchange.ISA15,
-            "ISA03": payload.traxion_response.response.edi.Interchange.ISA03,
-            "ISA14": payload.traxion_response.response.edi.Interchange.ISA14,
-            "ISA02": payload.traxion_response.response.edi.Interchange.ISA02,
-            "ISA13": payload.traxion_response.response.edi.Interchange.ISA13,
-            "ISA01": payload.traxion_response.response.edi.Interchange.ISA01,
-            "ISA12": payload.traxion_response.response.edi.Interchange.ISA12,
-            "ISA08": payload.traxion_response.response.edi.Interchange.ISA08,
-            "ISA07": payload.traxion_response.response.edi.Interchange.ISA07,
-            "ISA06": payload.traxion_response.response.edi.Interchange.ISA06,
-            "ISA05": payload.traxion_response.response.edi.Interchange.ISA16,
-            "ISA16": payload.traxion_response.response.edi.Interchange.ISA11,
-            "ISA11": payload.traxion_response.response.edi.Interchange.ISA11,
-            "ISA10": payload.traxion_response.response.edi.Interchange.ISA10
+            "ISA09": vars.payloadBK.CISDocument.Load.LoadStartDateTime as Date,
+            "ISA04": "",
+            "ISA15": "", //properties env
+            "ISA03": "00", //hard code
+            "ISA14": "0",
+            "ISA02": "", //hard code
+            "ISA13": vars.payloadBK.CISDocument.Load.ShipmentLeg.ShipmentDescription default 0 as Number, // Load id
+            "ISA01": "00", //hard code
+            "ISA12": "00401", //hard code
+            "ISA08": "LOAL", //hard code
+            "ISA07": "02",
+            "ISA06": "TRAXION",
+            "ISA05": "ZZ", //hard code
+            "ISA16": "`",
+            "ISA11": "U",
+            "ISA10": vars.payloadBK.CISDocument.Load.LoadStartDateTime as DateTime as String {format: "A"}
           },
           "Group": {
-            "GS05": payload.traxion_response.response.edi.Group.GS05,
-            "GS04": payload.traxion_response.response.edi.Group.GS04 as Date,
-            "GS07": payload.traxion_response.response.edi.Group.GS07,
-            "GS06": payload.traxion_response.response.edi.Group.GS06,
-            "GS08": payload.traxion_response.response.edi.Group.GS08,
-            "GS01": payload.traxion_response.response.edi.Group.GS01,
-            "GS03": payload.traxion_response.response.edi.Group.GS03,
-            "GS02": payload.traxion_response.response.edi.Group.GS02
+            "GS05": vars.payloadBK.CISDocument.Load.LoadStartDateTime as DateTime as String {format: "A"},
+            "GS04": vars.payloadBK.CISDocument.Load.LoadStartDateTime as Date,
+            "GS07": "X",
+            "GS06": vars.payloadBK.CISDocument.Load.SystemLoadID,
+            "GS08": "004010",
+            "GS01": "FA",
+            "GS03": "LOAL",
+            "GS02": "TRAXION"
           },
           "Heading": {
             "020_B1": {
-              "B103":  payload.traxion_response.response.shipment.PickupFromDateTime as Date,
+              "B103":  vars.payloadBK.CISDocument.Load.ShipmentLeg.PickupArrivalDateTime as Date,
               "B104": "A",
               "B101": "",
-              "B102":  payload.traxion_response.response.shipment.ShipmentNumber
+              "B102":  vars.payloadBK.CISDocument.Load.ShipmentLeg.ShipmentNumber
             }
           },
           "SetTrailer": {
-            "SE02": payload.traxion_response.response.edi.SetTrailer.SE02,
-            "SE01": payload.traxion_response.response.edi.SetTrailer.SE01
+            "SE02": vars.payloadBK.CISDocument.Load.CarrierCode,
+            "SE01": 6
           },
           "Id": "990",
           "SetHeader": {
-            "ST01": payload.traxion_response.response.edi.SetHeader.ST01,
-            "ST02": payload.traxion_response.response.edi.SetHeader.ST02
+            "ST01": "990",
+            "ST02": vars.payloadBK.CISDocument.Load.SystemLoadID
           },
           "Name": "Response to a Load Tender"
         }
@@ -86,5 +84,18 @@ ns ns1 http://xmlns.mulesoft.com/enterpriseobjects/core/address/
 	</sub-flow>
 	<sub-flow name="orchestrator-effem-ftp-edi-990-x12-write" doc:id="76f648e3-52fd-4e1e-8625-ff6539f404ef" >
 	<x12:write doc:name="Write" doc:id="a06931d0-f2d4-4dff-bd4b-3a1d7d61b637" config-ref="X12_EDI_Config-wri"/>
+	</sub-flow>
+	<sub-flow name="orchestrator-effem-ftp-edi-990-x12-set-name" doc:id="65a5c364-123b-4b55-8e4b-5a769de6ec3c" >
+		<ee:transform doc:name="Transform Message" doc:id="43681cee-492c-4422-b3b2-7961e7386c95" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="doc_name" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
 	</sub-flow>
 </mule>
