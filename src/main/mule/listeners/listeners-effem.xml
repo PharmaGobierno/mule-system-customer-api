@@ -34,12 +34,15 @@ payload]]></ee:set-variable>
 			</when>
 			<when expression='#[payload.CISDocument.Load.CurrentLoadOperationalStatusEnumVal =="S_IN_TRANSIT"]'>
 				<logger level="INFO" doc:name="S_IN_TRANSIT" doc:id="b31923a1-2e6a-4c5a-a2c9-e07925f9ac92" message="S_IN_TRANSIT"/>
+				<flow-ref doc:name="orchestrator-effem-ftp-edi-214-x12-main" doc:id="98388413-10eb-40b2-b32e-810c06b1213a" name="orchestrator-effem-ftp-edi-214-x12-main"/>
 			</when>
 			<when expression='#[payload.CISDocument.Load.CurrentLoadOperationalStatusEnumVal =="S_COMPLETED"]'>
 				<logger level="INFO" doc:name="S_COMPLETED" doc:id="9a5355ba-9e4e-49a7-8ca9-46b12a5c0c81" message="S_COMPLETED"/>
+				<flow-ref doc:name="orchestrator-effem-ftp-edi-214-x12-main" doc:id="7cf8a94d-2861-408d-8c6b-72f901979689" name="orchestrator-effem-ftp-edi-214-x12-main"/>
 			</when>
 			<when expression='#[payload.CISDocument.Load.CurrentLoadOperationalStatusEnumVal =="S_POD"]'>
 				<logger level="INFO" doc:name="S_POD" doc:id="d0339d32-7ff7-48a5-8da9-f525cb8b35c8" message="S_POD"/>
+				<flow-ref doc:name="orchestrator-effem-ftp-edi-214-x12-main" doc:id="c39befda-c05e-4bee-b101-d945e54246b9" name="orchestrator-effem-ftp-edi-214-x12-main"/>
 			</when>
 			<when expression='#[payload.CISDocument.EventName =="LoadTendered"]' >
 				<logger level="INFO" doc:name="LoadTendered" doc:id="0466b2dd-ebcf-42d3-ad4c-f4b596e8a5ba" message="LoadTendered"/>

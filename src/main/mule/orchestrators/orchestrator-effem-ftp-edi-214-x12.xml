@@ -29,7 +29,7 @@ output application/json
           "Interchange": {
             "ISA09": vars.payloadBK.CISDocument.Load.LoadStartDateTime as Date,
             "ISA04": "",
-            "ISA15": p('effem.edi.isa.env'),
+            "ISA15": "T",
             "ISA03": "00",
             "ISA14": "0",
             "ISA02": "",
@@ -55,99 +55,86 @@ output application/json
             "GS02": "TRAXION"
           },
           "Heading": {
-            "0100_Loop": [
-              {
+            "0100_Loop":  [
+		 {
                 "080_N4": {
-                  "N401": "NEW VIENNA",
-                  "N402": "OH",
-                  "N403": "45159",
-                  "N404": "US"
+                  "N401": vars.payloadBK.CISDocument.Load.*ShipmentLeg[0].ShipFromAddress.City,
+                  "N402": vars.payloadBK.CISDocument.Load.*ShipmentLeg[0].ShipFromAddress.State,
+                  "N403": vars.payloadBK.CISDocument.Load.*ShipmentLeg[0].ShipFromAddress.PostalCode,
+                  "N404": vars.payloadBK.CISDocument.Load.*ShipmentLeg[0].ShipFromAddress.CountryCode
                 },
                 "050_N1": {
                   "N101": "SH",
-                  "N102": "HUHTAMAKI FSBU"
+                  "N102": vars.payloadBK.CISDocument.Load.*ShipmentLeg[0].ShipFromLocationCode
                 },
                 "070_N3": [
                   {
-                    "N301": "5566 NEW VIENNA ROAD"
+                    "N301": vars.payloadBK.CISDocument.Load.*ShipmentLeg[0].ShipFromAddress.Street
                   }
                 ]
               },
-              {
+		{
                 "080_N4": {
-                  "N401": "LINCOLN",
-                  "N402": "RI",
-                  "N403": "02865",
-                  "N404": "US"
+                  "N401": vars.payloadBK.CISDocument.Load.*ShipmentLeg[0].ShipToAddress.City,
+                  "N402": vars.payloadBK.CISDocument.Load.*ShipmentLeg[0].ShipToAddress.State,
+                  "N403": vars.payloadBK.CISDocument.Load.*ShipmentLeg[0].ShipToAddress.PostalCode,
+                  "N404": vars.payloadBK.CISDocument.Load.*ShipmentLeg[0].ShipToAddress.CountryCode
                 },
                 "050_N1": {
                   "N101": "CN",
-                  "N102": "HUHTAMAKI"
+                  "N102": vars.payloadBK.CISDocument.Load.*ShipmentLeg[0].ShipToLocationCode
                 },
                 "070_N3": [
                   {
-                    "N301": "100 HIGGENSON AVE"
+                    "N301": vars.payloadBK.CISDocument.Load.*ShipmentLeg[0].ShipToAddress.Street
                   }
                 ]
               }
-            ],
-            "0200_Loop": [
+	]  ,
+            "0200_Loop": vars.payloadBK.CISDocument.Load.*Stop map(item)->
               {
                 "0205_Loop": [
                   {
                     "143_MS1": {
-                      "MS103": "US",
-                      "MS102": "OH",
-                      "MS101": "NEW VIENNA"
+                      "MS103": item.Address.CountryCode,
+                      "MS102": item.Address.State,
+                      "MS101": item.Address.City
                     },
                     "140_AT7": {
-                      "AT706": 57600000,
+                      "AT706": item.ActualDateTimeOfArrival as DateTime as String {format: "A"},
                       "AT707": "ET",
                       "AT704": "NA",
-                      "AT705": "2008-09-03T00:00:00-05:00",
+                      "AT705": item.ActualDateTimeOfArrival as Date,
                       "AT703": "AA"
                     }
                   }
                 ],
                 "200_AT8": [
                   {
-                    "AT803": 6240,
-                    "AT804": 402,
+                    "AT803": item.PickedWeight,
+                    "AT804": item.PickedPieces,
                     "AT801": "G",
-                    "AT802": "L"
+                    "AT802": "K"
                   }
                 ],
                 "130_LX": {
-                  "LX01": 1
+                  "LX01": item.StopSequenceNumber
                 }
+              } ,
+            "030_L11": vars.payloadBK.CISDocument.Load.*ShipmentLeg map (item)->
+              {
+                "L1101": item.ShipmentNumber,
+                "L1102": "BM"
               }
-            ],
-            "030_L11": [
-              {
-                "L1101": "5365205",
-                "L1102": "LO"
-              },
-              {
-                "L1101": "01",
-                "L1102": "QN"
-              },
-              {
-                "L1101": "392651",
-                "L1102": "PO"
-              },
-              {
-                "L1101": "392651",
-                "L1102": "PO"
-              }
-            ],
+,
             "020_B10": {
-              "B1002": "5365205",
-              "B1001": "4735103",
+              "B1002": vars.payloadBK.CISDocument.Load.SystemLoadID,
+              "B1001": vars.payloadBK.CISDocument.Load.ShipmentLeg.Shipment.ShipmentDescription default 0 as Number,
               "B1003": "SCAC"
             }
           },
           "SetTrailer": {
-            "SE02": "099510001",
+            "SE02": vars.payloadBK.CISDocument.Load.CarrierCode,
             "SE01": 17
           },
           "Id": "214",
