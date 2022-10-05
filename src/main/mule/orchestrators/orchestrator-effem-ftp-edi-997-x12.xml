@@ -32,7 +32,7 @@ ns ns1 http://xmlns.mulesoft.com/enterpriseobjects/core/address/
           "Interchange": {
             "ISA09": payload.CISDocument.EventDateTime as Date,
             "ISA04": "",
-            "ISA15": "", //properties env
+            "ISA15": p('effem.edi.isa.env'), //properties env
             "ISA03": "00", //hard code
             "ISA14": "0",
             "ISA02": "", //hard code
@@ -45,10 +45,10 @@ ns ns1 http://xmlns.mulesoft.com/enterpriseobjects/core/address/
             "ISA05": "ZZ", //hard code
             "ISA16": "`",
             "ISA11": "U",
-            "ISA10": payload.CISDocument.EventDateTime as DateTime as String {format: "A"}
+            "ISA10": payload.CISDocument.EventDateTime as DateTime as String {format: "HHmmss"} as Number
           },
           "Group": {
-            "GS05": payload.CISDocument.LoadStartDateTime as DateTime as String {format: "A"},
+            "GS05": payload.CISDocument.LoadStartDateTime as DateTime as String {format: "HHmmss"} as Number,
             "GS04": payload.CISDocument.LoadStartDateTime as Date,
             "GS07": "X",
             "GS06": payload.CISDocument.SystemLoadID as Number,
@@ -61,7 +61,7 @@ ns ns1 http://xmlns.mulesoft.com/enterpriseobjects/core/address/
             "030_AK2_Loop": [
               {
                 "030_AK2": {
-                  "AK202": payload.CISDocument.ShipmentLeg.Shipment.ShipmentNumber,
+                  "AK202": payload.CISDocument.ShipmentLeg.Shipment.SystemShipmentID,
                   "AK201": "204"
                 },
                 "060_AK5": {
@@ -102,6 +102,7 @@ ns ns1 http://xmlns.mulesoft.com/enterpriseobjects/core/address/
 	</sub-flow>
 	<sub-flow name="orchestrator-effem-ftp-edi-997-x12-write" doc:id="8f2b458e-c765-496f-b1ab-6e0a4ebe21da" >
 		<x12:write doc:name="Write" doc:id="2d277ad8-14a7-434b-9cd0-1bd4c9842a37" config-ref="X12_EDI_Config-write-997" />
+		<logger level="INFO" doc:name="Logger" doc:id="e3d72de3-2368-4eb7-b79b-7d7754dcbf2d" message="FINISH PAYLOAD X12"/>
 	</sub-flow>
 	<sub-flow name="orchestrator-effem-ftp-edi-997-x12set-edi-name" doc:id="a382cef2-5e91-42f1-867c-8153f057210e" >
 		<ee:transform doc:name="Transform Message" doc:id="7afd7ad1-e3e2-4a5c-96f2-7f8bfff44c90" >
@@ -111,8 +112,7 @@ ns ns1 http://xmlns.mulesoft.com/enterpriseobjects/core/address/
 				<ee:set-variable variableName="doc_name" ><![CDATA[%dw 2.0
 output application/json
 ---
-{
-}]]></ee:set-variable>
+"LOAD.TRAXION.997"++ vars.payloadBK.CISDocument.ShipmentLeg.Shipment.ShipmentDescription ++ ".EDI"]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
 	</sub-flow>

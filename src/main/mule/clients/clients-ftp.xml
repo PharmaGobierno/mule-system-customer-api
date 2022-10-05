@@ -10,7 +10,16 @@ http://www.mulesoft.org/schema/mule/ftp http://www.mulesoft.org/schema/mule/ftp/
 		</ftp:list>
 	</sub-flow>
 	<sub-flow name="clients-ftp-write-file" doc:id="f9ef56a7-aa79-445c-8d0f-ff1fc3f51762" >
-		<ftp:write doc:name="Write" doc:id="0f9650be-9283-4568-a7e7-89774ba78b50" config-ref="FTP_Config_effem" path="#[p('sftp.move.to.directory') ++ &quot;\TEST\RESPONSE.TRASPLACE.990.EDI&quot;]"/>
+		<logger level="INFO" doc:name="Logger" doc:id="95b657cd-8338-4136-a8ae-6ae0b5921a84" message="#[%dw 2.0
+output application/json
+---
+payload]"/>
+		<logger level="INFO" doc:name="Logger" doc:id="5308d6c8-57fd-4743-9ea5-86925a5fdcad" message="#[%dw 2.0
+output application/json
+---
+p('sftp.move.to.directory') ++ vars.doc_name]"/>
+		<ftp:write doc:name="Write" doc:id="0f9650be-9283-4568-a7e7-89774ba78b50" config-ref="FTP_Config_effem" path="#[p('sftp.move.to.directory') ++ vars.doc_name]" createParentDirectories="false"/>
+		<logger level="INFO" doc:name="FINISH" doc:id="8fae3d94-b932-4479-80c4-4d62986eaa50" message="FINISH WRITE"/>
 	</sub-flow>
 	
 </mule>

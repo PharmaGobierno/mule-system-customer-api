@@ -16,7 +16,10 @@ http://www.mulesoft.org/schema/mule/x12 http://www.mulesoft.org/schema/mule/x12/
 		<ee:transform doc:name="Transform Message" doc:id="a2ff77b4-d887-4eea-a186-f3cf3c2b6b40" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
-output application/json
+output application/java
+type BigDecimal = Number {class : "java.math.BigDecimal"}
+ns ns0 http://xmlns.mulesoft.com/enterpriseobjects/finance/purchaseorder/
+ns ns1 http://xmlns.mulesoft.com/enterpriseobjects/core/address/
 ---
 {
   "Errors": [
@@ -30,7 +33,7 @@ output application/json
           "Interchange": {
             "ISA09": vars.payloadBK.CISDocument.Load.LoadStartDateTime as Date,
             "ISA04": "",
-            "ISA15": "", //properties env
+            "ISA15": p('effem.edi.isa.env'), //properties env
             "ISA03": "00", //hard code
             "ISA14": "0",
             "ISA02": "", //hard code
@@ -43,10 +46,10 @@ output application/json
             "ISA05": "ZZ", //hard code
             "ISA16": "`",
             "ISA11": "U",
-            "ISA10": vars.payloadBK.CISDocument.Load.LoadStartDateTime as DateTime as String {format: "A"}
+            "ISA10": vars.payloadBK.CISDocument.Load.LoadStartDateTime as DateTime as String {format: "HHmmss"} as Number
           },
           "Group": {
-            "GS05": vars.payloadBK.CISDocument.Load.LoadStartDateTime as DateTime as String {format: "A"},
+            "GS05": vars.payloadBK.CISDocument.Load.LoadStartDateTime as DateTime as String {format: "HHmmss"} as Number,
             "GS04": vars.payloadBK.CISDocument.Load.LoadStartDateTime as Date,
             "GS07": "X",
             "GS06": vars.payloadBK.CISDocument.Load.SystemLoadID,
@@ -93,8 +96,7 @@ output application/json
 				<ee:set-variable variableName="doc_name" ><![CDATA[%dw 2.0
 output application/json
 ---
-{
-}]]></ee:set-variable>
+"LOAD.TRAXION.990"++ vars.payloadBK.CISDocument.Load.ShipmentLeg.ShipmentDescription ++ ".EDI"]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
 	</sub-flow>

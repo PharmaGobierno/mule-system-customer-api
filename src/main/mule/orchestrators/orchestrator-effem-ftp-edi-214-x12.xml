@@ -15,7 +15,7 @@ http://www.mulesoft.org/schema/mule/x12 http://www.mulesoft.org/schema/mule/x12/
 		<ee:transform doc:name="Transform Message" doc:id="8e4b21cc-d2c7-45c3-af7f-a213e2b94f6e">
 			<ee:message>
 				<ee:set-payload><![CDATA[%dw 2.0
-output application/json
+output application/java
 ---
 {
   "Errors": [
@@ -27,13 +27,13 @@ output application/json
       "214": [
         {
           "Interchange": {
-            "ISA09": vars.payloadBK.CISDocument.Load.LoadStartDateTime as Date,
+            "ISA09": vars.payloadBK.CISDocument.Load.LoadStartDateTime as Date default vars.payloadBK.CISDocument.Load.UpdatedDateTime as Date,
             "ISA04": "",
-            "ISA15": "T",
+            "ISA15": p('effem.edi.isa.env'),
             "ISA03": "00",
             "ISA14": "0",
             "ISA02": "",
-            "ISA13": vars.payloadBK.CISDocument.Load.ShipmentLeg.Shipment.ShipmentDescription default 0 as Number,
+            "ISA13": vars.payloadBK.CISDocument.Load.*ShipmentLeg[0].ShipmentDescription default 0 as Number,
             "ISA01": "00",
             "ISA12": "00401",
             "ISA08": "LOAL",
@@ -42,11 +42,11 @@ output application/json
             "ISA05": "ZZ",
             "ISA16": "`",
             "ISA11": "U",
-            "ISA10": vars.payloadBK.CISDocument.Load.LoadStartDateTime as DateTime as String {format: "A"}
+            "ISA10": vars.payloadBK.CISDocument.Load.LoadStartDateTime as DateTime as String {format: "A"} as Number default vars.payloadBK.CISDocument.Load.UpdatedDateTime as DateTime as String {format: "A"} as Number
           },
           "Group": {
-            "GS05": vars.payloadBK.CISDocument.Load.LoadStartDateTime as DateTime as String {format: "A"},
-            "GS04": vars.payloadBK.CISDocument.Load.LoadStartDateTime as Date,
+            "GS05": vars.payloadBK.CISDocument.Load.LoadStartDateTime as DateTime as String {format: "A"} as Number default vars.payloadBK.CISDocument.Load.UpdatedDateTime as DateTime as String {format: "A"} as Number,
+            "GS04": vars.payloadBK.CISDocument.Load.LoadStartDateTime as Date default vars.payloadBK.CISDocument.Load.UpdatedDateTime as Date,
             "GS07": "X",
             "GS06": vars.payloadBK.CISDocument.Load.SystemLoadID as Number,
             "GS08": "004010",
@@ -69,9 +69,8 @@ output application/json
                 },
                 "070_N3": [
                   {
-                    "N301": vars.payloadBK.CISDocument.Load.*ShipmentLeg[0].ShipFromAddress.Street
-                  }
-                ]
+                    "N301": vars.payloadBK.CISDocument.Load.*ShipmentLeg[0].ShipFromAddress.Street default "no provider"
+                  }]
               },
 		{
                 "080_N4": {
@@ -84,11 +83,11 @@ output application/json
                   "N101": "CN",
                   "N102": vars.payloadBK.CISDocument.Load.*ShipmentLeg[0].ShipToLocationCode
                 },
-                "070_N3": [
+                "070_N3":[ 
                   {
-                    "N301": vars.payloadBK.CISDocument.Load.*ShipmentLeg[0].ShipToAddress.Street
-                  }
-                ]
+                    "N301": vars.payloadBK.CISDocument.Load.*ShipmentLeg[0].ShipToAddress.Street default "no provider"
+                  }]
+               
               }
 	]  ,
             "0200_Loop": vars.payloadBK.CISDocument.Load.*Stop map(item)->
@@ -101,24 +100,24 @@ output application/json
                       "MS101": item.Address.City
                     },
                     "140_AT7": {
-                      "AT706": item.ActualDateTimeOfArrival as DateTime as String {format: "A"},
+                      "AT706": (item.ActualDateTimeOfArrival as DateTime as String {format: "A"} as Number) default (item.PickupArrivalDateTime as DateTime as String {format: "A"} as Number default 111111),
                       "AT707": "ET",
                       "AT704": "NA",
-                      "AT705": item.ActualDateTimeOfArrival as Date,
+                      "AT705": (item.ActualDateTimeOfArrival as Date) default (item.PickupArrivalDateTime as Date default now() as Date),
                       "AT703": "AA"
                     }
                   }
                 ],
                 "200_AT8": [
                   {
-                    "AT803": item.PickedWeight,
-                    "AT804": item.PickedPieces,
+                    "AT803": item.PickedWeight as Number,
+                    "AT804": item.PickedPieces as Number,
                     "AT801": "G",
                     "AT802": "K"
                   }
                 ],
                 "130_LX": {
-                  "LX01": item.StopSequenceNumber
+                  "LX01": item.StopSequenceNumber as Number
                 }
               } ,
             "030_L11": vars.payloadBK.CISDocument.Load.*ShipmentLeg map (item)->
@@ -129,7 +128,7 @@ output application/json
 ,
             "020_B10": {
               "B1002": vars.payloadBK.CISDocument.Load.SystemLoadID,
-              "B1001": vars.payloadBK.CISDocument.Load.ShipmentLeg.Shipment.ShipmentDescription default 0 as Number,
+              "B1001": vars.payloadBK.CISDocument.Load.ShipmentLeg.ShipmentDescription default 0 as Number,
               "B1003": "SCAC"
             }
           },
@@ -140,7 +139,7 @@ output application/json
           "Id": "214",
           "SetHeader": {
             "ST01": "214",
-            "ST02": vars.payloadBK.CISDocument.Load.ShipmentLeg.Shipment.SystemShipmentID
+            "ST02": vars.payloadBK.CISDocument.Load.ShipmentLeg.SystemShipmentID
           },
           "Name": "Transportation Carrier Shipment Status Message"
         }
@@ -162,8 +161,7 @@ output application/json
 				<ee:set-variable variableName="doc_name" ><![CDATA[%dw 2.0
 output application/json
 ---
-{
-}]]></ee:set-variable>
+"LOAD.TRAXION.214"++ vars.payloadBK.CISDocument.Load.ShipmentLeg.ShipmentDescription ++ ".EDI"]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
 	</sub-flow>
