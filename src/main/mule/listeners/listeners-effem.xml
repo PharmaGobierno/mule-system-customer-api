@@ -21,6 +21,10 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 output application/json
 ---
 payload]]></ee:set-variable>
+				<ee:set-variable variableName="project_name" ><![CDATA[%dw 2.0
+output application/json
+---
+(payload.CISDocument..*ShipmentReferenceNumberList filter (value, index) -> (value.ShipmentReferenceNumberType == "Project_Name"))[0].ShipmentReferenceNumber]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
 		<logger level="INFO" doc:name="Logger" doc:id="ebc0a8c5-6904-46d0-b1d2-cb018fa1ee45" message="#[vars.payloadBK]"/>
@@ -28,9 +32,14 @@ payload]]></ee:set-variable>
 	</flow>
 	<sub-flow name="listener-jms-queues-choise-validate-load-status" doc:id="b5757e0a-19d3-40ab-836a-0fea5843668a" >
 		<choice doc:name="file type" doc:id="7992421f-82e7-455e-bb32-8bfea1cc2c2d">
+			<when expression='#[payload.CISDocument.EventName =="LoadTendered"]' >
+				<logger level="INFO" doc:name="LoadTendered" doc:id="30b4bb81-18ac-4ffc-ab6a-07b15b94ee91" message="LoadTendered"/>
+				<flow-ref doc:name="listeners-effem-validate-project-name-tender" doc:id="2ea6fb4b-20c7-4a85-b6c7-29986e195453" name="listeners-effem-validate-project-name-tender"/> 
+				<!--  -->			
+			</when>
 			<when expression='#[payload.CISDocument.Load.CurrentLoadOperationalStatusEnumVal =="S_TENDER_ACCEPTED"]'>
 				<logger level="INFO" doc:name="S_TENDER_ACCEPTED" doc:id="f93dc1f7-b2ac-4849-b6fc-b911ab17e00f" message="S_TENDER_ACCEPTED"/>
-				<flow-ref doc:name="orchestrator-effem-ftp-edi-990-x12-main" doc:id="9aeb20da-35f0-46a9-866f-ee5bafdbfba1" name="orchestrator-effem-ftp-edi-990-x12-main" />
+				<flow-ref doc:name="listeners-effem-validate-project-name-tender-accepted" doc:id="9aeb20da-35f0-46a9-866f-ee5bafdbfba1" name="listeners-effem-validate-project-name-tender-accepted" />
 				<!--  -->
 			</when>
 			<when expression='#[payload.CISDocument.Load.CurrentLoadOperationalStatusEnumVal =="S_IN_TRANSIT"]'>
@@ -51,15 +60,72 @@ payload]]></ee:set-variable>
 				<flow-ref doc:name="orchestrator-effem-ftp-edi-214-x12-main" doc:id="c39befda-c05e-4bee-b101-d945e54246b9" name="orchestrator-effem-ftp-edi-214-x12-main"/>
 				<!-- -->
 			</when>
-			<when expression='#[payload.CISDocument.EventName =="LoadTendered"]' >
-				<logger level="INFO" doc:name="LoadTendered" doc:id="0466b2dd-ebcf-42d3-ad4c-f4b596e8a5ba" message="LoadTendered"/>
-				
-				<flow-ref doc:name="orchestrator-effem-ftp-edi-997-x12-main" doc:id="f84119e6-27d1-4b5d-96d9-8e59c0c3c16a" name="orchestrator-effem-ftp-edi-997-x12-main"/> 
-				<!--  -->			
-			</when>
 			<otherwise>
-				<logger level="INFO" doc:name="Logger" doc:id="95b6c101-9341-4ae5-ae3e-a49f1db0d2e9" message="RAW INTERFACE" />
+				<logger level="INFO" doc:name="Logger" doc:id="95b6c101-9341-4ae5-ae3e-a49f1db0d2e9" message="MESSAGE NOT PROCESSED BY STATUS" />
+			</otherwise>
+		</choice>
+	</sub-flow>
+	<sub-flow name="listeners-effem-validate-project-name-tender" doc:id="6da53353-0c94-4902-b8ee-8bb61388ec13" >
+		<ee:transform doc:name="set project" doc:id="91f62b67-92cc-4a4e-8967-eb353b1df9f6">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="project"><![CDATA[%dw 2.0
+output application/json
+---
+(vars.payloadBK.CISDocument.*ShipmentLeg.Shipment.*ShipmentReferenceNumberList filter ((item, index) -> item.ShipmentReferenceNumberType == "Project_Name"))[0]]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<choice doc:name="Choice" doc:id="3bfa14f0-86da-4690-b739-3f032b1fba50" >
+			<when expression='#[["Effem_XB","EffemLW_XB_Spot","Effem Nacional Outbound"] contains(vars.project)]'>
+				<flow-ref doc:name="orchestrator-effem-ftp-edi-997-x12-main" doc:id="a15d48f1-063e-4c3e-b8d0-dab57aaa496b" name="orchestrator-effem-ftp-edi-997-x12-main"/>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger" doc:id="dc99305a-cd3a-4efa-bce0-831f006c7ad0" message="MESSAGE NOT PROCESSED BY PROJECT NAME #[vars.project]"/>
+			</otherwise>
+		</choice>
+	</sub-flow>
+	<sub-flow name="listeners-effem-validate-project-name-tender-accepted" doc:id="75e1dd8f-1f2b-4c43-9ff6-0944a641e66d" >
+		<set-variable value="#[vars.payloadBK.CISDocument.Load.ShipmentLeg.ShipmentNumber]" doc:name="Set shipment number" doc:id="f8dd7b7c-f494-4edc-90fd-06a201bd6dc1" variableName="system_shipment_number" />
+		<flow-ref doc:name="client-tms-findEntities-get-shipment-main" doc:id="9837be36-b047-4ac6-8b5b-c58afea66190" name="client-tms-findEntities-get-shipment-main" />
+		<ee:transform doc:name="set project" doc:id="40df9162-e537-4b99-84cd-cc8484a22204">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="project"><![CDATA[%dw 2.0
+output application/json
+---
+vars.Shipment.ReferenceNumber6
+]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<choice doc:name="Choice" doc:id="093e0fb7-8e4c-4ee8-9725-e493f00b193c" >
+			<when expression='#[["Effem_XB","EffemLW_XB_Spot","Effem Nacional Outbound"] contains(vars.project)]'>
+				<flow-ref doc:name="orchestrator-effem-ftp-edi-990-x12-main" doc:id="2456058d-bb77-472a-95e0-c9601d918a33" name="orchestrator-effem-ftp-edi-990-x12-main"/>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger" doc:id="92bca51f-55bc-4ebb-8b21-c7e300dc7d4c" message="MESSAGE NOT PROCESSED BY PROJECT NAME #[vars.project]"/>
 			</otherwise>
 		</choice>
 	</sub-flow>	
+	<sub-flow name="listeners-effem-validate-project-name-completed-in-transit-pod" doc:id="cfd94c75-f445-4347-aecb-30d3d1220422" >
+		<set-variable value="#[vars.payloadBK.CISDocument.Load.ShipmentLeg.ShipmentNumber]" doc:name="Set shipment number" doc:id="0dc1dca2-1a94-4366-be05-ab6d5bf5532b" variableName="system_shipment_number" />
+		<flow-ref doc:name="client-tms-findEntities-get-shipment-main" doc:id="71883ad3-54a2-4101-a9b3-b3ee5d44395c" name="client-tms-findEntities-get-shipment-main" />
+		<ee:transform doc:name="set project" doc:id="5601771f-8c0a-4c23-b4ca-8b041bb58c93">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="project"><![CDATA[%dw 2.0
+output application/json
+---
+vars.Shipment.ReferenceNumber6
+]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<choice doc:name="Choice" doc:id="14464fc5-afc0-4f32-86a6-1c677f10f721" >
+			<when expression='#[["Effem_XB","EffemLW_XB_Spot","Effem Nacional Outbound"] contains(vars.project)]'>
+				<flow-ref doc:name="orchestrator-effem-ftp-edi-214-x12-main" doc:id="7346754b-a61d-47e2-8930-6be635ab68a5" name="orchestrator-effem-ftp-edi-214-x12-main"/>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger" doc:id="f557e54a-778b-4c4b-9f14-003bfad37cb8" message="MESSAGE NOT PROCESSED BY PROJECT NAME #[vars.project]"/>
+			</otherwise>
+		</choice>
+	</sub-flow>		
 </mule>

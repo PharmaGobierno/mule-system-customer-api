@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:traxion-s-logger="http://www.mulesoft.org/schema/mule/traxion-s-logger" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/traxion-s-logger http://www.mulesoft.org/schema/mule/traxion-s-logger/current/mule-traxion-s-logger.xsd">
+	<sub-flow name="client-tms-findEntities-get-shipment-main" doc:id="b7cf9e6b-fa1a-4951-aa68-bb904af9745f" >
+		<flow-ref doc:name="client-tms-findEntities-get-shipment-prepare-request" doc:id="83f6a11f-580a-4967-8373-97723a907a85" name="client-tms-findEntities-get-shipment-prepare-request"/>
+		<flow-ref doc:name="client-tms-findEntities-get-shipment-call-api-system-find-entities" doc:id="b06fef29-68fe-4490-b77c-09604d327ca5" name="client-tms-findEntities-get-shipment-call-api-system-find-entities"/>
+		<flow-ref doc:name="client-tms-findEntities-get-shipment-prepare-response" doc:id="fe2d2950-0317-4380-91e8-6876e4248b4f" name="client-tms-findEntities-get-shipment-prepare-response"/>
+	</sub-flow>
+	<sub-flow name="client-tms-findEntities-get-shipment-prepare-request" doc:id="54693e63-1919-410f-b930-8438dc690d22" >
+		<ee:transform doc:name="Transform Message" doc:id="ac69adea-456e-433b-bc0b-477d627ff578" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+"FindEntities": {
+    "Select": {
+		"Name": [
+		"ShipmentNumber",
+		"NumberOfShipmentLegs",
+		"CustomerCode",
+		"SystemLoadID",
+		"SystemShipmentID",
+		"ProfitCenterCode",
+		"ChargedAmount",
+		"CurrentShipmentFinancialStatusEnumVal",
+		"ProfitCenterCode",
+		"ShipmentDescription",
+		"ReferenceNumber1",
+		"ReferenceNumber2",
+		"ReferenceNumber3",
+		"ReferenceNumber4",
+		"ReferenceNumber5",
+		"ReferenceNumber6",
+		"ReferenceNumber26"		
+		]
+    },
+    "Filter": [
+        {
+            "Name": "ShipmentNumber",
+            "Op": "Eq",
+            "Value": vars.payloadBK.CISDocument.ShipmentLeg.Shipment.SystemShipmentNumber default vars.system_shipment_number
+        }
+    ]
+ }
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="client-tms-findEntities-get-shipment-call-api-system-find-entities" doc:id="d1874eba-5c5f-4e91-987f-bf3ee0c249d6" >
+		<http:request method="POST" doc:name="call system tms connection" doc:id="60ce57d3-b022-4cb9-a4c8-84dabd6511d5" config-ref="Http_request_system-tms-findentities" path="${client.system-tms-connection.http.path.findentities}" target="responseShipment">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"client_id": p('client.tms.https.client_id'),
+	"client_secret": p('client.tm.https.client_secret')
+}]]]></http:headers>
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"StartAtRow" : 0,
+	"MaxRows" : "999999",
+	"TotalRowCount" : 0,
+	"EntityType" : "ShipmentType"
+}]]]></http:query-params>
+		</http:request>
+	</sub-flow>
+	<sub-flow name="client-tms-findEntities-get-shipment-prepare-response" doc:id="b1e1a7f8-85ad-46d4-87a6-fcab6e771bb6" >
+		<ee:transform doc:name="Transform Message" doc:id="b5447c54-b309-47f3-9aa5-ffce214ec1b9" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="Shipment" ><![CDATA[%dw 2.0
+output application/json
+---
+vars.responseShipment.findEntitiesResponse.body.findEntitiesResponse.Entity.Shipment]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+	</sub-flow>
+</mule>

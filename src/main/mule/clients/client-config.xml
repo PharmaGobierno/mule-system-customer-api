@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:ftp="http://www.mulesoft.org/schema/mule/ftp"
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:ftp="http://www.mulesoft.org/schema/mule/ftp"
 	xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
 	xmlns:x12="http://www.mulesoft.org/schema/mule/x12" xmlns="http://www.mulesoft.org/schema/mule/core"
 	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
 http://www.mulesoft.org/schema/mule/ftp http://www.mulesoft.org/schema/mule/ftp/current/mule-ftp.xsd 
 http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/x12 http://www.mulesoft.org/schema/mule/x12/current/mule-x12.xsd">
@@ -44,5 +46,8 @@ http://www.mulesoft.org/schema/mule/x12 http://www.mulesoft.org/schema/mule/x12/
 			</reconnection>
 		</ftp:connection>
 	</ftp:config>
+	<http:request-config name="Http_request_system-tms-findentities" doc:name="HTTP Request configuration" doc:id="461e8e37-74e6-4b6a-bcab-3e2f5f74739c" >
+		<http:request-connection host="${client.system.tms-connection.http.host}" port="${client.system-tms-connection.http.port}" maxConnections="${client.system-tms-connection.http.max.connections}" connectionIdleTimeout="${client.system-tms-connection.http.connection.idle.timeout}" responseBufferSize="${client.system-tms-connection.http.response.buffer.size}" protocol="HTTPS"/>
+	</http:request-config>	
 
 </mule>
