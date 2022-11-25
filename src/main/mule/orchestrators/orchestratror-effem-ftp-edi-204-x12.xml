@@ -19,6 +19,7 @@ http://www.mulesoft.org/schema/mule/ftp http://www.mulesoft.org/schema/mule/ftp/
 				</when>
 				<otherwise>
 					<set-variable value="#[attributes.fileName]" doc:name="Set Variable" doc:id="ff783f48-0942-4869-9713-535a1a94d563" variableName="nombre" />
+					<logger level="INFO" doc:name="Logger" doc:id="d1333afe-cb91-4f32-9e3e-a7cc1d9e5696" message="processing file -&gt; #[vars.nombre]"/>
 					<flow-ref doc:name="orchestratror-effem-ftp-edi-204-x12-validate-edi-type" doc:id="f8c9d5ef-bec3-453d-937a-b1ff9ea9a407" name="orchestratror-effem-ftp-edi-204-x12-validate-edi-type"/>
 				
 </otherwise>
@@ -98,7 +99,7 @@ output application/json
 		</ee:transform>
 	</sub-flow>
 	<sub-flow name="orchestratror-effem-ftp-edi-204-x12-remove-file-ftp" doc:id="e58e3388-6b1f-4b44-ab7f-5a1e06d2190b" >
-		<ftp:delete doc:name="Delete" doc:id="ce615f28-911e-4d55-bea5-fc2c31ff21db" config-ref="FTP_Config_effem" path="#[p('sftp.directory.path') ++ vars.nombre]"/>
+		<ftp:delete doc:name="Delete" doc:id="ce615f28-911e-4d55-bea5-fc2c31ff21db" config-ref="FTP_Config_effem" path="#[p('sftp.directory.path') ++&quot;/&quot; ++ vars.nombre]"/>
 	</sub-flow>
 	<sub-flow name="orchestratror-effem-ftp-edi-214-x12-prepare-payload" doc:id="858efb1c-01df-4b01-8a3e-2ba03189eacb" >
 		<ee:transform doc:name="Transform Message" doc:id="b9e604af-a298-4f73-9f9f-85acb16928eb">
