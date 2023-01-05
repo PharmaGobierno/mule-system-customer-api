@@ -76,7 +76,7 @@ output application/json
 			</ee:variables>
 		</ee:transform>
 		<choice doc:name="Choice" doc:id="3bfa14f0-86da-4690-b739-3f032b1fba50" >
-			<when expression='#[["Effem_XB","EffemLW_XB_Spot","Effem Nacional Outbound"] contains(vars.project)]'>
+			<when expression='#[["Effem_XB","EffemLW_XB_Spot","Effem Nacional Outbound"] contains(vars.project.ShipmentReferenceNumber)]'>
 				<flow-ref doc:name="orchestrator-effem-ftp-edi-997-x12-main" doc:id="a15d48f1-063e-4c3e-b8d0-dab57aaa496b" name="orchestrator-effem-ftp-edi-997-x12-main"/>
 			</when>
 			<otherwise >

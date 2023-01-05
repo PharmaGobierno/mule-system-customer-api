@@ -36,10 +36,10 @@ output application/java
             "ISA13": vars.payloadBK.CISDocument.Load.*ShipmentLeg[0].ShipmentDescription default 0 as Number,
             "ISA01": "00",
             "ISA12": "00401",
-            "ISA08": "LOAL",
+            "ISA08": "TRANSPLACE", //hard code
             "ISA07": "02",
-            "ISA06": "TRAXION",
-            "ISA05": "ZZ",
+            "ISA06": "LOAL",
+            "ISA05": "ZZ", //hard code
             "ISA16": "`",
             "ISA11": "U",
             "ISA10": vars.payloadBK.CISDocument.Load.LoadStartDateTime as DateTime as String {format: "A"} as Number default vars.payloadBK.CISDocument.Load.UpdatedDateTime as DateTime as String {format: "A"} as Number
@@ -51,8 +51,8 @@ output application/java
             "GS06": vars.payloadBK.CISDocument.Load.SystemLoadID as Number,
             "GS08": "004010",
             "GS01": "QM",
-            "GS03": "LOAL",
-            "GS02": "TRAXION"
+            "GS03": "TRANSPLACE",
+            "GS02": "LOAL"
           },
           "Heading": {
             "0100_Loop":  [
@@ -123,13 +123,13 @@ output application/java
             "030_L11": vars.payloadBK.CISDocument.Load.*ShipmentLeg map (item)->
               {
                 "L1101": item.ShipmentNumber,
-                "L1102": "BM"
+                "L1102": "QN"
               }
 ,
             "020_B10": {
               "B1002": vars.payloadBK.CISDocument.Load.SystemLoadID,
               "B1001": vars.payloadBK.CISDocument.Load.ShipmentLeg.ShipmentDescription default 0 as Number,
-              "B1003": "SCAC"
+              "B1003": "LOAL"
             }
           },
           "SetTrailer": {

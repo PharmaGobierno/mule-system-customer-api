@@ -39,9 +39,9 @@ ns ns1 http://xmlns.mulesoft.com/enterpriseobjects/core/address/
             "ISA13": payload.CISDocument.ShipmentLeg.Shipment.ShipmentDescription default 0 as Number, // Load id
             "ISA01": "00", //hard code
             "ISA12": "00401", //hard code
-            "ISA08": "LOAL", //hard code
+            "ISA08": "TRANSPLACE", //hard code
             "ISA07": "02",
-            "ISA06": "TRAXION",
+            "ISA06": "LOAL",
             "ISA05": "ZZ", //hard code
             "ISA16": "`",
             "ISA11": "U",
@@ -54,8 +54,8 @@ ns ns1 http://xmlns.mulesoft.com/enterpriseobjects/core/address/
             "GS06": payload.CISDocument.SystemLoadID as Number,
             "GS08": "004010",
             "GS01": "FA",
-            "GS03": "LOAL",
-            "GS02": "TRAXION"
+            "GS03": "TRANSPLACE",
+            "GS02": "LOAL"
           },
           "Heading": {
             "030_AK2_Loop": [
