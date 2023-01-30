@@ -37,9 +37,9 @@ output application/java
             "ISA01": "00",
             "ISA12": "00401",
             "ISA08": "TRANSPLACE", //hard code
-            "ISA07": "02",
+            "ISA07": "ZZ",
             "ISA06": "LOAL",
-            "ISA05": "ZZ", //hard code
+            "ISA05": "02", //hard code
             "ISA16": "`",
             "ISA11": "U",
             "ISA10": vars.payloadBK.CISDocument.Load.LoadStartDateTime as DateTime as String {format: "A"} as Number default vars.payloadBK.CISDocument.Load.UpdatedDateTime as DateTime as String {format: "A"} as Number
