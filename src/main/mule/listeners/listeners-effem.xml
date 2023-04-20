@@ -76,7 +76,7 @@ output application/json
 			</ee:variables>
 		</ee:transform>
 		<choice doc:name="Choice" doc:id="3bfa14f0-86da-4690-b739-3f032b1fba50" >
-			<when expression='#[["Effem_XB","EffemLW_XB_Spot","Effem Nacional Outbound"] contains(vars.project.ShipmentReferenceNumber)]'>
+			<when expression='#[["Mars_Spot_XB"] contains(vars.project.ShipmentReferenceNumber)]'>
 				<flow-ref doc:name="orchestrator-effem-ftp-edi-997-x12-main" doc:id="a15d48f1-063e-4c3e-b8d0-dab57aaa496b" name="orchestrator-effem-ftp-edi-997-x12-main"/>
 			</when>
 			<otherwise >
@@ -98,7 +98,7 @@ vars.Shipment.ReferenceNumber6
 			</ee:variables>
 		</ee:transform>
 		<choice doc:name="Choice" doc:id="093e0fb7-8e4c-4ee8-9725-e493f00b193c" >
-			<when expression='#[["Effem_XB","EffemLW_XB_Spot","Effem Nacional Outbound"] contains(vars.project)]'>
+			<when expression='#[["Mars_Spot_XB"] contains(vars.project)]'>
 				<flow-ref doc:name="orchestrator-effem-ftp-edi-990-x12-main" doc:id="2456058d-bb77-472a-95e0-c9601d918a33" name="orchestrator-effem-ftp-edi-990-x12-main"/>
 			</when>
 			<otherwise >
@@ -120,7 +120,7 @@ vars.Shipment.ReferenceNumber6
 			</ee:variables>
 		</ee:transform>
 		<choice doc:name="Choice" doc:id="14464fc5-afc0-4f32-86a6-1c677f10f721" >
-			<when expression='#[["Effem_XB","EffemLW_XB_Spot","Effem Nacional Outbound"] contains(vars.project)]'>
+			<when expression='#[["Mars_Spot_XB"] contains(vars.project)]'>
 				<flow-ref doc:name="orchestrator-effem-ftp-edi-214-x12-main" doc:id="7346754b-a61d-47e2-8930-6be635ab68a5" name="orchestrator-effem-ftp-edi-214-x12-main"/>
 			</when>
 			<otherwise >
