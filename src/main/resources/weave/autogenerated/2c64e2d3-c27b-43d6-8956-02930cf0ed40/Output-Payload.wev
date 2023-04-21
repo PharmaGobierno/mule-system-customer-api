@@ -1,4 +1,0 @@
-%dw 2.0
-
-type auto_2c64e2d3_c27b_43d6_8956_02930cf0ed40_Output_Payload = Array<{|  remision_pedido: String,   clave: String,   lote: String,   piezas?: Number,   destino?: String,   fecha_confirmacion?: Date|}>
-

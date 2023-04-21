@@ -36,7 +36,7 @@ ns ns1 http://xmlns.mulesoft.com/enterpriseobjects/core/address/
             "ISA03": "00", //hard code
             "ISA14": "0",
             "ISA02": "", //hard code
-            "ISA13": payload.CISDocument.ShipmentLeg.Shipment.ShipmentDescription default 0 as Number, // Load id
+            "ISA13": (payload.CISDocument.ShipmentLeg.Shipment.ShipmentDescription default payload.CISDocument.ShipmentDescription) default 0, // Load id
             "ISA01": "00", //hard code
             "ISA12": "00401", //hard code
             "ISA08": "TRANSPLACE", //hard code
@@ -48,10 +48,10 @@ ns ns1 http://xmlns.mulesoft.com/enterpriseobjects/core/address/
             "ISA10": payload.CISDocument.EventDateTime as DateTime as String {format: "HHmmss"} as Number
           },
           "Group": {
-            "GS05": payload.CISDocument.LoadStartDateTime as DateTime as String {format: "HHmmss"} as Number,
-            "GS04": payload.CISDocument.LoadStartDateTime as Date,
+            "GS05": payload.CISDocument.LoadStartDateTime as DateTime as String {format: "HHmmss"} as Number default payload.CISDocument.EventOccurredDateTime as DateTime as String {format: "HHmmss"} as Number,
+            "GS04": payload.CISDocument.LoadStartDateTime as Date default payload.CISDocument.EventOccurredDateTime as Date,
             "GS07": "X",
-            "GS06": payload.CISDocument.SystemLoadID as Number,
+            "GS06": payload.CISDocument.SystemLoadID as Number default payload.CISDocument.SystemShipmentID as Number,
             "GS08": "004010",
             "GS01": "FA",
             "GS03": "TRANSPLACE",
@@ -61,33 +61,33 @@ ns ns1 http://xmlns.mulesoft.com/enterpriseobjects/core/address/
             "030_AK2_Loop": [
               {
                 "030_AK2": {
-                  "AK202": payload.CISDocument.ShipmentLeg.Shipment.SystemShipmentID,
+                  "AK202": payload.CISDocument.ShipmentLeg.Shipment.SystemShipmentID default payload.CISDocument.SystemShipmentID,
                   "AK201": "204"
                 },
                 "060_AK5": {
-                  "AK501": "A"
+                  "AK501": vars.status
                 }
               }
             ],
             "020_AK1": {
               "AK101": "SM",
-              "AK102": payload.CISDocument.SystemLoadID as Number,
+              "AK102": payload.CISDocument.SystemLoadID as Number default payload.CISDocument.SystemShipmentID as Number,
             },
             "070_AK9": {
               "AK903": 1,
               "AK904": 1,
-              "AK901": "A",
+              "AK901": vars.status,
               "AK902": 1
             }
           },
           "SetTrailer": {
-            "SE02": payload.CISDocument.Carrier.CarrierCode,
+            "SE02": payload.CISDocument.Carrier.CarrierCode default payload.CISDocument.CustomerCode,
             "SE01": 6
           },
           "Id": "997",
           "SetHeader": {
             "ST01": "997",
-            "ST02": payload.CISDocument.SystemLoadID
+            "ST02": payload.CISDocument.SystemLoadID default payload.CISDocument.SystemShipmentID as Number
           },
           "Name": "Functional Acknowledgment"
         }
@@ -112,7 +112,7 @@ ns ns1 http://xmlns.mulesoft.com/enterpriseobjects/core/address/
 				<ee:set-variable variableName="doc_name" ><![CDATA[%dw 2.0
 output application/json
 ---
-"LOAD.TRAXION.997"++ vars.payloadBK.CISDocument.ShipmentLeg.Shipment.ShipmentDescription ++ ".EDI"]]></ee:set-variable>
+"LOAD.TRAXION.997"++ (vars.payloadBK.CISDocument.ShipmentLeg.Shipment.ShipmentDescription default vars.payloadBK.CISDocument.ShipmentDescription) ++".EDI"]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
 	</sub-flow>

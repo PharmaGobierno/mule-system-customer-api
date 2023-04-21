@@ -1,4 +1,0 @@
-%dw 2.0
-
-type auto_718d5510_d44c_474a_a15d_adc4bb2dc6d4_Output_Variables_operation_name = String
-
