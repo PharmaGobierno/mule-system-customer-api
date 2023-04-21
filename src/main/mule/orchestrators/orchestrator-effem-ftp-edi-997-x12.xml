@@ -76,7 +76,7 @@ ns ns1 http://xmlns.mulesoft.com/enterpriseobjects/core/address/
             "070_AK9": {
               "AK903": 1,
               "AK904": 1,
-              "AK901": "1",
+              "AK901": "A",
               "AK902": 1
             }
           },
