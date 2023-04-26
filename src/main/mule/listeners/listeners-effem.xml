@@ -99,7 +99,7 @@ output application/json
 				<ee:set-variable variableName="project" ><![CDATA[%dw 2.0
 output application/json
 ---
-payload.CISDocument.ReasonCodeDescription]]></ee:set-variable>
+((payload.CISDocument.*ShipmentReferenceNumberList filter ((item, index) -> item.ShipmentReferenceNumberType== "Project_Name" ))[0]).ShipmentReferenceNumber]]></ee:set-variable>
 				<ee:set-variable variableName="status" ><![CDATA[%dw 2.0
 output application/json
 ---
