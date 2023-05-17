@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_75e1dd8f_1f2b_4c43_9ff6_0944a641e66d_Output_Variables_project = Any
+

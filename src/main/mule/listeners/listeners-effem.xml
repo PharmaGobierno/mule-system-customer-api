@@ -39,25 +39,42 @@ payload]]></ee:set-variable>
 			</when>
 			<when expression='#[payload.CISDocument.Load.CurrentLoadOperationalStatusEnumVal =="S_TENDER_ACCEPTED"]'>
 				<logger level="INFO" doc:name="S_TENDER_ACCEPTED" doc:id="f93dc1f7-b2ac-4849-b6fc-b911ab17e00f" message="S_TENDER_ACCEPTED"/>
-				<flow-ref doc:name="listeners-effem-validate-project-name-tender-accepted" doc:id="9aeb20da-35f0-46a9-866f-ee5bafdbfba1" name="listeners-effem-validate-project-name-tender-accepted" />
+				<flow-ref doc:name="orchestrator-load-tenders-txp-validate-sub-status-Tender-Accepted" doc:id="9aeb20da-35f0-46a9-866f-ee5bafdbfba1" name="orchestrator-load-tenders-txp-validate-sub-status-Tender-Accepted" />
 				<!--  -->
 			</when>
 			<when expression='#[payload.CISDocument.Load.CurrentLoadOperationalStatusEnumVal =="S_IN_TRANSIT"]'>
 				<logger level="INFO" doc:name="S_IN_TRANSIT" doc:id="b31923a1-2e6a-4c5a-a2c9-e07925f9ac92" message="S_IN_TRANSIT"/>
 				  
-				<flow-ref doc:name="orchestrator-effem-ftp-edi-214-x12-main" doc:id="98388413-10eb-40b2-b32e-810c06b1213a" name="orchestrator-effem-ftp-edi-214-x12-main"/>
+				<ee:transform doc:name="Transform Message" doc:id="57cecedf-cd05-4935-a85c-f915077cb206">
+					<ee:message>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="AT701" ><![CDATA[%dw 2.0
+output application/json
+---
+"X6"]]></ee:set-variable>
+						<ee:set-variable variableName="AT702" ><![CDATA[%dw 2.0
+output application/json
+---
+"NS"]]></ee:set-variable>
+						<ee:set-variable variableName="AT703" ><![CDATA[%dw 2.0
+output application/java
+---
+"AB"]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<flow-ref doc:name="listeners-effem-validate-project-name-completed-in-transit-pod" doc:id="98388413-10eb-40b2-b32e-810c06b1213a" name="listeners-effem-validate-project-name-completed-in-transit-pod"/>
 				<!-- -->
 			</when>
-			<when expression='#[payload.CISDocument.Load.CurrentLoadOperationalStatusEnumVal =="S_COMPLETED" and payload.CISDocument.Load.DisplayStatusEnumVal =="DSTS_LL_D_DELIVERED"]'>
+			<when expression='#[payload.CISDocument.Load.CurrentLoadOperationalStatusEnumVal =="S_COMPLETED"]'>
 				<logger level="INFO" doc:name="S_COMPLETED" doc:id="9a5355ba-9e4e-49a7-8ca9-46b12a5c0c81" message="S_COMPLETED"/>
-				  
-				<flow-ref doc:name="orchestrator-effem-ftp-edi-214-x12-main" doc:id="7cf8a94d-2861-408d-8c6b-72f901979689" name="orchestrator-effem-ftp-edi-214-x12-main"/>
+				<flow-ref doc:name="orchestrator-load-tenders-txp-validate-sub-status-completed" doc:id="3086f128-8de2-41b7-a444-f5aff0f4029c" name="orchestrator-load-tenders-txp-validate-sub-status-completed"/>
 				<!---->
 			</when>
 			<when expression='#[payload.CISDocument.Load.CurrentLoadOperationalStatusEnumVal =="S_COMPLETED" and payload.CISDocument.Load.DisplayStatusEnumVal =="DSTS_LL_D_POD"]'>
 				<logger level="INFO" doc:name="S_POD" doc:id="d0339d32-7ff7-48a5-8da9-f525cb8b35c8" message="S_POD"/>
 				 
-				<flow-ref doc:name="orchestrator-effem-ftp-edi-214-x12-main" doc:id="c39befda-c05e-4bee-b101-d945e54246b9" name="orchestrator-effem-ftp-edi-214-x12-main"/>
+				<flow-ref doc:name="listeners-effem-validate-project-name-completed-in-transit-pod" doc:id="c39befda-c05e-4bee-b101-d945e54246b9" name="listeners-effem-validate-project-name-completed-in-transit-pod"/>
 				<!-- -->
 			</when>
 			<when expression='#[payload.CISDocument.EventName =="ShipmentCancelled"]'>
@@ -92,71 +109,5 @@ output application/json
 			</otherwise>
 		</choice>
 	</sub-flow>
-	<sub-flow name="listeners-effem-validate-project-name-rejected" doc:id="80d24b68-be38-4267-b97a-6b1cd344dbc6" >
-		<ee:transform doc:name="set project" doc:id="9815c880-5330-417c-8ed4-08a3a1ebd30a" >
-			<ee:message />
-			<ee:variables >
-				<ee:set-variable variableName="project" ><![CDATA[%dw 2.0
-output application/json
----
-((payload.CISDocument.*ShipmentReferenceNumberList filter ((item, index) -> item.ShipmentReferenceNumberType== "Project_Name" ))[0]).ShipmentReferenceNumber]]></ee:set-variable>
-				<ee:set-variable variableName="status" ><![CDATA[%dw 2.0
-output application/json
----
-"R"]]></ee:set-variable>
-			</ee:variables>
-		</ee:transform>
-		<choice doc:name="Choice" doc:id="2370a138-f9fd-442e-8fee-3d1769938448" >
-			<when expression='#[vars.project == "Mars_OW_XB"]' >
-				<flow-ref doc:name="orchestrator-effem-ftp-edi-997-x12-main" doc:id="c8007467-5798-4927-a9f2-a91eef1ef733" name="orchestrator-effem-ftp-edi-997-x12-main" />
-			</when>
-			<otherwise >
-				<logger level="INFO" doc:name="Logger" doc:id="227a46d2-e8e1-4905-ab38-741fe1d55810" message="MESSAGE NOT PROCESSED BY PROJECT NAME #[vars.project]" />
-			</otherwise>
-		</choice>
-	</sub-flow>
-	<sub-flow name="listeners-effem-validate-project-name-tender-accepted" doc:id="75e1dd8f-1f2b-4c43-9ff6-0944a641e66d" >
-		<set-variable value="#[vars.payloadBK.CISDocument.Load.ShipmentLeg.ShipmentNumber]" doc:name="Set shipment number" doc:id="f8dd7b7c-f494-4edc-90fd-06a201bd6dc1" variableName="system_shipment_number" />
-		<flow-ref doc:name="client-tms-findEntities-get-shipment-main" doc:id="9837be36-b047-4ac6-8b5b-c58afea66190" name="client-tms-findEntities-get-shipment-main" />
-		<ee:transform doc:name="set project" doc:id="40df9162-e537-4b99-84cd-cc8484a22204">
-			<ee:message />
-			<ee:variables>
-				<ee:set-variable variableName="project"><![CDATA[%dw 2.0
-output application/json
----
-vars.Shipment.ReferenceNumber6
-]]></ee:set-variable>
-			</ee:variables>
-		</ee:transform>
-		<choice doc:name="Choice" doc:id="093e0fb7-8e4c-4ee8-9725-e493f00b193c" >
-			<when expression='#[["Mars_OW_XB"] contains(vars.project)]'>
-				<flow-ref doc:name="orchestrator-effem-ftp-edi-990-x12-main" doc:id="2456058d-bb77-472a-95e0-c9601d918a33" name="orchestrator-effem-ftp-edi-990-x12-main"/>
-			</when>
-			<otherwise >
-				<logger level="INFO" doc:name="Logger" doc:id="92bca51f-55bc-4ebb-8b21-c7e300dc7d4c" message="MESSAGE NOT PROCESSED BY PROJECT NAME #[vars.project]"/>
-			</otherwise>
-		</choice>
-	</sub-flow>	
-	<sub-flow name="listeners-effem-validate-project-name-completed-in-transit-pod" doc:id="cfd94c75-f445-4347-aecb-30d3d1220422" >
-		<set-variable value="#[vars.payloadBK.CISDocument.Load.ShipmentLeg.ShipmentNumber]" doc:name="Set shipment number" doc:id="0dc1dca2-1a94-4366-be05-ab6d5bf5532b" variableName="system_shipment_number" />
-		<flow-ref doc:name="client-tms-findEntities-get-shipment-main" doc:id="71883ad3-54a2-4101-a9b3-b3ee5d44395c" name="client-tms-findEntities-get-shipment-main" />
-		<ee:transform doc:name="set project" doc:id="5601771f-8c0a-4c23-b4ca-8b041bb58c93">
-			<ee:message />
-			<ee:variables>
-				<ee:set-variable variableName="project"><![CDATA[%dw 2.0
-output application/json
----
-vars.Shipment.ReferenceNumber6
-]]></ee:set-variable>
-			</ee:variables>
-		</ee:transform>
-		<choice doc:name="Choice" doc:id="14464fc5-afc0-4f32-86a6-1c677f10f721" >
-			<when expression='#[["Mars_OW_XB"] contains(vars.project)]'>
-				<flow-ref doc:name="orchestrator-effem-ftp-edi-214-x12-main" doc:id="7346754b-a61d-47e2-8930-6be635ab68a5" name="orchestrator-effem-ftp-edi-214-x12-main"/>
-			</when>
-			<otherwise >
-				<logger level="INFO" doc:name="Logger" doc:id="f557e54a-778b-4c4b-9f14-003bfad37cb8" message="MESSAGE NOT PROCESSED BY PROJECT NAME #[vars.project]"/>
-			</otherwise>
-		</choice>
-	</sub-flow>		
+	
 </mule>

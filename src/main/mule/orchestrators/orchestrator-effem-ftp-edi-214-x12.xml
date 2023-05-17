@@ -90,7 +90,7 @@ output application/java
                
               }
 	]  ,
-            "0200_Loop": vars.payloadBK.CISDocument.Load.*Stop map(item)->
+            "0200_Loop": (vars.payloadBK.CISDocument.Load.*Stop filter ("0" ++ $.StopSequenceNumber) == vars.L1101 ) map(item)->
               {
                 "0205_Loop": [
                   {
@@ -101,10 +101,12 @@ output application/java
                     },
                     "140_AT7": {
                       "AT706": (item.ActualDateTimeOfArrival as DateTime as String {format: "A"} as Number) default (item.PickupArrivalDateTime as DateTime as String {format: "A"} as Number default 111111),
-                      "AT707": "ET",
+                      "AT707": "CT",
                       "AT704": "NA",
                       "AT705": (item.ActualDateTimeOfArrival as Date) default (item.PickupArrivalDateTime as Date default now() as Date),
-                      "AT703": "AA"
+                      "AT703": vars.AT703,
+                      "AT702": vars.AT702,
+                      "AT701": vars.AT701
                     }
                   }
                 ],
@@ -118,14 +120,17 @@ output application/java
                 ],
                 "130_LX": {
                   "LX01": item.StopSequenceNumber as Number
-                }
+                },
+                "150_L11":[{
+	                "L1101": "0" ++ item.StopSequenceNumber,
+	                "L1102": "QN"                	
+                }]
               } ,
-            "030_L11": vars.payloadBK.CISDocument.Load.*ShipmentLeg map (item)->
+            "030_L11": [
               {
-                "L1101": item.ShipmentNumber,
+                "L1101": vars.L1101,
                 "L1102": "QN"
-              }
-,
+              }],
             "020_B10": {
               "B1002": vars.payloadBK.CISDocument.Load.SystemLoadID,
               "B1001": vars.payloadBK.CISDocument.Load.ShipmentLeg.ShipmentDescription default 0 as Number,
@@ -161,7 +166,7 @@ output application/java
 				<ee:set-variable variableName="doc_name" ><![CDATA[%dw 2.0
 output application/json
 ---
-"LOAD.TRAXION.214"++ vars.payloadBK.CISDocument.Load.ShipmentLeg.ShipmentDescription ++ ".EDI"]]></ee:set-variable>
+"LOAD.TRAXION.214."++ vars.payloadBK.CISDocument.Load.ShipmentLeg.ShipmentDescription ++ ".EDI"]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
 	</sub-flow>

@@ -1,0 +1,9 @@
+%dw 2.0
+
+type auto_e5a9db82_4098_4a34_8fee_0ed054540de1_Output_Payload = Binary | {|
+  FindEntities: {|
+    Select: {| Name: Array<"ReferenceNumber26"> |}, 
+    Filter: Array<{|      Name: String,       Op: String,       Value: Null    |}>
+  |}
+|}
+

@@ -61,7 +61,7 @@ ns ns1 http://xmlns.mulesoft.com/enterpriseobjects/core/address/
             "030_AK2_Loop": [
               {
                 "030_AK2": {
-                  "AK202": payload.CISDocument.ShipmentLeg.Shipment.SystemShipmentID default payload.CISDocument.SystemShipmentID,
+                  "AK202": payload.CISDocument.ShipmentLeg.Shipment.SystemShipmentID default payload.CISDocument.ShipmentDescription,
                   "AK201": "204"
                 },
                 "060_AK5": {
@@ -71,7 +71,7 @@ ns ns1 http://xmlns.mulesoft.com/enterpriseobjects/core/address/
             ],
             "020_AK1": {
               "AK101": "SM",
-              "AK102": payload.CISDocument.SystemLoadID as Number default payload.CISDocument.SystemShipmentID as Number,
+              "AK102": payload.CISDocument.SystemLoadID as Number default payload.CISDocument.ShipmentDescription as Number,
             },
             "070_AK9": {
               "AK903": 1,
@@ -87,7 +87,7 @@ ns ns1 http://xmlns.mulesoft.com/enterpriseobjects/core/address/
           "Id": "997",
           "SetHeader": {
             "ST01": "997",
-            "ST02": payload.CISDocument.SystemLoadID default payload.CISDocument.SystemShipmentID as Number
+            "ST02": payload.CISDocument.SystemLoadID default payload.CISDocument.ShipmentDescription as Number
           },
           "Name": "Functional Acknowledgment"
         }
@@ -112,7 +112,7 @@ ns ns1 http://xmlns.mulesoft.com/enterpriseobjects/core/address/
 				<ee:set-variable variableName="doc_name" ><![CDATA[%dw 2.0
 output application/json
 ---
-"LOAD.TRAXION.997"++ (vars.payloadBK.CISDocument.ShipmentLeg.Shipment.ShipmentDescription default vars.payloadBK.CISDocument.ShipmentDescription) ++".EDI"]]></ee:set-variable>
+"LOAD.TRAXION.997."++ (vars.payloadBK.CISDocument.ShipmentLeg.Shipment.ShipmentDescription default vars.payloadBK.CISDocument.ShipmentDescription) ++".EDI"]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
 	</sub-flow>

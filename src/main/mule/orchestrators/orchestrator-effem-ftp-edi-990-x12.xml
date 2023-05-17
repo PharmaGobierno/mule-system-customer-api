@@ -31,49 +31,49 @@ ns ns1 http://xmlns.mulesoft.com/enterpriseobjects/core/address/
       "990": [
         {
           "Interchange": {
-            "ISA09": vars.payloadBK.CISDocument.Load.LoadStartDateTime as Date,
+            "ISA09": vars.payloadBK.CISDocument.Load.LoadStartDateTime as Date default payload.CISDocument.EventDateTime as Date,
             "ISA04": "",
             "ISA15": p('effem.edi.isa.env'), //properties env
             "ISA03": "00", //hard code
             "ISA14": "0",
             "ISA02": "", //hard code
-            "ISA13": vars.payloadBK.CISDocument.Load.ShipmentLeg.ShipmentDescription default 0 as Number, // Load id
+            "ISA13": (vars.payloadBK.CISDocument.Load.ShipmentLeg.ShipmentDescription default payload.CISDocument.ShipmentDescription) default 0 as Number, // Load id
             "ISA01": "00", //hard code
             "ISA12": "00401", //hard code
-            "ISA08": "LOAL", //hard code
+            "ISA08": "TRANSPLACE", //hard code
             "ISA07": "ZZ",
-            "ISA06": "TRAXION",
+            "ISA06": "LOAL",
             "ISA05": "02", //hard code
             "ISA16": "`",
             "ISA11": "U",
-            "ISA10": vars.payloadBK.CISDocument.Load.LoadStartDateTime as DateTime as String {format: "HHmmss"} as Number
+            "ISA10": vars.payloadBK.CISDocument.Load.LoadStartDateTime as DateTime as String {format: "HHmmss"} as Number default  payload.CISDocument.EventDateTime as DateTime as String {format: "HHmmss"} as Number
           },
           "Group": {
-            "GS05": vars.payloadBK.CISDocument.Load.LoadStartDateTime as DateTime as String {format: "HHmmss"} as Number,
-            "GS04": vars.payloadBK.CISDocument.Load.LoadStartDateTime as Date,
+            "GS05": vars.payloadBK.CISDocument.Load.LoadStartDateTime as DateTime as String {format: "HHmmss"} as Number default payload.CISDocument.EventOccurredDateTime as DateTime as String {format: "HHmmss"} as Number,
+            "GS04": vars.payloadBK.CISDocument.Load.LoadStartDateTime as Date default payload.CISDocument.EventOccurredDateTime as Date,
             "GS07": "X",
-            "GS06": vars.payloadBK.CISDocument.Load.SystemLoadID,
+            "GS06": vars.payloadBK.CISDocument.Load.SystemLoadID default payload.CISDocument.ShipmentDescription as Number,
             "GS08": "004010",
-            "GS01": "FA",
-            "GS03": "LOAL",
-            "GS02": "TRAXION"
+            "GS01": "SM",
+            "GS03": "TRANSPLACE",
+            "GS02": "LOAL"
           },
           "Heading": {
             "020_B1": {
-              "B103":  vars.payloadBK.CISDocument.Load.ShipmentLeg.PickupArrivalDateTime as Date,
-              "B104": "A",
-              "B101": "",
-              "B102":  vars.payloadBK.CISDocument.Load.ShipmentLeg.ShipmentNumber
+              "B103":  vars.payloadBK.CISDocument.Load.ShipmentLeg.PickupArrivalDateTime as Date default payload.CISDocument.EventOccurredDateTime as Date,
+              "B104": vars.status,
+              "B101": "TEGB",
+              "B102":  vars.payloadBK.CISDocument.Load.ShipmentLeg.ShipmentDescription default payload.CISDocument.ShipmentDescription
             }
           },
           "SetTrailer": {
-            "SE02": vars.payloadBK.CISDocument.Load.CarrierCode,
-            "SE01": 6
+            "SE02": vars.payloadBK.CISDocument.Load.ShipmentLeg.ShipmentDescription default payload.CISDocument.ShipmentDescription,
+            "SE01": 1
           },
           "Id": "990",
           "SetHeader": {
             "ST01": "990",
-            "ST02": vars.payloadBK.CISDocument.Load.SystemLoadID
+            "ST02": vars.payloadBK.CISDocument.Load.ShipmentLeg.ShipmentDescription default payload.CISDocument.ShipmentDescription
           },
           "Name": "Response to a Load Tender"
         }
@@ -96,7 +96,7 @@ ns ns1 http://xmlns.mulesoft.com/enterpriseobjects/core/address/
 				<ee:set-variable variableName="doc_name" ><![CDATA[%dw 2.0
 output application/json
 ---
-"LOAD.TRAXION.990"++ vars.payloadBK.CISDocument.Load.ShipmentLeg.ShipmentDescription ++ ".EDI"]]></ee:set-variable>
+"LOAD.TRAXION.990."++ (vars.payloadBK.CISDocument.Load.ShipmentLeg.ShipmentDescription default vars.payloadBK.CISDocument.ShipmentDescription)++ ".EDI"]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
 	</sub-flow>

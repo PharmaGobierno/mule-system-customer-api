@@ -1,0 +1,9 @@
+%dw 2.0
+
+type auto_cfd94c75_f445_4347_aecb_30d3d1220422_Output_Payload = Binary | {|
+  FindEntities: {|
+    Select: {| Name: Array<"ShipmentNumber" | "NumberOfShipmentLegs" | "CustomerCode" | "SystemLoadID" | "SystemShipmentID" | "ChargedAmount" | "CurrentShipmentFinancialStatusEnumVal" | "ProfitCenterCode" | "ShipmentDescription" | "ReferenceNumber1" | "ReferenceNumber2" | "ReferenceNumber3" | "ReferenceNumber4" | "ReferenceNumber5" | "ReferenceNumber6" | "ReferenceNumber26"> |}, 
+    Filter: Array<{|      Name: String,       Op: String,       Value: Null    |}>
+  |}
+|}
+
