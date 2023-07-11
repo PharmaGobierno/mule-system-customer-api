@@ -101,10 +101,10 @@ output application/java
                     },
                     "140_AT7": {
                       "AT706": (item.ActualDateTimeOfArrival as DateTime as String {format: "A"} as Number) default (item.PickupArrivalDateTime as DateTime as String {format: "A"} as Number default 111111),
-                      "AT707": "CT",
-                      "AT704": "NA",
+                      //"AT707": "CT",
+                      //"AT704": "NA",
                       "AT705": (item.ActualDateTimeOfArrival as Date) default (item.PickupArrivalDateTime as Date default now() as Date),
-                      "AT703": vars.AT703,
+                      //"AT703": vars.AT703,
                       "AT702": vars.AT702,
                       "AT701": vars.AT701
                     }
