@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<sub-flow name="orchestrator-shipping-notification-main" doc:id="36df8afd-643c-4607-97c3-cb58a311ee2a" >
+		<logger level="INFO" doc:name="Logger" doc:id="a632176f-f804-490a-8d10-accbc779e1bf" message="#[payload]"/>
+		<http:request method="POST" doc:name="Request" doc:id="220dfc1e-92c5-47a7-ad9c-2234fe053c68" url="https://wapps02.gruposid.com.mx:4443/gas401/ws/r/izelwms/856/v1/add">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Content-Type" : "application/json",
+	"SID-API-KEY" : "iZELWMS=GQUQrs47YWdksIkniBV=cG-U0iBAQ8KUxs0z1m?SDdGE6mmoGjQ9vN8D",
+	"SID-USER-TOKEN" : "iZELWMSM!CCfsZbQVqnZbyfCkiSPYqnBUUywTAO8Mq/80kzjQ7ToEYpNKEEqEac/OxQwFvGLMDXKbnlRe1MY6dL55K4-NpdOdvxXPsMW6Ku04n/PsUWpaCPg72FxelKOP=W6wjG7grcV9S4NhHBvS9=HTCgcfTeicJap9hGCx18VMKB0M32Llka4NcwrysRe9zFVY!H2mCPWCkWWxjWt9xV!KZ7UhPXAz9bau/3UPPuyQZYtwTRRv/5hlqJQz7CS"
+}]]]></http:headers>
+		</http:request>
+	</sub-flow>
+</mule>

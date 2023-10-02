@@ -156,13 +156,6 @@
 			<version>1.7.1</version>
 			<classifier>mule-plugin</classifier>
 		</dependency>
-		<dependency>
-			<groupId>ab8117f6-d718-4307-b5f7-03262d589cd0</groupId>
-			<artifactId>system-customer-api</artifactId>
-			<version>1.0.4</version>
-			<classifier>raml</classifier>
-			<type>zip</type>
-		</dependency>
 
 		<dependency>
 			<groupId>com.mulesoft.munit</groupId>
@@ -177,6 +170,13 @@
 			<version>2.2.5</version>
 			<classifier>mule-plugin</classifier>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>ab8117f6-d718-4307-b5f7-03262d589cd0</groupId>
+			<artifactId>system-customer-api</artifactId>
+			<version>1.0.7</version>
+			<classifier>raml</classifier>
+			<type>zip</type>
 		</dependency>
 	</dependencies>
 
