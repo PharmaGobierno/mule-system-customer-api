@@ -281,18 +281,5 @@ payload]]></ee:set-payload>
 			</ee:variables>
 		</ee:transform>
 		<flow-ref doc:name="orchestrator-trailer-activity-main" doc:id="f4697b58-2088-432f-881f-34240b3efa2b" name="orchestrator-trailer-activity-main"/>
-		<ee:transform>
-            <ee:message>
-                <ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{
-  traxion_response: {
-    completed_succesfully: "true",
-    message: "Status updated successfully"
-  }
-}]]></ee:set-payload>
-            </ee:message>
-        </ee:transform>
     </flow>
 </mule>
