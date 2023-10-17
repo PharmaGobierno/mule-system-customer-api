@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="orchestrator-trailer-activity-main" doc:id="c209128c-ac79-4597-82ac-1a654053ed80" >
+		<flow-ref doc:name="client-trailer-activity-token" doc:id="c42abffe-2f1c-44e7-972d-abdec3361a75" name="client-trailer-activity-token"/>
+		<flow-ref doc:name="client-update-status-trailer-activity-main" doc:id="1c690776-8c95-4c5a-be1e-9a336ef997b6" name="client-update-status-trailer-activity-main"/>
+		<ee:transform doc:name="Transform Message" doc:id="be0b053c-2d2f-4634-8b5b-e7b870c2b16c" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  traxion_response: {
+    completed_succesfully: "true",
+    message: "Status updated successfully"
+  }
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+</mule>

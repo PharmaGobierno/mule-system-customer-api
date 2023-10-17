@@ -271,7 +271,17 @@ payload]]></ee:set-payload>
         </ee:transform>
     </flow>
     <flow name="post:\customer\statusUpdate:application\json:system-customer-api-config">
-        <ee:transform>
+        <ee:transform doc:name="Transform Message" doc:id="556a1486-c2e9-4cf1-84c9-c5d7c29c2dae" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="trafficLigth" ><![CDATA[payload.trafficligth]]></ee:set-variable>
+				<ee:set-variable variableName="new_status" ><![CDATA[payload.status]]></ee:set-variable>
+				<ee:set-variable variableName="vrid" ><![CDATA[payload.vrid]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="orchestrator-trailer-activity-main" doc:id="f4697b58-2088-432f-881f-34240b3efa2b" name="orchestrator-trailer-activity-main"/>
+		<ee:transform>
             <ee:message>
                 <ee:set-payload><![CDATA[%dw 2.0
 output application/json

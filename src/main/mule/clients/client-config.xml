@@ -48,6 +48,12 @@ http://www.mulesoft.org/schema/mule/x12 http://www.mulesoft.org/schema/mule/x12/
 	</ftp:config>
 	<http:request-config name="Http_request_system-tms-findentities" doc:name="HTTP Request configuration" doc:id="461e8e37-74e6-4b6a-bcab-3e2f5f74739c" >
 		<http:request-connection host="${client.system.tms-connection.http.host}" port="${client.system-tms-connection.http.port}" maxConnections="${client.system-tms-connection.http.max.connections}" connectionIdleTimeout="${client.system-tms-connection.http.connection.idle.timeout}" responseBufferSize="${client.system-tms-connection.http.response.buffer.size}" protocol="HTTPS"/>
+	</http:request-config>
+	<http:request-config name="Http_request_status_update_redpack" doc:name="HTTP Request configuration" doc:id="cab9e30b-3014-4199-8b05-dbbcfdfea5d6" >
+		<http:request-connection protocol="${client.redpack.http.protocol}" host="${client.redpack.token.http.host}" port="${client.redpack.token.http.port}" maxConnections="${client.redpack.token.http.max.connections}" connectionIdleTimeout="${client.redpack.token.http.connection.idle.timeout}" responseBufferSize="${client.redpack.token.http.response.buffer.size}" />
+	</http:request-config>	
+	<http:request-config name="Http_request_update_status_activity" doc:name="HTTP Request configuration" doc:id="d5e0f706-5432-42ab-9d0c-56090f95a2c0" >
+		<http:request-connection host="${client.redpack.update.status.http.host}" port="${client.redpack.update.status.http.port}" maxConnections="${client.redpack.update.status.http.max.connections}" connectionIdleTimeout="${client.redpack.update.status.http.connection.idle.timeout}" responseBufferSize="${client.redpack.update.status.http.response.buffer.size}" protocol="${client.redpack.http.protocol}"/>
 	</http:request-config>	
 
 </mule>

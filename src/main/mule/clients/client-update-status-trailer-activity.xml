@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="client-trailer-activity-token" doc:id="3c900030-3ee3-497b-9de5-4999d460407b" >
+		<http:request method="POST" doc:name="Request" doc:id="5538ef58-8b77-4a18-8ce1-c4ac849c2fa4" config-ref="Http_request_status_update_redpack" path="${client.redpack.token.http.path.token}">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Authorization": p('client.redpack.token.Authorization')
+}]]]></http:headers>
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"username" : p('client.redpack.token.username'),
+	"grant_type" : p('client.redpack.token.grant_type'),
+	"password" : p('client.redpack.token.password')
+}]]]></http:query-params>
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="7e4074da-5808-4c1c-9e9e-8d32c5522b9e" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="tokenRedpack" ><![CDATA["Bearer " ++ payload.access_token]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="be96d566-a0e4-4351-84f6-84f482b1d10e" message="Token Redpack #[vars.tokenRedpack]"/>
+	</sub-flow>
+	<sub-flow name="client-update-status-trailer-activity-main" doc:id="3bd0d41d-d67c-4f56-ba20-221fdd71987f" >
+		<http:request method="POST" doc:name="Request" doc:id="07a210a5-044f-4047-a39c-4ea0ffa40476" config-ref="Http_request_update_status_activity" path="${client.redpack.update.status.http.path}">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Authorization" : vars.tokenRedpack
+}]]]></http:headers>
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"vrid" : vars.vrid,
+	"trafficligth" : vars.trafficligth,
+	"status" : vars.new_status
+}]]]></http:query-params>
+		</http:request>
+		<logger level="INFO" doc:name="Logger" doc:id="03fbc9f5-cab8-4b05-9abd-1371720037da" message="El estatus del vrid #[vars.vrid] se actualizo correctamente al estatus #[vars.new_status]"/>
+	</sub-flow>
+</mule>

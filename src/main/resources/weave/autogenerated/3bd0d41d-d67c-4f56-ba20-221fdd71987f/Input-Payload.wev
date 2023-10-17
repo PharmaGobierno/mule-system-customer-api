@@ -1,0 +1,9 @@
+%dw 2.0
+
+type auto_3bd0d41d_d67c_4f56_ba20_221fdd71987f_Input_Payload = {
+  vrid: String, 
+  trafficLigth?: String, 
+  status: String, 
+  _?: Any
+}
+
