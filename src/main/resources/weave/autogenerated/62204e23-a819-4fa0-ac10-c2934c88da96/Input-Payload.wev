@@ -1,0 +1,12 @@
+%dw 2.0
+
+type auto_62204e23_a819_4fa0_ac10_c2934c88da96_Input_Payload = {|
+  traxion_response: {|
+    completed_succesfully: String, 
+    response: {|
+      operation: String, 
+      data: {|  |}
+    |}
+  |}
+|}
+

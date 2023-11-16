@@ -3,7 +3,7 @@
     <http:listener-config name="system-customer-api-httpListenerConfig">
         <http:listener-connection host="0.0.0.0" port="8082" protocol="HTTPS" tlsContext="TLS_Context" />
     </http:listener-config>
-    <apikit:config name="system-customer-api-config" api="resource::ab8117f6-d718-4307-b5f7-03262d589cd0:system-customer-api:1.0.7:raml:zip:system-customer-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <apikit:config name="system-customer-api-config" api="resource::ab8117f6-d718-4307-b5f7-03262d589cd0:system-customer-api:1.0.8:raml:zip:system-customer-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
     <flow name="system-customer-api-main">
         <http:listener config-ref="system-customer-api-httpListenerConfig" path="/api/*">
             <http:response statusCode="#[vars.httpStatus default 200]">
@@ -150,7 +150,7 @@ output application/json
                 </ee:transform>
             </on-error-propagate>
             <on-error-propagate type="HTTP:BAD_REQUEST" enableNotifications="true" logException="true">
-				<ee:transform>
+                <ee:transform>
                     <ee:message>
                         <ee:set-payload><![CDATA[%dw 2.0
 output application/json
@@ -161,7 +161,7 @@ error.errorMessage.payload]]></ee:set-payload>
                         <ee:set-variable variableName="httpStatus"><![CDATA[400]]></ee:set-variable>
                     </ee:variables>
                 </ee:transform>
-            </on-error-propagate>            
+            </on-error-propagate>
             <on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="ebf8e80d-8cef-45d6-b0a1-31c1c2b22e58" type="ANY">
                 <ee:transform doc:name="Transform Message" doc:id="c307f56a-fe57-49dc-a5af-07e3d8b8fb7a">
                     <ee:message>
@@ -260,8 +260,8 @@ output application/json
         <flow-ref doc:name="Call to orchestrator-insert-customer-remissions" doc:id="cf8c6f7e-dd8b-4718-9e83-f539aca6d3b8" name="orchestrator-insert-customer-remissions" />
     </flow>
     <flow name="post:\customer\shipping\notification:application\json:system-customer-api-config">
-        <flow-ref doc:name="orchestrator-shipping-notification-main" doc:id="31f2f980-b7eb-4a3a-a74d-7b59d1e64424" name="orchestrator-shipping-notification-main"/>
-		<ee:transform>
+        <flow-ref doc:name="orchestrator-shipping-notification-main" doc:id="31f2f980-b7eb-4a3a-a74d-7b59d1e64424" name="orchestrator-shipping-notification-main" />
+        <ee:transform>
             <ee:message>
                 <ee:set-payload><![CDATA[%dw 2.0
 output application/json
@@ -271,15 +271,33 @@ payload]]></ee:set-payload>
         </ee:transform>
     </flow>
     <flow name="post:\customer\statusUpdate:application\json:system-customer-api-config">
-        <ee:transform doc:name="Transform Message" doc:id="556a1486-c2e9-4cf1-84c9-c5d7c29c2dae" >
-			<ee:message >
-			</ee:message>
-			<ee:variables >
-				<ee:set-variable variableName="trafficLigth" ><![CDATA[payload.trafficligth]]></ee:set-variable>
-				<ee:set-variable variableName="new_status" ><![CDATA[payload.status]]></ee:set-variable>
-				<ee:set-variable variableName="vrid" ><![CDATA[payload.vrid]]></ee:set-variable>
-			</ee:variables>
-		</ee:transform>
-		<flow-ref doc:name="orchestrator-trailer-activity-main" doc:id="f4697b58-2088-432f-881f-34240b3efa2b" name="orchestrator-trailer-activity-main"/>
+        <ee:transform doc:name="Transform Message" doc:id="556a1486-c2e9-4cf1-84c9-c5d7c29c2dae">
+            <ee:message />
+            <ee:variables>
+                <ee:set-variable variableName="trafficLigth"><![CDATA[payload.trafficligth]]></ee:set-variable>
+                <ee:set-variable variableName="new_status"><![CDATA[payload.status]]></ee:set-variable>
+                <ee:set-variable variableName="vrid"><![CDATA[payload.vrid]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <flow-ref doc:name="orchestrator-trailer-activity-main" doc:id="f4697b58-2088-432f-881f-34240b3efa2b" name="orchestrator-trailer-activity-main" />
+    </flow>
+    <flow name="post:\customer\gnma\load:application\json:system-customer-api-config">
+		<flow-ref doc:name="client-consume-api-genomma-consume-service-status-gnma" doc:id="688c08b8-ab52-4484-a7f0-f4dd064e4b88" name="client-consume-api-genomma-consume-service-status-gnma"/>
+		<ee:transform>
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  traxion_response: {
+    completed_succesfully: "true",
+    response: {
+      operation: "The record has been update successfully",
+      data: {}
+    }
+  }
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
     </flow>
 </mule>

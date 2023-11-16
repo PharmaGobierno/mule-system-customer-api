@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+	<wsc:config name="Web_Service_Consumer_Config" doc:name="Web Service Consumer Config" doc:id="503f0aa9-62a4-40d0-ab68-20140834e4eb" >
+		<wsc:connection wsdlLocation="wsdl\wsdl_soamanager_dev.wsdl" service="service" port="binding" address="https://189.204.216.233:8001/sap/bc/srt/scs/sap/zsi_gps_eventos_in?sap-client=200" mtomEnabled="true">
+			<wsc:custom-transport-configuration >
+				<wsc:http-transport-configuration requesterConfig="HTTP_Request_configuration" />
+			</wsc:custom-transport-configuration>
+		</wsc:connection>
+	</wsc:config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="73c2d68a-3fac-46bb-8e4a-061b6f6c9469" >
+		<http:request-connection protocol="HTTPS" host="189.204.216.233" port="8001" >
+			<tls:context >
+				<tls:trust-store path="client_truststore.ts" type="jks" password="Pa55word"/>
+			</tls:context>
+			<http:authentication >
+				<http:basic-authentication username="GPS_TRAX" password="$rGu0BhZp@wKwzNf34J5Ceym" />
+			</http:authentication>
+		</http:request-connection>
+	</http:request-config>
+	<http:request-config name="HTTP_Request_configuration1" doc:name="HTTP Request configuration" doc:id="e79649ce-d2d1-4c27-98ad-61e20b505d95" >
+		<http:request-connection protocol="HTTPS" host="189.204.216.233" port="8001">
+			<tls:context >
+				<tls:trust-store path="client_truststore.ts" password="Pa55word" type="jks" insecure="true" />
+			</tls:context>
+			<http:authentication >
+				<http:basic-authentication username="GPS_TRAX" password="$rGu0BhZp@wKwzNf34J5Ceym" />
+			</http:authentication>
+		</http:request-connection>
+	</http:request-config>
+	<sub-flow name="client-consume-api-genomma-consume-service-status-gnma" doc:id="62204e23-a819-4fa0-ac10-c2934c88da96" >
+		<ee:transform doc:name="Transform Message" doc:id="d489d413-325b-4ac2-ba46-3cda337e8a19" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+---
+{
+      "MT_Event_GPS_rqst": {
+        "HEADER": {
+          "ID_TRANSACTION": payload.idTransaction,
+          "FREIGHT_ORDER": payload.freightOrder
+        },
+        "EVENT": {
+          "ID_EVENT": payload.idEvent,
+          "SEQUENCE": payload.sequence,
+          "LOCATION": payload.location,
+          "DATE": payload.dateTransaction as DateTime as String{format : "dd.MM.uuuu"},
+          "HOUR": payload.dateTransaction as DateTime as String{format : "HH:mm"}
+        }
+      }
+    }}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="POST" doc:name="Request" doc:id="0caa9311-98e2-4b65-a7af-b61392c8149c" config-ref="HTTP_Request_configuration1" path="/sap/bc/srt/scs/sap/zsi_gps_eventos_in?sap-client=200">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Content-Type" : "text/xml"
+}]]]></http:headers>
+
+		</http:request>
+<!-- [STUDIO:"Consume"]		<wsc:consume doc:name="Consume" doc:id="503f0aa9-62a4-40d0-ab68-20140834e4eb" config-ref="Web_Service_Consumer_Config" operation="SI_GPS_EVENTOS_IN">
+		</wsc:consume> [STUDIO] -->
+	</sub-flow>
+</mule>
