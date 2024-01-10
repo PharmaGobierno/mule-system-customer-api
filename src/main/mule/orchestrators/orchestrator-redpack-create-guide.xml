@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	<sub-flow name="orchestrator-redpack-create-guide-main" doc:id="6933a584-68e0-4fbe-bc95-d96f37c68182" >
+		<flow-ref doc:name="client-redpack-get-token-main" doc:id="256ac4e9-c676-49c1-9833-5528e4cee249" name="client-redpack-get-token-main"/>
+		<flow-ref doc:name="client-create-guide-prepare-request" doc:id="8cbcd17d-5c63-4d0e-9719-17db83b3ba90" name="client-create-guide-prepare-request"/>
+		<flow-ref doc:name="client-create-guide-call-service-create-guide" doc:id="f0f60657-0f99-4abe-9373-924830cd2f17" name="client-create-guide-call-service-create-guide"/>
+		<flow-ref doc:name="client-create-guide-prepare-response" doc:id="4333d9b8-a305-4472-a09a-cbb89070f8ae" name="client-create-guide-prepare-response"/>
+	</sub-flow>
+</mule>

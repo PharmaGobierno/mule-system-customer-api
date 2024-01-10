@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_9e9c0322_d57e_43ea_a218_a6746c1f6e3a_Output_Variables_username = String
+

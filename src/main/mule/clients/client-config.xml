@@ -55,5 +55,14 @@ http://www.mulesoft.org/schema/mule/x12 http://www.mulesoft.org/schema/mule/x12/
 	<http:request-config name="Http_request_update_status_activity" doc:name="HTTP Request configuration" doc:id="d5e0f706-5432-42ab-9d0c-56090f95a2c0" >
 		<http:request-connection host="${client.redpack.update.status.http.host}" port="${client.redpack.update.status.http.port}" maxConnections="${client.redpack.update.status.http.max.connections}" connectionIdleTimeout="${client.redpack.update.status.http.connection.idle.timeout}" responseBufferSize="${client.redpack.update.status.http.response.buffer.size}" protocol="${client.redpack.http.protocol}"/>
 	</http:request-config>	
-
+	<http:request-config name="HTTP_Request_configuration_redpack_uno" doc:name="HTTP Request configuration" doc:id="91a808dd-c104-4cff-ab87-1420da8635c6" responseTimeout="${http.request.redpack.api.timeout}">
+		<http:request-connection host="#[vars.host]" port="#[vars.port_service]" connectionIdleTimeout="${http.request.redpack.api.connection.idle.timeout}" protocol="HTTPS" maxConnections="${http.request.redpack.api.max.connections}" responseBufferSize="${http.request.redpack.api.response.buffer.size}"/>
+	</http:request-config>
+	<http:request-config name="HTTP_Request_configuration_redpack_auth" doc:name="HTTP Request configuration" doc:id="8d5933a1-7066-45bc-b1fe-2f152e7e6aa7" responseTimeout="${http.request.redpack.token.timeout}" >
+		<http:request-connection host="${http.request.redpack.token.host}" port="${http.request.redpack.token.port}" protocol="HTTPS" maxConnections="${http.request.redpack.token.max.connections}" connectionIdleTimeout="${http.request.redpack.token.connection.idle.timeout}" responseBufferSize="${http.request.redpack.token.response.buffer.size}">
+			<http:authentication >
+				<http:basic-authentication username="${http.request.redpack.token.user}" password="${http.request.redpack.token.password}" />
+			</http:authentication>
+		</http:request-connection>
+	</http:request-config>	
 </mule>

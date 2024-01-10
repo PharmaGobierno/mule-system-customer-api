@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<sub-flow name="client-redpack-get-token-main" doc:id="9e9c0322-d57e-43ea-a218-a6746c1f6e3a" >
+		<flow-ref doc:name="client-redpack-get-token-set-vars" doc:id="d9be7f05-769c-4d1a-93b5-19ad4e91b698" name="client-redpack-get-token-set-vars"/>
+		<flow-ref doc:name="client-redpack-get-token-call-service-get-token" doc:id="a5741f55-badd-4632-949f-be3db3f8d581" name="client-redpack-get-token-call-service-get-token"/>
+		<flow-ref doc:name="client-redpack-get-token-save-token" doc:id="6e4291f8-e8c2-4892-990f-17ee67d3782a" name="client-redpack-get-token-save-token"/>
+	</sub-flow>
+	<sub-flow name="client-redpack-get-token-set-vars" doc:id="4134f834-8570-4103-b3a5-6e102db54981" >
+		<ee:transform doc:name="Transform Message" doc:id="3fc978ad-9826-4d11-b992-6d0aa506f4f8" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="grant_type" ><![CDATA[%dw 2.0
+output application/json
+---
+p('http.request.redpack.token.grant_type')]]></ee:set-variable>
+				<ee:set-variable variableName="username" ><![CDATA[%dw 2.0
+output application/json
+---
+p('http.request.redpack.token.username')]]></ee:set-variable>
+				<ee:set-variable variableName="password" ><![CDATA[%dw 2.0
+output application/json
+---
+p('http.request.redpack.token.userpassword')]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="client-redpack-get-token-call-service-get-token" doc:id="664f62eb-6f90-45bd-921d-0d1f2ad8c792" >
+		<http:request method="POST" doc:name="Request" doc:id="4ebb8a4a-c2a9-48ca-996c-d1f1737840a1" config-ref="HTTP_Request_configuration_redpack_auth" path="${http.request.redpack.token.path}">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Content-Type" : "application/x-www-form-urlencoded"
+}]]]></http:headers>
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"username" : vars.username,
+	"grant_type" : vars.grant_type,
+	"password" : vars.password
+}]]]></http:query-params>
+		</http:request>
+	</sub-flow>
+	<sub-flow name="client-redpack-get-token-save-token" doc:id="6e9ed7f4-fb5c-4c8c-9415-93612849dc82" >
+		<ee:transform doc:name="Transform Message" doc:id="41ef2ff2-f032-4f62-9bd8-d7d9d87359ca" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="access_token" ><![CDATA[%dw 2.0
+output application/json
+---
+"Bearer " ++ payload.access_token]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+	</sub-flow>
+</mule>

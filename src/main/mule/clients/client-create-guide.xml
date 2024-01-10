@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<sub-flow name="client-create-guide-prepare-request" doc:id="4446ab7e-8b21-4536-9e18-15d43334528c" >
+		<ee:transform doc:name="Transform Message" doc:id="98d38d43-4e1f-4cbe-b205-9b68a75a19c5" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+vars.payloadBK map (guia)	-> {
+		"deliveryType": {
+			"description": "",
+			"equivalence": "",
+			"id": 2
+		},
+		"gpsLatitude": guia.gpsLatitude,
+		"gpsLength": guia.gpsLength,
+		"idClient": "122063",
+		"nationalCurrency": "MXN",
+		"observations": guia.observations,
+		"origin": {
+			"city": guia.origin.city,
+			"company": guia.origin.company,
+			"country": guia.origin.country,
+			"email": guia.origin.email,
+			"name": guia.origin.name,
+			"originRfc": guia.origin.rfc,
+			"phones": [
+				{
+					"areaCode": "52",
+					"extension": "0",
+					"phone": guia.origin.phone
+				}
+			],
+			"reference3": guia.origin.reference3,
+			"state": guia.origin.state,
+			"street": guia.origin.street,
+			"suburb": guia.origin.suburb,
+			"zipCode": guia.origin.zipCode
+		},
+		"parcels": guia.parcels map (parcel)->
+			{
+				"description": parcel.description,
+				"high": parcel.high,
+				"length": parcel.length,
+				"piece": parcel.piece,
+				"weigth": parcel.weigth,
+				"width": parcel.width
+			},
+		"printType": 1,
+		"reference2": "",
+		"serviceType": {
+			"id": 1
+		},
+		"shippingType": {
+			"id": 1
+		},
+		"shippingValue": 0,
+		"target": {
+			"city": guia.target.city,
+			"company": guia.target.company,
+			"country": guia.target.country,
+			"email": guia.target.email,
+			"externalNumber": guia.target.externalNumber,
+			"internalNumber": guia.target.internalNumber,
+			"name": guia.target.name,
+			"phones": [
+				{
+					"areaCode": "",
+					"extension": "",
+					"phone": guia.target.phone
+				}
+			],
+			"reference1": guia.target.reference1,
+			"state": guia.target.state,
+			"street": guia.target.street,
+			"suburb": guia.target.suburb,
+			"targetRfc": guia.target.rfc,
+			"zipCode": guia.target.zipCode
+		}
+	}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="fb3d3a6c-b8e3-4c26-a2ab-84c5300d223c" message="#[payload]"/>
+	</sub-flow>
+	<sub-flow name="client-create-guide-call-service-create-guide" doc:id="c4e3c836-6844-4bf2-82d8-9b421623faf2" >
+		<set-variable value="#[p('http.request.redpack.api.host.one')]" doc:name="set host" doc:id="38c93409-b1ac-4d5b-818b-f9f25fd1609d" variableName="host"/>
+		<set-variable value="#[p('http.request.redpack.api.port.one')]" doc:name="Set port in var" doc:id="755fda0a-7d2d-44a6-b98f-b906373ce4e1" variableName="port_service"/>
+		<http:request method="POST" doc:name="Request" doc:id="caed0b0e-e2c6-45bc-a725-ab514bacf5a9" config-ref="HTTP_Request_configuration_redpack_uno" path="${http.request.redpack.api.add.guide}">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Authorization" : vars.access_token
+}]]]></http:headers>
+		</http:request>
+	</sub-flow>
+	<sub-flow name="client-create-guide-prepare-response" doc:id="0b955020-2da2-467f-99ad-a69fc8676690" >
+		<ee:transform doc:name="Transform Message" doc:id="eb4c0100-a5ff-465c-8051-1a49ce510be3" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+    "print_type": payload[0].printType,
+    "tracking_number": payload[0].trackingNumber,
+    "origin": {
+        "company": payload[0].origin.company,
+        "name": payload[0].origin.name,
+        "email": payload[0].origin.email,
+        "phones": payload[0].origin.phones map(phone)->
+            {
+                "area_code": phone.areaCode,
+                "phone": phone.phone,
+                "extension": phone.extension
+            },
+        "street": payload[0].origin.street,
+        "external_number": payload[0].origin.externalNumber,
+        "internal_number": payload[0].origin.internalNumber,
+        "suburb": payload[0].origin.suburb,
+        "city": payload[0].origin.city,
+        "state": payload[0].origin.state,
+        "country": payload[0].origin.country,
+        "reference": payload[0].origin.reference3,
+        "zip_code": payload[0].origin.zipCode
+    },
+    "destination": {
+        "company": payload[0].target.company,
+        "name": payload[0].target.name,
+        "email": payload[0].target.email,
+        "phones": payload[0].target.phones map(phone)->
+            {
+                "area_code": phone.areaCode,
+                "phone": phone.phone,
+                "extension": phone.extension
+            },
+        "street": payload[0].target.street,
+        "external_number": payload[0].target.externalNumber,
+        "internal_number": payload[0].target.internalNumber,
+        "suburb": payload[0].target.suburb,
+        "city": payload[0].target.city,
+        "state": payload[0].target.state,
+        "country": payload[0].target.country,
+        "reference": payload[0].target.reference1,
+        "zip_code": payload[0].target.zipCode
+    },
+    "shipping_type": {
+        "description": payload[0].shippingType.description,
+        "id": payload[0].shippingType.id
+    },
+    "delivery_type": {
+        "description": payload[0].deliveryType.description,
+        "id": payload[0].deliveryType.id
+    },
+    "service_type": {
+        "description": payload[0].serviceType.description,
+        "id": payload[0].serviceType.id
+    },
+    "reference": payload[0].reference2,
+    "parcels": payload[0].parcels map(parcel) ->
+        {
+            "length": parcel.length,
+            "high": parcel.high,
+            "width": parcel.width,
+            "weigth": parcel.weigth,
+            "piece": parcel.piece,
+            "description": parcel.description,
+            "label": parcel.label,
+            "extra_data": parcel.extraData map(data)->
+                {
+                    "barcode": data.barcode,
+                    "barcode_data": data.barcodeData,
+                    "instance": data.instance
+                }
+          
+        },
+    "client_id": payload[0].idClient,
+    "observations": payload[0].observations default ""
+}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+			</ee:variables>
+		</ee:transform>
+	</sub-flow>
+</mule>

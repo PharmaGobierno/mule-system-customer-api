@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	<sub-flow name="orchestrator-redpack-create-label-main" doc:id="dbef7a87-30cd-45d3-8068-a64ff05e4782" >
+		<flow-ref doc:name="client-redpack-get-token-main" doc:id="cc5efecc-28b1-4390-a7a5-db2755fc482e" name="client-redpack-get-token-main"/>
+		<flow-ref doc:name="client-create-label-prepare-request" doc:id="1380cd15-ad8f-4d70-ab2a-048fdaf6ce5d" name="client-create-label-prepare-request"/>
+		<flow-ref doc:name="client-create-label-call-service-create-label" doc:id="b2fc8dce-2756-4086-a6ed-aaa19f8e336c" name="client-create-label-call-service-create-label"/>
+		<flow-ref doc:name="client-create-label-prepare-response" doc:id="cfa44537-f94b-4365-aec7-242d91262315" name="client-create-label-prepare-response"/>
+	</sub-flow>
+</mule>

@@ -3,7 +3,7 @@
     <http:listener-config name="system-customer-api-httpListenerConfig">
         <http:listener-connection host="0.0.0.0" port="8082" protocol="HTTPS" tlsContext="TLS_Context" />
     </http:listener-config>
-    <apikit:config name="system-customer-api-config" api="resource::ab8117f6-d718-4307-b5f7-03262d589cd0:system-customer-api:1.0.8:raml:zip:system-customer-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <apikit:config name="system-customer-api-config" api="resource::ab8117f6-d718-4307-b5f7-03262d589cd0:system-customer-api:1.0.11:raml:zip:system-customer-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
     <flow name="system-customer-api-main">
         <http:listener config-ref="system-customer-api-httpListenerConfig" path="/api/*">
             <http:response statusCode="#[vars.httpStatus default 200]">
@@ -282,8 +282,50 @@ payload]]></ee:set-payload>
         <flow-ref doc:name="orchestrator-trailer-activity-main" doc:id="f4697b58-2088-432f-881f-34240b3efa2b" name="orchestrator-trailer-activity-main" />
     </flow>
     <flow name="post:\customer\gnma\load:application\json:system-customer-api-config">
-		<flow-ref doc:name="client-consume-api-genomma-consume-service-status-gnma" doc:id="688c08b8-ab52-4484-a7f0-f4dd064e4b88" name="client-consume-api-genomma-consume-service-status-gnma"/>
-		<ee:transform>
+        <flow-ref doc:name="client-consume-api-genomma-consume-service-status-gnma" doc:id="688c08b8-ab52-4484-a7f0-f4dd064e4b88" name="client-consume-api-genomma-consume-service-status-gnma" />
+        <ee:transform>
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  traxion_response: {
+    completed_succesfully: "true",
+    response: {
+      operation: "The record has been update successfully",
+      data: {}
+    }
+  }
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+    <flow name="post:\customer\redpack\guide:application\json:system-customer-api-config">
+        <ee:transform doc:id="e169ca2b-8ee5-47e0-b747-22b897186cab">
+            <ee:message />
+            <ee:variables>
+                <ee:set-variable variableName="payloadBK"><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <flow-ref doc:name="orchestrator-redpack-create-guide-main" doc:id="4c42ae21-cb8f-477a-963c-4206c822a164" name="orchestrator-redpack-create-guide-main" />
+    </flow>
+    <flow name="post:\customer\redpack\labels:application\json:system-customer-api-config">
+        <ee:transform>
+            <ee:message />
+            <ee:variables>
+                <ee:set-variable variableName="payloadBK"><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <flow-ref doc:name="orchestrator-redpack-create-label-main" doc:id="90a8fd7f-e596-49dc-9bee-f5f1bb0c50b6" name="orchestrator-redpack-create-label-main" />
+    </flow>
+    <flow name="post:\customer\redpack\test\delivery:application\json:system-customer-api-config">
+        <ee:transform>
             <ee:message>
                 <ee:set-payload><![CDATA[%dw 2.0
 output application/json
