@@ -327,19 +327,14 @@ payload]]></ee:set-variable>
     <flow name="post:\customer\redpack\test\delivery:application\json:system-customer-api-config">
         <ee:transform>
             <ee:message>
-                <ee:set-payload><![CDATA[%dw 2.0
+            </ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="payloadBK" ><![CDATA[%dw 2.0
 output application/json
 ---
-{
-  traxion_response: {
-    completed_succesfully: "true",
-    response: {
-      operation: "The record has been update successfully",
-      data: {}
-    }
-  }
-}]]></ee:set-payload>
-            </ee:message>
+payload]]></ee:set-variable>
+			</ee:variables>
         </ee:transform>
+		<flow-ref doc:name="orchestrator-redpack-create-test-delivery-main" doc:id="bb204896-f918-4fb2-bf91-172ab453516c" name="orchestrator-redpack-create-test-delivery-main"/>
     </flow>
 </mule>

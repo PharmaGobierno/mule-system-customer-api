@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	<sub-flow name="orchestrator-redpack-create-test-delivery-main" doc:id="6be48692-40f5-4ac7-ac90-1237543ccb35" >
+		<flow-ref doc:name="client-redpack-get-token-main" doc:id="34aa6acc-21a1-4e01-8e60-f748795c2157" name="client-redpack-get-token-main"/>
+		<flow-ref doc:name="client-create-test-delivery-prepare-request" doc:id="f5e5e565-da81-41a8-bb3f-1dcb587c1e82" name="client-create-test-delivery-prepare-request"/>
+		<flow-ref doc:name="client-create-test-delivery-call-service-create-pod" doc:id="2ec5860c-dd6b-41cb-94f5-dfff785a001c" name="client-create-test-delivery-call-service-create-pod"/>
+		<flow-ref doc:name="client-create-test-delivery-prepare-response" doc:id="8c51c78d-88fc-432b-956e-193f791b3698" name="client-create-test-delivery-prepare-response"/>
+	</sub-flow>
+</mule>

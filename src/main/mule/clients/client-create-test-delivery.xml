@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<sub-flow name="client-create-test-delivery-prepare-request" doc:id="4446ab7e-8b21-4536-9e18-15d43334528c" >
+		<ee:transform doc:name="Transform Message" doc:id="98d38d43-4e1f-4cbe-b205-9b68a75a19c5" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+vars.payloadBK map (guide)->
+  {
+    "trackingNumber": guide.trackingNumber
+}
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="fb3d3a6c-b8e3-4c26-a2ab-84c5300d223c" message="#[payload]"/>
+	</sub-flow>
+	<sub-flow name="client-create-test-delivery-call-service-create-pod" doc:id="c4e3c836-6844-4bf2-82d8-9b421623faf2" >
+		<set-variable value="#[p('http.request.redpack.api.host.three')]" doc:name="set host" doc:id="38c93409-b1ac-4d5b-818b-f9f25fd1609d" variableName="host"/>
+		<set-variable value="#[p('http.request.redpack.api.port.two')]" doc:name="Set port in var" doc:id="755fda0a-7d2d-44a6-b98f-b906373ce4e1" variableName="port_service"/>
+		<http:request method="POST" doc:name="Request" doc:id="caed0b0e-e2c6-45bc-a725-ab514bacf5a9" config-ref="HTTP_Request_configuration_redpack_uno" path="${http.request.redpack.api.create.test.delivery}">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Authorization" : vars.access_token
+}]]]></http:headers>
+		</http:request>
+	</sub-flow>
+	<sub-flow name="client-create-test-delivery-prepare-response" doc:id="0b955020-2da2-467f-99ad-a69fc8676690" >
+		<ee:transform doc:name="Transform Message" doc:id="eb4c0100-a5ff-465c-8051-1a49ce510be3" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+			</ee:variables>
+		</ee:transform>
+	</sub-flow>
+</mule>
