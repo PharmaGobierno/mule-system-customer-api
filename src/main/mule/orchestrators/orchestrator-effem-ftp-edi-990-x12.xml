@@ -86,7 +86,8 @@ ns ns1 http://xmlns.mulesoft.com/enterpriseobjects/core/address/
 			
 	</sub-flow>
 	<sub-flow name="orchestrator-effem-ftp-edi-990-x12-write" doc:id="76f648e3-52fd-4e1e-8625-ff6539f404ef" >
-	<x12:write doc:name="Write" doc:id="a06931d0-f2d4-4dff-bd4b-3a1d7d61b637" config-ref="X12_EDI_Config-wri"/>
+		<logger level="INFO" doc:name="Logger" doc:id="07ada279-a126-44cc-8e5e-45f8ddeab890" />
+	<!-- <x12:write doc:name="Write" doc:id="a06931d0-f2d4-4dff-bd4b-3a1d7d61b637" config-ref="X12_EDI_Config-wri"/> -->
 	</sub-flow>
 	<sub-flow name="orchestrator-effem-ftp-edi-990-x12-set-name" doc:id="65a5c364-123b-4b55-8e4b-5a769de6ec3c" >
 		<ee:transform doc:name="Transform Message" doc:id="43681cee-492c-4422-b3b2-7961e7386c95" >

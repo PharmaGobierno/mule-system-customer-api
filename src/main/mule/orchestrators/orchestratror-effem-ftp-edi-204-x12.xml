@@ -42,7 +42,7 @@ http://www.mulesoft.org/schema/mule/ftp http://www.mulesoft.org/schema/mule/ftp/
 		</choice>
 	</sub-flow>
 	<sub-flow name="orchestratror-effem-ftp-edi-204-x12-read-edi" doc:id="0c4da49f-0790-42e5-a808-90426f0a3b80" >
-		<x12:read doc:name="Read edi" doc:id="147c5e2d-2e0d-4148-8265-716fc7362a83" config-ref="X12_EDI_Config" />
+		<!-- <x12:read doc:name="Read edi" doc:id="147c5e2d-2e0d-4148-8265-716fc7362a83" config-ref="X12_EDI_Config" /> -->
 		<logger level="INFO" doc:name="print payload" doc:id="1481fa9e-64fc-48e2-b663-ed8570014efa" message="#[%dw 2.0&#10;output application/json&#10;---&#10;payload]" />
 	</sub-flow>
 	<sub-flow name="orchestratror-effem-ftp-edi-204-x12-validate-errors" doc:id="4e5273bc-789a-446e-b629-0b81422b7fa9" >

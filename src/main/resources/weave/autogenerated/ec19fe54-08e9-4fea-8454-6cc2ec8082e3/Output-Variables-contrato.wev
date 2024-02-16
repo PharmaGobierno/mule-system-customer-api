@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_ec19fe54_08e9_4fea_8454_6cc2ec8082e3_Output_Variables_contrato = String
+

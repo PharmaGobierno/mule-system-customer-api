@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:request-config name="cca-connection-HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="2ecfd3e5-1f8e-4bae-bc9e-e17e7a4a23b6" responseTimeout="${http.request.cca.api.timeout}">
+		<http:request-connection protocol="HTTPS" host="${http.request.cca.api.host}" port="#[vars.port]"/>
+	</http:request-config>
+	<sub-flow name="client-cca-call-services-get-order-remision" doc:id="ec19fe54-08e9-4fea-8454-6cc2ec8082e3" >
+		<http:request method="GET" doc:name="Request" doc:id="d313d774-6ace-49b5-b99d-7f2c3e4cc4dd" url="https://ppsai-abasto.imss.gob.mx/msportprov-orden/v1/ordenes/50030399">
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"clasPtal" : vars.clasPtal,
+	"contrato" : vars.contrato,
+	"password" : vars.password
+}]]]></http:query-params>
+		</http:request>
+	</sub-flow>
+</mule>

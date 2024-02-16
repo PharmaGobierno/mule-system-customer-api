@@ -101,7 +101,7 @@ ns ns1 http://xmlns.mulesoft.com/enterpriseobjects/core/address/
 		</ee:transform>
 	</sub-flow>
 	<sub-flow name="orchestrator-effem-ftp-edi-997-x12-write" doc:id="8f2b458e-c765-496f-b1ab-6e0a4ebe21da" >
-		<x12:write doc:name="Write" doc:id="2d277ad8-14a7-434b-9cd0-1bd4c9842a37" config-ref="X12_EDI_Config-write-997" />
+		<!-- <x12:write doc:name="Write" doc:id="2d277ad8-14a7-434b-9cd0-1bd4c9842a37" config-ref="X12_EDI_Config-write-997" /> -->
 		<logger level="INFO" doc:name="Logger" doc:id="e3d72de3-2368-4eb7-b79b-7d7754dcbf2d" message="FINISH PAYLOAD X12"/>
 	</sub-flow>
 	<sub-flow name="orchestrator-effem-ftp-edi-997-x12set-edi-name" doc:id="a382cef2-5e91-42f1-867c-8153f057210e" >

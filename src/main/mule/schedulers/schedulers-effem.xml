@@ -3,7 +3,7 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
-	<flow name="schedulers-effem-ftp" doc:id="658688d3-2aab-422c-8e59-927afcb70062" >
+	<flow name="schedulers-effem-ftp" doc:id="658688d3-2aab-422c-8e59-927afcb70062" initialState="stopped">
 		<scheduler doc:name="Scheduler effem" doc:id="f3e93547-84ed-46f1-9d98-ec8a8540c66a" >
 			<scheduling-strategy >
 				<fixed-frequency frequency="5" timeUnit="MINUTES" />

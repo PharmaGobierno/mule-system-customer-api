@@ -10,7 +10,7 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 http://www.mulesoft.org/schema/mule/ftp http://www.mulesoft.org/schema/mule/ftp/current/mule-ftp.xsd 
 http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/x12 http://www.mulesoft.org/schema/mule/x12/current/mule-x12.xsd">
-	<x12:config name="X12_EDI_Config" doc:name="X12 EDI Config" doc:id="9c53de1e-0064-4be7-b796-a4c2f8d9dcd4" interchangeIdQualifierSelf="02" interchangeIdQualifierPartner="ZZ" interchangeIdSelf="LOAL" interchangeIdPartner="TRANSPLACE" requireUniqueInterchanges="false" initialInterchangeNumber="0" groupIdSelf="LOAL" groupIdPartner="TRANSPLACE" truncateExceedingMaxLength="true" ackAllSets="true" acknowledgmentSchemaPath="/x12/004010/997.esl" componentSeparator="`" batchDefaultUsageIndicator="T" batchComponentSeparator="`">
+	<!--  <x12:config name="X12_EDI_Config" doc:name="X12 EDI Config" doc:id="9c53de1e-0064-4be7-b796-a4c2f8d9dcd4" interchangeIdQualifierSelf="02" interchangeIdQualifierPartner="ZZ" interchangeIdSelf="LOAL" interchangeIdPartner="TRANSPLACE" requireUniqueInterchanges="false" initialInterchangeNumber="0" groupIdSelf="LOAL" groupIdPartner="TRANSPLACE" truncateExceedingMaxLength="true" ackAllSets="true" acknowledgmentSchemaPath="/x12/004010/997.esl" componentSeparator="`" batchDefaultUsageIndicator="T" batchComponentSeparator="`">
 		<x12:schemas >
 			<x12:schema value="/x12/004010/204.esl" />
 		</x12:schemas>
@@ -29,7 +29,7 @@ http://www.mulesoft.org/schema/mule/x12 http://www.mulesoft.org/schema/mule/x12/
 		<x12:schemas >
 			<x12:schema value="/x12/004010/214.esl" />
 		</x12:schemas>
-	</x12:config>		
+	</x12:config>	-->	
 	<jms:config name="JMS_Config" doc:name="JMS Config" doc:id="e89735f1-1936-42e9-82d1-1f5458a956b7" >
 		<jms:active-mq-connection username="${jms.settings.user}" password="${jms.settings.passwd}">
 			<reconnection >

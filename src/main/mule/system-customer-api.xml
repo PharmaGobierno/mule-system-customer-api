@@ -3,7 +3,7 @@
     <http:listener-config name="system-customer-api-httpListenerConfig">
         <http:listener-connection host="0.0.0.0" port="8082" protocol="HTTPS" tlsContext="TLS_Context" />
     </http:listener-config>
-    <apikit:config name="system-customer-api-config" api="resource::ab8117f6-d718-4307-b5f7-03262d589cd0:system-customer-api:1.0.11:raml:zip:system-customer-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <apikit:config name="system-customer-api-config" api="resource::ab8117f6-d718-4307-b5f7-03262d589cd0:system-customer-api:1.0.14:raml:zip:system-customer-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
     <flow name="system-customer-api-main">
         <http:listener config-ref="system-customer-api-httpListenerConfig" path="/api/*">
             <http:response statusCode="#[vars.httpStatus default 200]">
@@ -326,15 +326,26 @@ payload]]></ee:set-variable>
     </flow>
     <flow name="post:\customer\redpack\test\delivery:application\json:system-customer-api-config">
         <ee:transform>
-            <ee:message>
-            </ee:message>
-			<ee:variables >
-				<ee:set-variable variableName="payloadBK" ><![CDATA[%dw 2.0
+            <ee:message />
+            <ee:variables>
+                <ee:set-variable variableName="payloadBK"><![CDATA[%dw 2.0
 output application/json
 ---
 payload]]></ee:set-variable>
-			</ee:variables>
+            </ee:variables>
         </ee:transform>
-		<flow-ref doc:name="orchestrator-redpack-create-test-delivery-main" doc:id="bb204896-f918-4fb2-bf91-172ab453516c" name="orchestrator-redpack-create-test-delivery-main"/>
+        <flow-ref doc:name="orchestrator-redpack-create-test-delivery-main" doc:id="bb204896-f918-4fb2-bf91-172ab453516c" name="orchestrator-redpack-create-test-delivery-main" />
+    </flow>
+    <flow name="get:\customer\cca\order\remision:system-customer-api-config">
+        <ee:transform>
+            <ee:message />
+            <ee:variables>
+                <ee:set-variable variableName="clasPtal"><![CDATA[%dw 2.0
+output application/json
+---
+attributes.queryParams.clasPtal]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <flow-ref doc:name="orchestrator-get-order-remisions-main" doc:id="1eca1a1e-802a-4729-88db-2d91a9056eb2" name="orchestrator-get-order-remisions-main" />
     </flow>
 </mule>
