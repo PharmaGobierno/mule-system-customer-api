@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="client-redpack-send-ccp-token" doc:id="20272b3d-7a1b-41c6-b680-d2f715d5a76e" >
+		<ee:transform doc:name="Vars token" doc:id="860d3ce2-0c98-4141-99ad-efc385cbcc7b" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="passwordRPK" ><![CDATA[%dw 2.0
+output application/json
+---
+p('client.redpack.ccp.token.password')]]></ee:set-variable>
+				<ee:set-variable variableName="usernameRPK" ><![CDATA[%dw 2.0
+output application/json
+---
+p('client.redpack.ccp.token.username')]]></ee:set-variable>
+				<ee:set-variable variableName="grantTypeRPK" ><![CDATA[%dw 2.0
+output application/json
+---
+p('client.redpack.ccp.token.grant_type')]]></ee:set-variable>
+				<ee:set-variable variableName="authorizationRPK" ><![CDATA[%dw 2.0
+output application/json
+---
+p('client.redpack.ccp.token.Authorization')]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<http:request method="POST" doc:name="Token CCP" doc:id="16cffa97-3c7e-4554-89a0-06756f55db50" config-ref="Http_request_Redpack_ccp_token" path="${client.redpack.ccp.token.http.path.token}">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Authorization" : vars.authorizationRPK
+}]]]></http:headers>
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"username" : vars.usernameRPK,
+	"grant_type" : vars.grantTypeRPK,
+	"password" : vars.passwordRPK
+}]]]></http:query-params>
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="fe24d7f7-5b5d-4312-b6f7-d48f46a9076c" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="access_token" ><![CDATA[%dw 2.0
+output application/json
+---
+"Bearer " ++ payload.access_token]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="client-redpack-send-ccp-main" doc:id="d9457cb9-e320-4429-9c5d-3eca76e16b32" >
+		<http:request method="POST" doc:name="Request" doc:id="7ab2bc2f-b5de-4377-9c32-57c66d4a5188" config-ref="Http_request_Redpack_ccp_send" path="${client.redpack.ccp.path}">
+			<http:body ><![CDATA[#[vars.payloadCCP]]]></http:body>
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Authorization" : vars.access_token
+}]]]></http:headers>
+		</http:request>
+		<logger level="INFO" doc:name="Logger" doc:id="108a8567-0429-4ea9-8151-f3b04eba9a80" message="#[payload]"/>
+	</sub-flow>
+</mule>

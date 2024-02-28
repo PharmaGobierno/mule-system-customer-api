@@ -1,0 +1,9 @@
+%dw 2.0
+
+type auto_20272b3d_7a1b_41c6_b680_d2f715d5a76e_Output_Payload = {
+  vrid: String, 
+  trafficLigth?: String, 
+  status: String, 
+  _?: Any
+}
+

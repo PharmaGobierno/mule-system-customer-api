@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="orchestrator-redpack-send-ccp-main" doc:id="360f9030-269a-44b4-ac51-2059a44cfa54" >
+		<flow-ref doc:name="Call to client-redpack-send-ccp-token" doc:id="db9b9a6a-91b3-4f6c-8e27-0bf63cad0fc8" name="client-redpack-send-ccp-token"/>
+		<flow-ref doc:name="Call to client-redpack-send-ccp-main" doc:id="34dea904-49c2-4618-8915-ccc6c267888b" name="client-redpack-send-ccp-main"/>
+		<ee:transform doc:name="Transform Message" doc:id="bedfd9f2-d749-4d5b-90e4-53df712e8ed9" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+</mule>
