@@ -3,7 +3,7 @@
     <http:listener-config name="system-customer-api-httpListenerConfig">
         <http:listener-connection host="0.0.0.0" port="8082" protocol="HTTPS" tlsContext="TLS_Context" />
     </http:listener-config>
-    <apikit:config name="system-customer-api-config" api="resource::ab8117f6-d718-4307-b5f7-03262d589cd0:system-customer-api:1.0.15:raml:zip:system-customer-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <apikit:config name="system-customer-api-config" api="resource::ab8117f6-d718-4307-b5f7-03262d589cd0:system-customer-api:1.0.17:raml:zip:system-customer-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
     <flow name="system-customer-api-main">
         <http:listener config-ref="system-customer-api-httpListenerConfig" path="/api/*">
             <http:response statusCode="#[vars.httpStatus default 200]">
@@ -349,17 +349,29 @@ attributes.queryParams.clasPtal]]></ee:set-variable>
         <flow-ref doc:name="orchestrator-get-order-remisions-main" doc:id="1eca1a1e-802a-4729-88db-2d91a9056eb2" name="orchestrator-get-order-remisions-main" />
     </flow>
     <flow name="post:\customer\redpack\send\ccp:application\json:system-customer-api-config">
-		<ee:transform doc:name="Transform Message" doc:id="ef0bb54e-b2bd-432a-bf73-708d556f6dc6" >
-			<ee:message >
-			</ee:message>
-			<ee:variables >
-				<ee:set-variable variableName="payloadCCP" ><![CDATA[%dw 2.0
+        <ee:transform doc:name="Transform Message" doc:id="ef0bb54e-b2bd-432a-bf73-708d556f6dc6">
+            <ee:message />
+            <ee:variables>
+                <ee:set-variable variableName="payloadCCP"><![CDATA[%dw 2.0
 output application/json
 ---
 payload]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <logger level="INFO" doc:name="Logger" doc:id="c26b066a-3118-4e61-8971-0caa731fa9b6" message="#[vars.payloadCCP]" />
+        <flow-ref doc:name="Call to orchestrator-redpack-send-ccp-main" doc:id="f736c971-dcc7-4273-abf8-be4f326634b3" name="orchestrator-redpack-send-ccp-main" />
+    </flow>
+    <flow name="post:\wms\order:application\xml:system-customer-api-config">
+        <ee:transform doc:name="Transform Message">
+            <ee:message>
+            </ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="customer_name" ><![CDATA[%dw 2.0
+output application/json
+---
+attributes.queryParams.customer_name]]></ee:set-variable>
 			</ee:variables>
-		</ee:transform>
-		<logger level="INFO" doc:name="Logger" doc:id="c26b066a-3118-4e61-8971-0caa731fa9b6" message="#[vars.payloadCCP]"/>
-		<flow-ref doc:name="Call to orchestrator-redpack-send-ccp-main" doc:id="f736c971-dcc7-4273-abf8-be4f326634b3" name="orchestrator-redpack-send-ccp-main"/>
+        </ee:transform>
+		<flow-ref doc:name="Call-orchestrator-post-wms-order" doc:id="e403a64e-b12d-4fcc-ab32-cca42e0d353a" name="orchestrator-post-wms-order"/>
     </flow>
 </mule>
