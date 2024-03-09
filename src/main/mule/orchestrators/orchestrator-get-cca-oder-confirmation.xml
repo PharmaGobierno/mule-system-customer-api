@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	<sub-flow name="orchestrator-get-cca-oder-confirmation" doc:id="4d56571a-0040-4326-b700-39814f4fc973" >
+		<logger level="INFO" doc:name="Visualize payload request" doc:id="7f3c15e4-fb76-45eb-b166-89576cffb8d4" message="#[payload]"/>
+		<flow-ref doc:name="Call-client-cca-call-services-get-order-confirmation" doc:id="607a0ac0-0753-42b8-ac96-b7a994594a3f" name="client-cca-call-services-get-order-confirmation"/>
+		<logger level="INFO" doc:name="Visualize payload response" doc:id="1285267f-8e8e-48ed-92bd-2df64e4e312b" message="#[payload]"/>
+	</sub-flow>
+</mule>

@@ -18,4 +18,7 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 }]]]></http:query-params>
 		</http:request>
 	</sub-flow>
+	<sub-flow name="client-cca-call-services-get-order-confirmation" doc:id="93809432-409f-4b12-b995-26a263a938a4" >
+		<http:request method="POST" doc:name="Request" doc:id="8cc5325d-88e3-4bbf-870c-1de232e2d6ac" url="https://ppsai-abasto.imss.gob.mx/msportprov-entrada/v1/entradas"/>
+	</sub-flow>
 </mule>
