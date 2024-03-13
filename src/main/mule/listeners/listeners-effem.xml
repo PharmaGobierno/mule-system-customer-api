@@ -5,7 +5,7 @@
 	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
-	<flow name="listeners-effem-listener-response-shipment" doc:id="9bed8b43-0177-485a-ba36-7dd26f60b934" >
+	<flow name="listeners-effem-listener-response-shipment" doc:id="9bed8b43-0177-485a-ba36-7dd26f60b934" initialState="stopped">
 		<jms:listener doc:name="listener response create shipment effem" doc:id="8e63d3ae-a3f5-4249-ac7c-38916c3fa070" config-ref="JMS_Config" destination="${jms.settings.queue.system.tms.to.effem}" inboundContentType="application/json" >
 			<reconnect-forever frequency="${jms.reconnection.frequency.ms}" />
 			<jms:consumer-type >
