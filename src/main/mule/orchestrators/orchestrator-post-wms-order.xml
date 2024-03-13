@@ -14,7 +14,7 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 output application/json
 ---
 {
-	"user": Mule::p('client.wms.blueyonder.https.path.login.user'),
+	"usr_id": Mule::p('client.wms.blueyonder.https.path.login.user'),
 	"password": Mule::p('client.wms.blueyonder.https.path.login.password')
 }]]></ee:set-variable>
 			</ee:variables>

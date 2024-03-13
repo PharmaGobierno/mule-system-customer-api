@@ -13,6 +13,7 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 	</sub-flow>
 	<sub-flow name="client-wms-blueyonder-service-api" doc:id="09d5fdd2-8cff-4e1f-9f91-240f11e9f670" >
 		<logger level="INFO" doc:name="Visualize payload" doc:id="05f6396e-add4-4f3d-91b2-31f11a525adb" message="#[payload]"/>
-		<http:request method="POST" doc:name="Request" doc:id="5a1299d2-4c24-4994-bd7f-b81979cb097a" config-ref="HTTP_Request_configuration-Wms-blueyonder-connection" path="${client.wms.blueyonder.https.path.wms.post}"/>
+		<http:request method="POST" doc:name="Request" doc:id="5a1299d2-4c24-4994-bd7f-b81979cb097a" config-ref="HTTP_Request_configuration-Wms-blueyonder-connection" path="${client.wms.blueyonder.https.path.wms.post.imss}"/>
+		<logger level="INFO" doc:name="Logger" doc:id="3d23c613-8de7-4aee-b4ae-149ea72af029" message="#[payload]"/>
 	</sub-flow>
 </mule>
