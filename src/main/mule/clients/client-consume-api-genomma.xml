@@ -67,7 +67,7 @@ ns soapenv http://schemas.xmlsoap.org/soap/envelope/
 			</ee:message>
 		</ee:transform>
 		<logger level="INFO" doc:name="Logger" doc:id="af24de8f-9ae3-41ad-baf6-546a7d962fa5" message="#[payload]"/>
-		<http:request method="POST" doc:name="Request" doc:id="0caa9311-98e2-4b65-a7af-b61392c8149c" config-ref="HTTP_Request_configuration1" path="/sap/bc/srt/scs/sap/zsi_gps_eventos_in?sap-client=200" outputMimeType="text/xml">
+		<http:request method="POST" doc:name="Request" doc:id="0caa9311-98e2-4b65-a7af-b61392c8149c" config-ref="HTTP_Request_configuration1" path="/sap/bc/srt/scs/sap/zsi_gps_eventos_in?sap-client=250" outputMimeType="text/xml">
 			<http:headers ><![CDATA[#[output application/java
 ---
 {
