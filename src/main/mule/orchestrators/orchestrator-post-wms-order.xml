@@ -6,6 +6,15 @@
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
 	<sub-flow name="orchestrator-post-wms-order" doc:id="1d5615d8-cea1-4fab-b02a-d9fcb525dd11" >
 		<logger level="INFO" doc:name="Visualize payload" doc:id="369b3ec0-2f29-4d07-841f-306101132a47" message="#[payload]"/>
+		<ee:transform doc:name="Back up payload" doc:id="f7578377-37b5-4d78-83ab-11427b843b44">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="backUpPayload"><![CDATA[%dw 2.0
+output application/xml
+---
+payload]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
 		<ee:transform doc:name="Set var-body requestLogin" doc:id="7d570d10-d3c5-48b1-b1ac-ee68e5eaeea6" >
 			<ee:message >
 			</ee:message>
