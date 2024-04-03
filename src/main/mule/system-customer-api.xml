@@ -3,7 +3,7 @@
     <http:listener-config name="system-customer-api-httpListenerConfig">
         <http:listener-connection host="0.0.0.0" port="8082" protocol="HTTPS" tlsContext="TLS_Context" />
     </http:listener-config>
-    <apikit:config name="system-customer-api-config" api="resource::ab8117f6-d718-4307-b5f7-03262d589cd0:system-customer-api:1.0.28:raml:zip:system-customer-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <apikit:config name="system-customer-api-config" api="resource::ab8117f6-d718-4307-b5f7-03262d589cd0:system-customer-api:1.0.29:raml:zip:system-customer-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
     <flow name="system-customer-api-main">
         <http:listener config-ref="system-customer-api-httpListenerConfig" path="/api/*">
             <http:response statusCode="#[vars.httpStatus default 200]">
@@ -162,10 +162,10 @@ error.errorMessage.payload]]></ee:set-payload>
                     </ee:variables>
                 </ee:transform>
             </on-error-propagate>
-			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="110b66f9-31f8-42a4-86ac-6eb49affdef8" type="CCA:ERROR">
-				<ee:transform doc:name="Transform Message" doc:id="58ca8027-c5df-4486-a8b0-2003935f7d7f" >
-					<ee:message >
-						<ee:set-payload ><![CDATA[%dw 2.0
+            <on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="110b66f9-31f8-42a4-86ac-6eb49affdef8" type="CCA:ERROR">
+                <ee:transform doc:name="Transform Message" doc:id="58ca8027-c5df-4486-a8b0-2003935f7d7f">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
 if(isEmpty(payload.erroresM[0]))
@@ -192,20 +192,20 @@ else
 		}
 	}
 }]]></ee:set-payload>
-					</ee:message>
-					<ee:variables >
-						<ee:set-variable variableName="httpStatus" ><![CDATA[%dw 2.0
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus"><![CDATA[%dw 2.0
 output application/json
 ---
 if(isEmpty(payload.erroresM[0]) and vars.codeErrorCca == 206)
 400
 else
 409]]></ee:set-variable>
-					</ee:variables>
-				</ee:transform>
-				<logger level="INFO" doc:name="Logger" doc:id="af44ce0c-9b98-46f6-b878-5e68c1dd717e" message="#[payload]"/>
-			</on-error-propagate>
-			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="ebf8e80d-8cef-45d6-b0a1-31c1c2b22e58" type="ANY">
+                    </ee:variables>
+                </ee:transform>
+                <logger level="INFO" doc:name="Logger" doc:id="af44ce0c-9b98-46f6-b878-5e68c1dd717e" message="#[payload]" />
+            </on-error-propagate>
+            <on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="ebf8e80d-8cef-45d6-b0a1-31c1c2b22e58" type="ANY">
                 <ee:transform doc:name="Transform Message" doc:id="c307f56a-fe57-49dc-a5af-07e3d8b8fb7a">
                     <ee:message>
                         <ee:set-payload><![CDATA[%dw 2.0
@@ -238,9 +238,9 @@ output application/json
 	}
 }]]></ee:set-payload>
                     </ee:message>
-					<ee:variables >
-						<ee:set-variable variableName="httpStatus" ><![CDATA[500]]></ee:set-variable>
-					</ee:variables>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus"><![CDATA[500]]></ee:set-variable>
+                    </ee:variables>
                 </ee:transform>
             </on-error-propagate>
         </error-handler>
