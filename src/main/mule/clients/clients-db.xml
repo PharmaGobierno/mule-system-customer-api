@@ -57,4 +57,58 @@ payload]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
 	</sub-flow>
+	<sub-flow name="client-bd-connection-cca-key-from-wms-key" doc:id="8b2f42b5-626b-4c72-b100-b812c8a71cdf">
+		<ee:transform doc:name="Set query" doc:id="36c510c6-d8ff-4ee6-a062-00a6aa3106fc">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="ccaKeyFrmWms"><![CDATA[%dw 2.0
+output application/json
+var schema = Mule::p('database.wms.blueyonder.schema')
+---
+"SELECT
+	ALT.ALT_PRTNUM CLAVE_CCA
+FROM
+	"++ schema ++".ALT_PRTMST ALT
+JOIN "++ schema ++".PRTMST PRT ON
+	PRT.PRTNUM = ALT.PRTNUM
+WHERE
+	PRT.PRTNUM IN ('"++ (vars.prtNumPl default "") ++"')"]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<logger level="INFO" doc:name="Visualize query variable" doc:id="3c9bd5a9-31c6-4810-878c-3c96ce14587f" message="#[vars.ccaKeyFrmWms]"/>
+		<db:select doc:name="Select" doc:id="4fb32127-f1b0-4f5c-b964-32bb6e945fe5" config-ref="Database_Config_Wms_Blueyonder" target="dbResponse">
+			<db:sql><![CDATA[#[vars.ccaKeyFrmWms]]]></db:sql>
+			<db:parameter-types />
+		</db:select>
+		<ee:transform doc:name="Transform java response to json" doc:id="7c23b431-c493-43da-811e-af7de8fdd857" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+vars.dbResponse]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Visualize response transformation" doc:id="a23e5b1a-5f04-4ea3-9427-dad00cf2afd1" message="#[payload]"/>
+	</sub-flow>
+	<sub-flow name="client-bd-connection-wms-key-from-cca-key" doc:id="92de8428-7d9a-4604-9f04-b643304140a0" >
+		<ee:transform doc:name="Set query" doc:id="deec73f3-44f7-4b84-a9ee-6b892ec6b15f" >
+			<ee:message />
+			<ee:variables >
+				<ee:set-variable variableName="wmsKeyFrmCca" ><![CDATA[%dw 2.0
+output application/json
+var schema = p('database.wms.blueyonder.schema')
+---
+"select prtmst.prtnum clave_wms
+   from alt_prtmst
+   join prtmst
+     on prtmst.prtnum = alt_prtmst.prtnum
+    and prtmst.prt_client_id = alt_prtmst.prt_client_id
+  where alt_prtmst.alt_prtnum = @clave_cca
+    and alt_prtmst.alt_prt_typ = 'CCA'"]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<db:select doc:name="Select" doc:id="2ba9e652-3961-4ee3-8c4f-4581d6e3ef82" config-ref="Database_Config_Wms_Blueyonder" >
+			<db:sql ><![CDATA[#[vars.wmsKeyFrmCca]]]></db:sql>
+		</db:select>
+	</sub-flow>
 </mule>

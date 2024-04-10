@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	<sub-flow name="orchestrator-get-cca-key-from-wms-key" doc:id="8141839c-9b58-4236-97ff-ab16dc4a55a5" >
+		<logger level="INFO" doc:name="Logger" doc:id="a5ffe2f2-2812-47c5-96f6-c18d6036e57f" message="#[payload]"/>
+		<flow-ref doc:name="Call-client-bd-connection-cca-key-from-wms-key" doc:id="44678bbf-ea49-4524-b7c6-0411525a6d56" name="client-bd-connection-cca-key-from-wms-key"/>
+		<logger level="INFO" doc:name="Logger" doc:id="3b7a7aa2-4e2d-4bef-89a1-ec8cf7678890" message="#[payload]"/>
+	</sub-flow>
+</mule>
