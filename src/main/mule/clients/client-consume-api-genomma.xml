@@ -56,8 +56,8 @@ ns soapenv http://schemas.xmlsoap.org/soap/envelope/
           "ID_EVENT": payload.idEvent,
           "SEQUENCE": payload.sequence,
           "LOCATION": payload.location,
-          "DATE": payload.dateTransaction as DateTime as String {format: "dd.MM.uuuu"} default "?",
-          "HOUR": payload.dateTransaction as DateTime as String {format: "KK:mm:ss"} default "?"
+          "DATE": payload.dateTransaction as DateTime as String {format: "uuuuMMdd"} default "?",
+          "HOUR": payload.dateTransaction as DateTime as String {format: "KKmmss"} default "?"
         }
       }
     }
