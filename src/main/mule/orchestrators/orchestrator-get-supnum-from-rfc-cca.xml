@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	<sub-flow name="orchestrator-get-supnum-from-rfc-cca" doc:id="757bc781-3409-4980-a46c-538736b235c0" >
+		<logger level="INFO" doc:name="Logger" doc:id="2d20e7f6-9d16-4c54-afd9-bed6a303b011" message="#[payload]" />
+		<flow-ref doc:name="Call-clients-db-connection-integrations-get-supnum-from-rfc-cca" doc:id="4b381bc4-88cc-4240-9abf-e08f3f8bf472" name="clients-db-connection-integrations-get-supnum-from-rfc-cca" />
+		<logger level="INFO" doc:name="Logger" doc:id="36c32e6a-c937-4e44-b795-ff64a7e79c83" message="#[payload]" />
+	</sub-flow>
+</mule>
