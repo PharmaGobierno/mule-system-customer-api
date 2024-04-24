@@ -111,6 +111,7 @@ WHERE
 		<db:select doc:name="Select" doc:id="77026d6b-06da-4a4b-9508-b405e8122b4a" config-ref="Database_Config_Db_Integrations" target="dbResponse">
 			<db:sql ><![CDATA[#[vars.getSupnumFromRfc]]]></db:sql>
 		</db:select>
+		<logger level="INFO" doc:name="Visualize payload dbresponse" doc:id="944edc29-fd6d-40da-94f5-e341edb03b8f" message="#[%dw 2.0&#10;output application/json&#10;---&#10;vars.dbResponse]"/>
 		<ee:transform doc:name="Transform java response to json" doc:id="34ec1ab5-d305-41cc-a5e6-91945bbd0df2" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
