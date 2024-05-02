@@ -25,11 +25,8 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
 			</http:authentication>
 		</http:request-connection>
 	</http:request-config>
-	<http:request-config name="HTTP_Request_configuration1" doc:name="HTTP Request configuration" doc:id="e79649ce-d2d1-4c27-98ad-61e20b505d95" >
-		<http:request-connection protocol="HTTPS" host="189.204.216.233" port="8001">
-			<tls:context >
-				<tls:trust-store path="client_truststore.ts" password="Pa55word" type="jks" insecure="true" />
-			</tls:context>
+	<http:request-config name="HTTP_Request_configuration_genomma" doc:name="HTTP Request configuration" doc:id="e79649ce-d2d1-4c27-98ad-61e20b505d95" >
+		<http:request-connection host="192.168.12.77" port="8000">
 			<http:authentication >
 				<http:basic-authentication username="GPS_TRAX" password="$rGu0BhZp@wKwzNf34J5Ceym" />
 			</http:authentication>
@@ -49,7 +46,7 @@ ns soapenv http://schemas.xmlsoap.org/soap/envelope/
     soapenv#"Body": {
       even#"MT_Event_GPS_rqst": {
         "HEADER": {
-          "ID_TRANSACTION": payload.idTransaction,
+          "ID_TRANSACTION": "?",
           "FREIGHT_ORDER": payload.freightOrder
         },
         "EVENT": {
@@ -67,7 +64,7 @@ ns soapenv http://schemas.xmlsoap.org/soap/envelope/
 			</ee:message>
 		</ee:transform>
 		<logger level="INFO" doc:name="Logger" doc:id="af24de8f-9ae3-41ad-baf6-546a7d962fa5" message="#[payload]"/>
-		<http:request method="POST" doc:name="Request" doc:id="0caa9311-98e2-4b65-a7af-b61392c8149c" config-ref="HTTP_Request_configuration1" path="/sap/bc/srt/scs/sap/zsi_gps_eventos_in?sap-client=250" outputMimeType="text/xml">
+		<http:request method="POST" doc:name="Request" doc:id="0caa9311-98e2-4b65-a7af-b61392c8149c" config-ref="HTTP_Request_configuration_genomma" path="/sap/bc/srt/scs/sap/zsi_gps_eventos_in?sap-client=250" outputMimeType="text/xml">
 			<http:headers ><![CDATA[#[output application/java
 ---
 {
@@ -75,7 +72,8 @@ ns soapenv http://schemas.xmlsoap.org/soap/envelope/
 }]]]></http:headers>
 
 		</http:request>
-<ee:transform doc:name="Transform Message" doc:id="27882aee-94fd-4e96-8a49-208e85adec9d" >
+<logger level="INFO" doc:name="Logger" doc:id="d40e5e12-d8c8-43ec-bdf6-80ba4be52594" message="#[payload]"/>
+		<ee:transform doc:name="Transform Message" doc:id="27882aee-94fd-4e96-8a49-208e85adec9d" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
