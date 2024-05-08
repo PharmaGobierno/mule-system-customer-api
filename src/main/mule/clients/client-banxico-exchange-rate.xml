@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:request-config name="banxico_HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="29ae69b9-7763-4b81-94fe-eeee231a6647" responseTimeout="${client.banxico.https.response.timeout}">
+		<http:request-connection protocol="HTTPS" host="${client.banxico.https.host}" port="${client.banxico.https.port}" maxConnections="${client.banxico.https.max.connections}" connectionIdleTimeout="${client.banxico.https.connection.idle.timeout}" responseBufferSize="${client.banxico.https.response.buffer.size}"/>
+	</http:request-config>
+
+	<sub-flow name="client-banxico-exchange-rate-call-service" doc:id="34946120-f1c3-4351-b91a-c3b0efbd0693" >
+		<http:request method="GET" doc:name="Request" doc:id="0065aee1-43a7-474f-9ab4-755d80d53514" config-ref="banxico_HTTP_Request_configuration" path="${client.banxico.https.path.tipo.cambio.post}" sendBodyMode="AUTO" requestStreamingMode="AUTO">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Content-Type" : "application/json"
+}]]]></http:headers>
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"end_date" : vars.end_date,
+	"start_date" : vars.start_date,
+	"series_id" : vars.series_id
+}]]]></http:uri-params>
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"token" : vars.token
+}]]]></http:query-params>
+		</http:request>
+	</sub-flow>
+</mule>

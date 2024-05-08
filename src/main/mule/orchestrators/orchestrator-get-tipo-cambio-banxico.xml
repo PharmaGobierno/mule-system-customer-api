@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	<sub-flow name="orchestrator-get-tipo-cambio-banxico-main" doc:id="2842387d-8db8-427b-8539-f62e919a3e35" >
+		<flow-ref doc:name="client-banxico-exchange-rate-set-vars" doc:id="ca0c9856-9dc4-402e-8e25-8ff50df9de8f" name="client-banxico-exchange-rate-set-vars"/>
+		<flow-ref doc:name="client-banxico-exchange-rate-call-service" doc:id="2961e459-2cfc-4783-97db-040a143163b5" name="client-banxico-exchange-rate-call-service"/>
+		<flow-ref doc:name="orchestrator-get-tipo-cambio-banxico-prepare-reponse" doc:id="06d078b2-120e-422b-ad25-06e76ed17697" name="orchestrator-get-tipo-cambio-banxico-prepare-reponse"/>
+	</sub-flow>
+		<sub-flow name="client-banxico-exchange-rate-set-vars" doc:id="dbae6400-0b1e-41e5-b0a6-60d12e883bfa" >
+		<ee:transform doc:name="Transform Message" doc:id="919a2ad0-8bf4-49a3-b4df-1fdec99603e7" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="end_date" ><![CDATA[%dw 2.0
+output application/json
+---
+now() as String {format: "yyyy-MM-dd"}]]></ee:set-variable>
+				<ee:set-variable variableName="start_date" ><![CDATA[%dw 2.0
+output application/json
+---
+now() as String {format: "yyyy-MM-dd"}]]></ee:set-variable>
+				<ee:set-variable variableName="series_id" ><![CDATA[%dw 2.0
+output application/json
+---
+"SF63528"]]></ee:set-variable>
+				<ee:set-variable variableName="token" ><![CDATA[%dw 2.0
+output application/json
+---
+p('client.banxico.token')]]></ee:set-variable>
+			
+</ee:variables>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="orchestrator-get-tipo-cambio-banxico-prepare-reponse" doc:id="7d701a65-6b2e-4e78-9d51-bd8544847c3b" >
+		<ee:transform doc:name="Transform Message" doc:id="b5492958-1695-4e3d-9ce9-607d8bb51305" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload.bmx.series]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+</mule>

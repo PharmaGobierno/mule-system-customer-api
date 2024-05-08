@@ -1,6 +1,6 @@
 %dw 2.0
 
-type auto_0f04d81a_6165_4b3a_bc6e_b1a9fc949804_Input_Attributes = {|
+type auto_2842387d_8db8_427b_8539_f62e919a3e35_Input_Attributes = {|
   clientCertificate?: {|
     publicKey?: {|  |}, 
     "type"?: String, 
@@ -12,7 +12,7 @@ type auto_0f04d81a_6165_4b3a_bc6e_b1a9fc949804_Input_Attributes = {|
   |}, 
   listenerPath: String, 
   method: String, 
-  queryParams: {| clasPtal: String |}, 
+  queryParams: {|  |}, 
   queryString: String, 
   relativePath: String, 
   remoteAddress: String, 
