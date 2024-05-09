@@ -3,7 +3,7 @@
     <http:listener-config name="system-customer-api-httpListenerConfig">
         <http:listener-connection host="0.0.0.0" port="8082" protocol="HTTPS" tlsContext="TLS_Context" />
     </http:listener-config>
-    <apikit:config name="system-customer-api-config" api="resource::ab8117f6-d718-4307-b5f7-03262d589cd0:system-customer-api:1.0.33:raml:zip:system-customer-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <apikit:config name="system-customer-api-config" api="resource::ab8117f6-d718-4307-b5f7-03262d589cd0:system-customer-api:1.0.34:raml:zip:system-customer-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
     <flow name="system-customer-api-main">
         <http:listener config-ref="system-customer-api-httpListenerConfig" path="/api/*">
             <http:response statusCode="#[vars.httpStatus default 200]">
@@ -447,7 +447,7 @@ attributes.queryParams.rfc]]></ee:set-variable>
         </ee:transform>
         <flow-ref doc:name="Call-orchestrator-get-supnum-from-rfc-cca" doc:id="cb01d8e3-b9bb-45fb-913b-fde5bc6397e1" name="orchestrator-get-supnum-from-rfc-cca" />
     </flow>
-    <flow name="get:\wms\banxico\exchange-rate:system-customer-api-config">
-		<flow-ref doc:name="orchestrator-get-tipo-cambio-banxico-main" doc:id="feab1ec4-0346-4ba4-9e14-aa6915c0f770" name="orchestrator-get-tipo-cambio-banxico-main"/>
+    <flow name="get:\banxico\exchange-rate:system-customer-api-config">
+        <flow-ref doc:name="orchestrator-get-tipo-cambio-banxico-main" doc:id="feab1ec4-0346-4ba4-9e14-aa6915c0f770" name="orchestrator-get-tipo-cambio-banxico-main" />
     </flow>
 </mule>
