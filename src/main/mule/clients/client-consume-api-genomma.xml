@@ -81,7 +81,5 @@ output application/json
 payload]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
-		<!-- [STUDIO:"Consume"]		<wsc:consume doc:name="Consume" doc:id="503f0aa9-62a4-40d0-ab68-20140834e4eb" config-ref="Web_Service_Consumer_Config" operation="SI_GPS_EVENTOS_IN">
-		</wsc:consume> [STUDIO] -->
 	</sub-flow>
 </mule>

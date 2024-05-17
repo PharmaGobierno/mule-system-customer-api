@@ -97,10 +97,9 @@ vars.dbResponse]]></ee:set-payload>
 			<ee:variables >
 				<ee:set-variable variableName="getSupnumFromRfc" ><![CDATA[%dw 2.0
 output application/json
-var schema = Mule::p('database.wms.mega.schema')
+var schema = Mule::p('database.wms.blueyonder.schema')
 ---
  "SELECT
-	RF.FAXNUM,
 	SPN.SUPNUM
 FROM
 	"++ schema ++".ADRMST RF
@@ -112,7 +111,7 @@ WHERE
 			</ee:variables>
 		</ee:transform>
 		<logger level="INFO" doc:name="Visualize query variable" doc:id="b433d7a7-2b53-4d2c-a45d-60fa967e0371" message="#[vars.getSupnumFromRfc]"/>
-		<db:select doc:name="Select" doc:id="77026d6b-06da-4a4b-9508-b405e8122b4a" config-ref="Database_Config_Db_Wms" target="dbResponse">
+		<db:select doc:name="Select" doc:id="77026d6b-06da-4a4b-9508-b405e8122b4a" target="dbResponse" config-ref="Database_Config_Wms_Blueyonder">
 			<db:sql ><![CDATA[#[vars.getSupnumFromRfc]]]></db:sql>
 		</db:select>
 		<logger level="INFO" doc:name="Visualize payload dbresponse" doc:id="944edc29-fd6d-40da-94f5-e341edb03b8f" message="#[%dw 2.0&#10;output application/json&#10;---&#10;vars.dbResponse]"/>
