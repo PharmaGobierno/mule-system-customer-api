@@ -64,5 +64,12 @@ http://www.mulesoft.org/schema/mule/x12 http://www.mulesoft.org/schema/mule/x12/
 				<http:basic-authentication username="${http.request.redpack.token.user}" password="${http.request.redpack.token.password}" />
 			</http:authentication>
 		</http:request-connection>
+	</http:request-config>
+	<http:request-config name="HTTP_Request_configuration_Uber_Freight" doc:name="HTTP Request configuration" doc:id="ca841821-f238-4332-b13e-a54835ed7c01" >
+		<http:request-connection protocol="HTTPS" host="uatapi.transplace.com" >
+			<http:authentication >
+				<http:basic-authentication username="QAdxTt7Y3tUth6ArgsY7C4AgoDkfxqn3" password="iGgMrivYj0vDzj9A" />
+			</http:authentication>
+		</http:request-connection>
 	</http:request-config>	
 </mule>

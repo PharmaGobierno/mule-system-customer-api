@@ -5,14 +5,81 @@
 	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="listeners-effemSub_Flow" doc:id="3604a2c9-1971-464c-a86a-75d48e653a04" >
+		<choice doc:name="Choice" doc:id="9b0cdc05-6da6-4551-8d2e-b46828053e47" >
+			<when expression='#[payload.operation_name == "changeTender"]'>
+				<flow-ref doc:name="client-uber-freigth-get-token" doc:id="e0fa9a6e-d785-4331-bef4-ff65cebb9232" name="client-uber-freigth-get-token" target="token"/>
+				<ee:transform doc:name="Transform Message" doc:id="38a28ed4-0c4e-4d4f-9f61-b00e381ef03d" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<flow-ref doc:name="client-uber-freigth-tender" doc:id="3bb0bcf9-2e42-4a8f-8362-48dfff97f479" name="client-uber-freigth-tender"/>
+			</when>
+			<when expression='#[payload.operation_name == "changeTender" and payload.status != "POD"]'>
+				<flow-ref doc:name="client-uber-freigth-get-token" doc:id="1dd3c091-08f7-4660-b155-37dafc743641" name="client-uber-freigth-get-token" target="token" />
+				<ee:transform doc:name="Transform Message" doc:id="7a2320d7-9a25-4c44-a497-9dba15977d11" >
+					<ee:message >
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="codes" ><![CDATA[%dw 2.0
+output application/json
+---
+payload.status match{
+    case "check_out" -> 				{typeCode: "ARRIVAL",
+											statusCode: "X1"}
+    case "loading" -> 				{typeCode: "LOADED",
+											statusCode: "CP"}
+    case "unloading" -> 				{typeCode: "LOADED",
+											statusCode: "CP"}
+    case "check_in" -> 				{typeCode: "ARRIVAL",
+											statusCode: "X3 "}
+    case "loaded" -> 				{typeCode: "LOADED",
+											statusCode: "D1"}
+    case "unloaded" -> 				{typeCode: "UNLOADED",
+											statusCode: "D1"}
+    
+    else -> {}
+}]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<ee:transform doc:name="Transform Message" doc:id="c2394a68-4fae-48a9-8157-39e24595b0e2" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  loadId: 877376436,
+  scac: "LOAL",
+  shipmentLookupReferenceName: "SHIP ID",
+  shipmentLookupReferenceValue: "877376436",
+  checkCalls: [{
+      stopSequenceNumber: 1,
+      "type": "ARRIVAL",
+      statusCode: "X3",
+      reasonCode: "NS",
+      dateTime: "2024-04-04 09:00"
+    }
+  ]
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<flow-ref doc:name="client-uber-freigth-change-status" doc:id="4912ec8a-1b93-4ca0-a110-e001cae0460c" name="client-uber-freigth-change-status"/>
+			</when>
+		</choice>
+	</sub-flow>
 	<flow name="listeners-effem-listener-response-shipment" doc:id="9bed8b43-0177-485a-ba36-7dd26f60b934" >
-		<jms:listener doc:name="listener response create shipment effem" doc:id="8e63d3ae-a3f5-4249-ac7c-38916c3fa070" config-ref="JMS_Config" destination="${jms.settings.queue.system.tms.to.effem}" inboundContentType="application/json" >
+<!-- [STUDIO:"listener response create shipment effem"]		<jms:listener doc:name="listener response create shipment effem" doc:id="8e63d3ae-a3f5-4249-ac7c-38916c3fa070" config-ref="JMS_Config" destination="${jms.settings.queue.system.tms.to.effem}" inboundContentType="application/json" >
 			<reconnect-forever frequency="${jms.reconnection.frequency.ms}" />
 			<jms:consumer-type >
 				<jms:queue-consumer />
 			</jms:consumer-type>
 			<jms:response sendCorrelationId="ALWAYS"/>
-		</jms:listener>
+		</jms:listener> [STUDIO] -->
 		<ee:transform doc:name="backup payload" doc:id="0a680007-9fc8-4577-85e2-efff351317d3" >
 			<ee:message >
 			</ee:message>

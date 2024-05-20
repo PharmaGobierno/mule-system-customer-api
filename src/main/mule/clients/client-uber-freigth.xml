@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="client-uber-freigth-get-token" doc:id="639e3d95-7156-484a-8db0-c44e62013623" >
+		<http:request method="POST" doc:name="Request" doc:id="691594a3-9910-4efd-b1a1-aca51d141dd2" config-ref="HTTP_Request_configuration_Uber_Freight" path="/oauth2/accesstoken">
+			<http:body ><![CDATA[#[%dw 2.0
+output application/x-www-form-urlencoded
+---
+{
+grant_type: "client_credentials"
+}]]]></http:body>
+		</http:request>
+	</sub-flow>
+	<sub-flow name="client-uber-freigth-tender" doc:id="954f10b2-d870-45e7-83ff-2b2e358fcce1" >
+		<http:request method="POST" doc:name="Request" doc:id="249bfc20-be81-4dd3-abe5-c01e21476923" config-ref="HTTP_Request_configuration_Uber_Freight" path="/tp-api/carrier/v2/tender-accept-reject" >
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Authorization" : "Bearer " ++ vars.token.access_token as String
+}]]]></http:headers>
+		</http:request>
+	</sub-flow>
+	<sub-flow name="client-uber-freigth-change-status" doc:id="27230e40-9b35-4ede-8fe5-39f1fc6d3124" >
+		<http:request method="POST" doc:name="Request" doc:id="c3e991f2-d039-4a60-9363-59c31cd5e1e3" config-ref="HTTP_Request_configuration_Uber_Freight" path="/tp-api/carrier/v2/carrier-shipment-status">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Authorization" : "Bearer " ++ vars.token.access_token as String
+}]]]></http:headers>
+		</http:request>
+	</sub-flow>
+	<flow name="client-uber-freigthFlow" doc:id="f25020d3-d2e9-42f3-906f-12d22516ea0a" >
+		<http:listener doc:name="Listener" doc:id="9c52ad6c-5221-4cfb-88cc-b3af42e2cb19" config-ref="system-customer-api-httpListenerConfig" path="/token/uber"/>
+		<flow-ref doc:name="Flow Reference" doc:id="67d24da5-5235-42ae-a068-003cb260000b" name="client-uber-freigth-get-token"/>
+	</flow>
+	<flow name="client-uber-freigthFlow1" doc:id="43bce6b9-2811-4ba6-b6a8-33d8fa892ef4" >
+		<http:listener doc:name="Listener" doc:id="a861814f-2231-4e56-b323-635d776650e5" config-ref="system-customer-api-httpListenerConfig" path="/tender" />
+		<ee:transform doc:name="Transform Message" doc:id="fb53c35a-368e-416f-bc05-36f31e4c0e1a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  action: "ACCEPT",
+  scac: "LOAL",
+  loadId: payload.load
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="POST" doc:name="Request" doc:id="0365e441-d258-4b7f-9b7b-2cab2e39b2cc" config-ref="HTTP_Request_configuration_Uber_Freight" path="/tp-api/carrier/v2/tender-accept-reject" >
+			<http:body ><![CDATA[#[%dw 2.0
+output application/x-www-form-urlencoded
+---
+{
+grant_type: "client_credentials"
+}]]]></http:body>
+		</http:request>
+	</flow>
+	<flow name="client-uber-freigthFlow2" doc:id="aea04eb9-e092-43f5-b390-1871337ee84c" >
+		<http:listener doc:name="Listener" doc:id="a29a504d-aaf9-4ed4-b294-dbc70b56693b" config-ref="system-customer-api-httpListenerConfig" path="/tender" />
+		<ee:transform doc:name="Transform Message" doc:id="db729662-fef7-4945-b197-ce2d2757c367" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  action: "ACCEPT",
+  scac: "LOAL",
+  loadId: payload.load
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
