@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:validation="http://www.mulesoft.org/schema/mule/validation"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 	<http:request-config name="cca-connection-HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="2ecfd3e5-1f8e-4bae-bc9e-e17e7a4a23b6" responseTimeout="${http.request.cca.api.timeout}">
 		<http:request-connection protocol="HTTPS" host="${http.request.cca.api.host}" port="#[vars.port]"/>
 	</http:request-config>
 	<sub-flow name="client-cca-call-services-get-order-remision" doc:id="ec19fe54-08e9-4fea-8454-6cc2ec8082e3" >
+		<logger level="INFO" doc:name="Logger" doc:id="1d2450f6-d3b6-48f8-b9cb-31517a47a88e" message="#[payload]"/>
 		<http:request method="GET" doc:name="Request" doc:id="d313d774-6ace-49b5-b99d-7f2c3e4cc4dd" url="https://ppsai-abasto.imss.gob.mx/msportprov-orden/v1/ordenes/50030399">
 			<http:query-params ><![CDATA[#[output application/java
 ---
@@ -17,5 +21,27 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 	"password" : vars.password
 }]]]></http:query-params>
 		</http:request>
+		<logger level="INFO" doc:name="Logger" doc:id="82a98730-5fe0-4c9a-920f-c7bf519d506c" message="#[payload]"/>
+	</sub-flow>
+	<sub-flow name="client-cca-call-services-get-order-confirmation" doc:id="93809432-409f-4b12-b995-26a263a938a4" >
+		<logger level="INFO" doc:name="Logger" doc:id="fced381f-8cb9-47ba-9ad5-337179b99590" message="#[payload]"/>
+		<http:request method="POST" doc:name="Request" doc:id="8cc5325d-88e3-4bbf-870c-1de232e2d6ac" url="https://ppsai-abasto.imss.gob.mx/msportprov-entrada/v1/entradas">
+		</http:request>
+		<ee:transform doc:name="Catch http status 206" doc:id="6149e312-9df5-442a-8742-5c565e877b77">
+				<ee:message>
+				</ee:message>
+				<ee:variables>
+				<ee:set-variable variableName="codeErrorCca" ><![CDATA[attributes.statusCode]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		<choice doc:name="Choice" doc:id="9c3f4174-318d-4c4a-8218-bee0f4889bc9" >
+			<when expression="#[vars.codeErrorCca == 206]">
+				<raise-error doc:name="Raise error" doc:id="75c1172f-fea2-4f64-9c1e-7da4c28df2e4" type="CCA:ERROR" description="ERROR AL DAR DE ALTA" />
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger" doc:id="a03b095c-4795-4acf-b8de-78a4bbcf7bc4" message="#[payload]"/>
+			</otherwise>
+		</choice>
+		<logger level="INFO" doc:name="Logger" doc:id="142d806b-46a3-4c03-8ff6-e65eaf084b15" message="#[payload]"/>
 	</sub-flow>
 </mule>

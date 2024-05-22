@@ -5,7 +5,7 @@
 	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
-	<sub-flow name="listeners-effemSub_Flow" doc:id="3604a2c9-1971-464c-a86a-75d48e653a04" >
+	<sub-flow name="listeners-effem-update-status" doc:id="3604a2c9-1971-464c-a86a-75d48e653a04" >
 		<choice doc:name="Choice" doc:id="9b0cdc05-6da6-4551-8d2e-b46828053e47" >
 			<when expression='#[payload.operation_name == "changeTender"]'>
 				<flow-ref doc:name="client-uber-freigth-get-token" doc:id="e0fa9a6e-d785-4331-bef4-ff65cebb9232" name="client-uber-freigth-get-token" target="token"/>
@@ -59,8 +59,8 @@ output application/json
   shipmentLookupReferenceValue: "877376436",
   checkCalls: [{
       stopSequenceNumber: 1,
-      "type": "ARRIVAL",
-      statusCode: "X3",
+      "type": vars.codes.typeCode,
+      statusCode: vars.codes.statusCode,
       reasonCode: "NS",
       dateTime: "2024-04-04 09:00"
     }
@@ -74,6 +74,8 @@ output application/json
 	</sub-flow>
 	<flow name="listeners-effem-listener-response-shipment" doc:id="9bed8b43-0177-485a-ba36-7dd26f60b934" >
 <!-- [STUDIO:"listener response create shipment effem"]		<jms:listener doc:name="listener response create shipment effem" doc:id="8e63d3ae-a3f5-4249-ac7c-38916c3fa070" config-ref="JMS_Config" destination="${jms.settings.queue.system.tms.to.effem}" inboundContentType="application/json" >
+	<flow name="listeners-effem-listener-response-shipment" doc:id="9bed8b43-0177-485a-ba36-7dd26f60b934" initialState="started">
+		<jms:listener doc:name="listener response create shipment effem" doc:id="8e63d3ae-a3f5-4249-ac7c-38916c3fa070" config-ref="JMS_Config" destination="${jms.settings.queue.system.tms.to.effem}" inboundContentType="application/json" >
 			<reconnect-forever frequency="${jms.reconnection.frequency.ms}" />
 			<jms:consumer-type >
 				<jms:queue-consumer />
@@ -95,7 +97,7 @@ payload]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
 		<logger level="INFO" doc:name="Logger" doc:id="ebc0a8c5-6904-46d0-b1d2-cb018fa1ee45" message="#[vars.payloadBK]"/>
-		<flow-ref doc:name="listener-jms-queues-choise-validate-load-status" doc:id="06631e26-152b-4128-8a09-f6c8e9454b50" name="listener-jms-queues-choise-validate-load-status"/>
+		<!-- [STUDIO:"listener-jms-queues-choise-validate-load-status"]<flow-ref doc:name="listener-jms-queues-choise-validate-load-status" doc:id="06631e26-152b-4128-8a09-f6c8e9454b50" name="listener-jms-queues-choise-validate-load-status"/> [STUDIO] -->
 	</flow>
 	<sub-flow name="listener-jms-queues-choise-validate-load-status" doc:id="b5757e0a-19d3-40ab-836a-0fea5843668a" >
 		<choice doc:name="file type" doc:id="7992421f-82e7-455e-bb32-8bfea1cc2c2d">

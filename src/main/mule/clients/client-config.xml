@@ -71,5 +71,11 @@ http://www.mulesoft.org/schema/mule/x12 http://www.mulesoft.org/schema/mule/x12/
 				<http:basic-authentication username="QAdxTt7Y3tUth6ArgsY7C4AgoDkfxqn3" password="iGgMrivYj0vDzj9A" />
 			</http:authentication>
 		</http:request-connection>
+	</http:request-config>
+	<http:request-config name="Http_request_Redpack_ccp_token" doc:name="HTTP Request configuration" doc:id="3f4697bd-118f-4978-b3b0-6e1752931cea" >
+		<http:request-connection protocol="HTTPS" host="${client.redpack.ccp.token.http.host}" port="${client.redpack.ccp.token.http.port}" maxConnections="${client.redpack.ccp.token.http.max.connections}" connectionIdleTimeout="${client.redpack.ccp.token.http.connection.idle.timeout}" responseBufferSize="${client.redpack.ccp.token.http.response.buffer.size}" />
+	</http:request-config>
+	<http:request-config name="Http_request_Redpack_ccp_send" doc:name="HTTP Request configuration" doc:id="80c8fe2d-adcc-42d2-aaf5-544f765b9d47" >
+		<http:request-connection protocol="HTTPS" host="${client.redpack.ccp.http.host}" port="${client.redpack.ccp.http.port}" maxConnections="${client.redpack.ccp.http.max.connections}" connectionIdleTimeout="${client.redpack.ccp.http.connection.idle.timeout}" responseBufferSize="${client.redpack.ccp.response.buffer.size}" />
 	</http:request-config>	
 </mule>

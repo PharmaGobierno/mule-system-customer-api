@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:ftp="http://www.mulesoft.org/schema/mule/ftp"
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:ftp="http://www.mulesoft.org/schema/mule/ftp"
 	xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp"
-	xmlns:db="http://www.mulesoft.org/schema/mule/db"
-	xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway" xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
-	xmlns:traxion-s-logger="http://www.mulesoft.org/schema/mule/traxion-s-logger"
-	xmlns:jms="http://www.mulesoft.org/schema/mule/jms" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+	xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway"
+	xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+	xmlns:traxion-s-logger="http://www.mulesoft.org/schema/mule/traxion-s-logger" xmlns:jms="http://www.mulesoft.org/schema/mule/jms" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
 http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
 http://www.mulesoft.org/schema/mule/traxion-s-logger http://www.mulesoft.org/schema/mule/traxion-s-logger/current/mule-traxion-s-logger.xsd
 http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
-http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd">
+http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 	<configuration-properties doc:name="Configuration properties" doc:id="2ebe0f1d-6033-4b45-afb4-464f46a18cf9" file="system-customer-${env}.properties" />
 	<global-property doc:name="Global Property" doc:id="0d881c61-252d-43fa-b382-2c62bb4d3bb1" name="env" value="uat" />
 	<tls:context name="TLS_Context" doc:name="TLS Context" doc:id="d49be2a6-abf1-4439-abd7-e1b0abfff9db" >
-		<tls:key-store type="pkcs12" path="Traxion_Logistics.p12" keyPassword="wWpg9LfX6nxh9Ke3u1L0wxSmYr5y3YKTjAWiTMEa9dww" password="wWpg9LfX6nxh9Ke3u1L0wxSmYr5y3YKTjAWiTMEa9dww" />
+		<tls:key-store type="${https.listener.key.store.type}" path="${https.listener.key.store.path}" keyPassword="${https.listener.key.store.key.password}" password="${https.listener.key.store.password}" />
 	</tls:context>
 	<db:config name="Database_Config_informix" doc:name="Database Config" doc:id="77749134-fe26-4bb1-8652-7c23ab48779f">
         <db:generic-connection url="${db.settings.informix.url}" driverClassName="com.informix.jdbc.IfxDriver" user="${db.settings.informix.user}" password='Xu&lt;VE")\E-h-q8rN' />
@@ -22,6 +23,16 @@ http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/m
 	<api-gateway:autodiscovery apiId="${anypoint.platform.autodiscovery}" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="a94b9406-08b6-4543-bdf1-17ab596c27bc" flowRef="system-customer-api-main" />
 	<db:config name="Database_Config" doc:name="Database Config" doc:id="f13dd0cd-d4cf-4ae4-acac-957850b3361a" >
 		<db:generic-connection url="${db.settings.url}" user="${db.settings.user}" driverClassName="software.aws.rds.jdbc.mysql.Driver" password="${db.settings.password}"/>
+	</db:config>
+	<http:request-config name="HTTP_Request_configuration-Wms-blueyonder-connection" doc:name="HTTP Request configuration" doc:id="0e9c9409-ce06-4df1-a6e4-ca202f4d6cdc" responseTimeout="${client.wms.blueyonder.https.response.timeout}">
+		<http:request-connection protocol="HTTPS" host="${client.wms.blueyonder.https.host}" port="${client.wms.blueyonder.https.port}" maxConnections="${client.wms.blueyonder.https.max.connections}" connectionIdleTimeout="${client.wms.blueyonder.https.connection.idle.timeout}" responseBufferSize="${client.wms.blueyonder.https.response.buffer.size}">
+			<tls:context >
+				<tls:trust-store path="${https.connection.wms.tls.path}" password="${https.connection.wms.tls.password}" type="${https.connection.wms.tls.type}" />
+			</tls:context>
+		</http:request-connection>
+	</http:request-config>
+	<db:config name="Database_Config_Wms_Blueyonder" doc:name="Database Config" doc:id="669f892b-2b17-4f13-92a5-02d0611f1bd0" >
+		<db:oracle-connection host="${database.wms.blueyonder.server}" port="${database.wms.blueyonder.port}" user="${database.wms.blueyonder.username}" password="${database.wms.blueyonder.password}" serviceName="${database.wms.blueyonder.name}"/>
 	</db:config>
 
 </mule>

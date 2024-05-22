@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="orchestrator-post-cca-wms-receipt" doc:id="55173ac9-6b7d-4d04-b06e-c2825893b3c5" >
+		<logger level="INFO" doc:name="Visualize payload" doc:id="6c5f6a81-5a6e-4aff-ae7a-2661594f4459" message="#[payload]"/>
+		<ee:transform doc:name="Back up payload" doc:id="4638d8f3-49ba-474c-a44a-864492b6861a" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="backUpPayload" ><![CDATA[%dw 2.0
+output application/xml
+---
+payload]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<ee:transform doc:name="Set var-body requestLogin" doc:id="10857d63-6e73-4557-ac78-09fc1a42bfa2" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="requestLogin" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"usr_id": Mule::p('client.wms.blueyonder.https.path.login.user'),
+	"password": Mule::p('client.wms.blueyonder.https.path.login.password')
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="Call-client-wms-blueyonder-login" doc:id="5b668ad3-6c67-4dc1-8ae1-f5c9c2eb20ca" name="client-wms-blueyonder-login"/>
+		<logger level="INFO" doc:name="Visualize response payload" doc:id="56987e50-48a1-4056-8ca6-f126f51fedf3" message="#[payload]"/>
+	</sub-flow>
+</mule>
