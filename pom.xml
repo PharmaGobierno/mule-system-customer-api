@@ -158,12 +158,6 @@
 		</dependency>
 		<dependency>
 			<groupId>org.mule.connectors</groupId>
-			<artifactId>mule-wsc-connector</artifactId>
-			<version>1.9.0</version>
-			<classifier>mule-plugin</classifier>
-		</dependency>
-		<dependency>
-			<groupId>org.mule.connectors</groupId>
 			<artifactId>mule-jms-connector</artifactId>
 			<version>1.9.4</version>
 			<classifier>mule-plugin</classifier>
@@ -174,6 +168,12 @@
 			<version>1.0.35</version>
 			<classifier>raml</classifier>
 			<type>zip</type>
+		</dependency>
+		<dependency>
+			<groupId>org.mule.connectors</groupId>
+			<artifactId>mule-wsc-connector</artifactId>
+			<version>1.8.1</version>
+			<classifier>mule-plugin</classifier>
 		</dependency>
 	</dependencies>
 
