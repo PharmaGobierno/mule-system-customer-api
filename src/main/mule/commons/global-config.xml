@@ -34,5 +34,8 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 	<db:config name="Database_Config_Wms_Blueyonder" doc:name="Database Config" doc:id="669f892b-2b17-4f13-92a5-02d0611f1bd0" >
 		<db:oracle-connection host="${database.wms.blueyonder.server}" port="${database.wms.blueyonder.port}" user="${database.wms.blueyonder.username}" password="${database.wms.blueyonder.password}" serviceName="${database.wms.blueyonder.name}"/>
 	</db:config>
+	<db:config name="Database_Config_prodIntegra" doc:name="Database Config" doc:id="95bc81bf-81da-45a2-b47a-1df598c5b716" >
+		<db:my-sql-connection host="${database.integrations.server}" port="${database.integrations.port}" user="${database.integrations.user}" password="${database.integrations.password}" database="${database.integrations.schema}" />
+	</db:config>
 
 </mule>
