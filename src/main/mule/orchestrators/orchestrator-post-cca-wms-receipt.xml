@@ -24,8 +24,8 @@ payload]]></ee:set-variable>
 output application/json
 ---
 {
-	"usr_id": Mule::p('client.wms.blueyonder.https.path.login.user'),
-	"password": Mule::p('client.wms.blueyonder.https.path.login.password')
+	"usr_id": p('client.wms.blueyonder.https.path.login.user'),
+	"password": p('client.wms.blueyonder.https.path.login.password')
 }]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
