@@ -16,7 +16,7 @@ grant_type: "client_credentials"
 			<http:headers ><![CDATA[#[output application/java
 ---
 {
-	"Authorization" : "Basic UUFkeFR0N1kzdFV0aDZBcmdzWTdDNEFnb0RrZnhxbjM6aUdnTXJpdllqMHZEemo5QQ=="
+	"Authorization" : "Basic MVh0U0lWcUJqMVVrR3RHMzQ4eDFoVzk0MXBWVVdMR3c6Q05tRHpBOTdiNnZYeFRSag=="
 }]]]></http:headers>
 		</http:request>
 	</sub-flow>
@@ -38,38 +38,4 @@ grant_type: "client_credentials"
 }]]]></http:headers>
 		</http:request>
 	</sub-flow>
-	<flow name="client-uber-freigthFlow1" doc:id="43bce6b9-2811-4ba6-b6a8-33d8fa892ef4">
-<!-- [STUDIO:"Scheduler"]		<scheduler doc:name="Scheduler" doc:id="fd33ee74-95d4-4b10-89f4-fa0ee252f778" >
-			<scheduling-strategy >
-				<fixed-frequency frequency="1" timeUnit="HOURS"/>
-			</scheduling-strategy>
-		</scheduler> [STUDIO] -->
-		<ee:transform doc:name="Transform Message" doc:id="6b30d260-dfbe-4d4a-b0bf-74e0e45d93a2" >
-			<ee:message >
-				<ee:set-payload ><![CDATA[%dw 2.0
-output application/json
----
-{
-    "operation_name": "changeStatus",
-    "status": "check_out",
-    "system_load_id": "48133", // Colocar el número de load Id 
-    "carrier_code": "0309001318",
-    "service_code": "FTL", // Para efecto de prueba dejar FTL 
-    "equipment_type_code": "T_53P", // Dejar T_53P 
-    "tender_accepted_by": "Traxporta", // Para efecto de prueba dejar Traxporta 
-    "gps": "", // Valor vacio 
-    "tractor_number": "", // Número de unidad en su sistema 
-    "tractor_plates": "", // PLacas de la unidad 
-    "trailer_number": "", // Numero del trailer en su sistema 
-    "trailer_plates": "", // Placas del trailer 
-    "driver_name": "", // Nombre completo de operador 
-    "shipment_number": "", // Valor vacio 
-    "event_date_time": "2024-05-22T12:50:15", // Mantener formato 
-    "record_date_time": "2024-05-22T12:50:15", // Mantener formato 
-    "stop_sequence_number": "1"
-}]]></ee:set-payload>
-			</ee:message>
-		</ee:transform>
-		<flow-ref doc:name="listeners-effem-update-status" doc:id="2706903f-57bc-475e-9332-5889f01ea4cf" name="listeners-effem-update-status"/>
-	</flow>
 </mule>

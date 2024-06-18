@@ -66,7 +66,7 @@ http://www.mulesoft.org/schema/mule/x12 http://www.mulesoft.org/schema/mule/x12/
 		</http:request-connection>
 	</http:request-config>
 	<http:request-config name="HTTP_Request_configuration_Uber_Freight" doc:name="HTTP Request configuration" doc:id="ca841821-f238-4332-b13e-a54835ed7c01" >
-		<http:request-connection protocol="HTTPS" host="uatapi.transplace.com" >
+		<http:request-connection protocol="HTTPS" host="${client.mars.http.host}" maxConnections="${client.mars.http.max.connections}" connectionIdleTimeout="${client.mars.http.connection.idle.timeout}" responseBufferSize="${client.mars.http.response.buffer.size}">
 		</http:request-connection>
 	</http:request-config>
 	<http:request-config name="Http_request_Redpack_ccp_token" doc:name="HTTP Request configuration" doc:id="3f4697bd-118f-4978-b3b0-6e1752931cea" >
