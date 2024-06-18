@@ -83,7 +83,7 @@ vars.responseShipment.findEntitiesResponse.body.findEntitiesResponse.Entity.Ship
 		</ee:transform>
 	</sub-flow>
 	<sub-flow name="client-tms-findEntities-get-shipment-call-api-system-find-load" doc:id="30585fc3-e261-4962-862b-3b4890837d07" >
-		<http:request method="GET" doc:name="call system tms connection" doc:id="4cbc91eb-81a3-4e27-baec-1c1dec080d0c" config-ref="Http_request_system-tms-findentities" path="${client.system-tms-connection.http.path.load}" target="responseShipment" >
+		<http:request method="GET" doc:name="call system tms connection" doc:id="4cbc91eb-81a3-4e27-baec-1c1dec080d0c" config-ref="Http_request_system-tms-findentities" path="${client.system-tms-connection.http.path.load}">
 			<http:headers ><![CDATA[#[output application/java
 ---
 {

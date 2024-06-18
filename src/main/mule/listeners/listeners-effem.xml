@@ -8,16 +8,6 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 	<sub-flow name="listeners-effem-update-status" doc:id="3604a2c9-1971-464c-a86a-75d48e653a04" >
 		<logger level="INFO" doc:name="Logger" doc:id="ef77ceef-7577-44a7-8be2-f02b11b2184b" message="Mars"/>
 		<logger level="INFO" doc:name="Logger" doc:id="8431d596-868e-434b-8614-94798237c2e0" message="#[payload]"/>
-		<ee:transform doc:name="Transform Message" doc:id="926ff1c0-7199-4b59-834a-50e94306c43e" >
-			<ee:message >
-			</ee:message>
-			<ee:variables >
-				<ee:set-variable variableName="loadId" ><![CDATA[%dw 2.0
-output application/json
----
-payload.system_load_id]]></ee:set-variable>
-			</ee:variables>
-		</ee:transform>
 		<flow-ref doc:name="client-tms-findEntities-get-shipment-call-api-system-find-load" doc:id="bb90842f-bc0f-472f-823a-291c68a5ecba" name="client-tms-findEntities-get-shipment-call-api-system-find-load" target="marsLoad" targetValue="#[payload.loads[0].ShipmentLeg.ShipmentDescription]"/>
 		<choice doc:name="Choice" doc:id="9b0cdc05-6da6-4551-8d2e-b46828053e47" >
 			<when expression='#[payload.operation_name == "changeTender"]'>
@@ -45,21 +35,39 @@ output application/json
 					<ee:variables >
 						<ee:set-variable variableName="codes" ><![CDATA[%dw 2.0
 output application/json
+var ssn = payload.stop_sequence_number == "1" default "1"
 ---
 payload.status match{
-    case "check_out" -> 				{typeCode: "ARRIVAL",
-											statusCode: "X1"}
-    case "loading" -> 				{typeCode: "LOADED",
-											statusCode: "CP"}
-    case "unloading" -> 				{typeCode: "LOADED",
-											statusCode: "CP"}
-    case "check_in" -> 				{typeCode: "ARRIVAL",
-											statusCode: "X3 "}
-    case "loaded" -> 				{typeCode: "LOADED",
-											statusCode: "D1"}
+	case "check_in" -> 				{typeCode: "ARRIVAL",
+											statusCode: if(ssn) "X3" else "X1",
+											stopSequenceNumber: if(ssn) 1 else 99}
+	case "loaded" -> 				{typeCode: "LOADED",
+											statusCode: "CP",
+											stopSequenceNumber: 1}
+    case "check_out" -> 			{typeCode: "DEPARTURE",
+											statusCode: if(ssn) "AF" else "CD",
+											stopSequenceNumber: if(ssn) 1 else 99}
     case "unloaded" -> 				{typeCode: "UNLOADED",
-											statusCode: "D1"}
-    
+											statusCode: "D1",
+											stopSequenceNumber: 99}
+    case "CHECK-IN" -> 				{typeCode: "ARRIVAL",
+											statusCode: "X3",
+											stopSequenceNumber: 1}
+	case "LOADING ENDED" -> 		{typeCode: "LOADED",
+											statusCode: "CP",
+											stopSequenceNumber: 1}
+    case "TRNT" -> 			        {typeCode: "DEPARTURE",
+											statusCode: "AF",
+											stopSequenceNumber: 1}
+    case "DLVD" -> 			 	    {typeCode: "ARRIVAL",
+											statusCode: "X1",
+											stopSequenceNumber: 99}
+    case "UNLOADING ENDED" -> 		{typeCode: "UNLOADED",
+											statusCode: "D1",
+											stopSequenceNumber: 99}
+    case "CHECK-OUT" -> 		    {typeCode: "DEPARTURE",
+											statusCode: "CD",
+											stopSequenceNumber: 99}
     else -> {}
 }]]></ee:set-variable>
 					</ee:variables>
@@ -73,13 +81,13 @@ output application/json
   loadId: vars.marsLoad,
   scac: "LOAL",
   shipmentLookupReferenceName: "SHIP ID",
-  shipmentLookupReferenceValue: payload.system_load_id as String,
+  shipmentLookupReferenceValue: vars.marsLoad,
   checkCalls: [{
-      stopSequenceNumber: 1,
+      stopSequenceNumber: vars.codes.stopSequenceNumber,
       "type": vars.codes.typeCode,
       statusCode: vars.codes.statusCode,
       reasonCode: "NS",
-      dateTime: payload.record_date_time as String {format: "yyyy-MM-dd HH:mm"}
+      dateTime: payload.recordDate as String {format: "yyyy-MM-dd HH:mm"}
     }
   ]
 }]]></ee:set-payload>
@@ -89,7 +97,7 @@ output application/json
 				<flow-ref doc:name="client-uber-freigth-change-status" doc:id="4912ec8a-1b93-4ca0-a110-e001cae0460c" name="client-uber-freigth-change-status"/>
 			</when>
 		</choice>
-		<logger level="INFO" doc:name="Logger1" doc:id="ca55b690-3216-4674-bb44-29807df920d3" message="#[payload]" />
+		<logger level="INFO" doc:name="Logger" doc:id="ca55b690-3216-4674-bb44-29807df920d3" message="#[payload]" />
 	</sub-flow>
 	<flow name="listeners-effem-listener-response-shipment" doc:id="9bed8b43-0177-485a-ba36-7dd26f60b934" >
 <!-- [STUDIO:"listener response create shipment effem"]		<jms:listener doc:name="listener response create shipment effem" doc:id="8e63d3ae-a3f5-4249-ac7c-38916c3fa070" config-ref="JMS_Config" destination="${jms.settings.queue.system.tms.to.effem}" inboundContentType="application/json" >
