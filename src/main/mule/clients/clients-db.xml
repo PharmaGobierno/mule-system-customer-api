@@ -64,22 +64,23 @@ payload]]></ee:set-payload>
 				<ee:set-variable variableName="ccaKeyFrmWms"><![CDATA[%dw 2.0
 output application/json
 var schema = Mule::p('database.wms.blueyonder.schema')
----
-"SELECT
-	ALT.ALT_PRTNUM CLAVE_CCA
-FROM
-	"++ schema ++".ALT_PRTMST ALT
-JOIN "++ schema ++".PRTMST PRT ON
-	PRT.PRTNUM = ALT.PRTNUM
-WHERE
-	PRT.PRTNUM IN ('"++ (vars.prtNumPl default "") ++"')"]]></ee:set-variable>
+---"SELECT	ALT.ALT_PRTNUM CLAVE_CCAFROM	"++ schema ++".ALT_PRTMST ALTJOIN "++ schema ++".PRTMST PRT ON	PRT.PRTNUM = ALT.PRTNUMWHERE	PRT.PRTNUM IN ('"++ (vars.prtNumPl default "") ++"')"
+
+//"SELECT input_1
+//FROM prodtxlintegra.generic_xconfiguration
+//WHERE
+//input_1 = '"++ (vars.prtNumPl default "") ++"';"]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
 		<logger level="INFO" doc:name="Visualize query variable" doc:id="3c9bd5a9-31c6-4810-878c-3c96ce14587f" message="#[vars.ccaKeyFrmWms]"/>
-		<db:select doc:name="Select" doc:id="4fb32127-f1b0-4f5c-b964-32bb6e945fe5" config-ref="Database_Config_Wms_Blueyonder" target="dbResponse">
+		<db:select doc:name="Query wms" doc:id="4fb32127-f1b0-4f5c-b964-32bb6e945fe5" config-ref="Database_Config_Wms_Blueyonder" target="dbResponse">
 			<db:sql><![CDATA[#[vars.ccaKeyFrmWms]]]></db:sql>
 			<db:parameter-types />
 		</db:select>
+		<!-- [STUDIO:"Query prod integra"]<db:select doc:name="Query prod integra" doc:id="87ed30e1-058e-4261-9f42-90f8f48de011" config-ref="Database_Config_prodIntegra" target="dbResponse">
+			<db:sql><![CDATA[#[vars.ccaKeyFrmWms&#93;&#93;&#93;></db:sql>
+			<db:parameter-types />
+		</db:select> [STUDIO] -->
 		<ee:transform doc:name="Transform java response to json" doc:id="7c23b431-c493-43da-811e-af7de8fdd857" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
