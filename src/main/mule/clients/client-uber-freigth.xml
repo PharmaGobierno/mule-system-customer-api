@@ -16,7 +16,7 @@ grant_type: "client_credentials"
 			<http:headers ><![CDATA[#[output application/java
 ---
 {
-	"Authorization" : "Basic MVh0U0lWcUJqMVVrR3RHMzQ4eDFoVzk0MXBWVVdMR3c6Q05tRHpBOTdiNnZYeFRSag=="
+	"Authorization" : p("client.mars.http.basic")
 }]]]></http:headers>
 		</http:request>
 	</sub-flow>

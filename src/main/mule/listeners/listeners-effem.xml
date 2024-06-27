@@ -8,6 +8,16 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 	<sub-flow name="listeners-effem-update-status" doc:id="3604a2c9-1971-464c-a86a-75d48e653a04" >
 		<logger level="INFO" doc:name="Logger" doc:id="ef77ceef-7577-44a7-8be2-f02b11b2184b" message="Mars"/>
 		<logger level="INFO" doc:name="Logger" doc:id="8431d596-868e-434b-8614-94798237c2e0" message="#[payload]"/>
+		<ee:transform doc:name="Transform Message" doc:id="a56290e5-4c3c-47ce-b147-e5d45a50679d" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="loadId" ><![CDATA[%dw 2.0
+output application/json
+---
+payload.system_load_id]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
 		<flow-ref doc:name="client-tms-findEntities-get-shipment-call-api-system-find-load" doc:id="bb90842f-bc0f-472f-823a-291c68a5ecba" name="client-tms-findEntities-get-shipment-call-api-system-find-load" target="marsLoad" targetValue="#[payload.loads[0].ShipmentLeg.ShipmentDescription]"/>
 		<choice doc:name="Choice" doc:id="9b0cdc05-6da6-4551-8d2e-b46828053e47" >
 			<when expression='#[payload.operation_name == "changeTender"]'>
@@ -87,7 +97,7 @@ output application/json
       "type": vars.codes.typeCode,
       statusCode: vars.codes.statusCode,
       reasonCode: "NS",
-      dateTime: payload.recordDate as String {format: "yyyy-MM-dd HH:mm"}
+      dateTime: (payload.recordDate default payload.record_date_time)  as String {format: "yyyy-MM-dd HH:mm"}
     }
   ]
 }]]></ee:set-payload>
