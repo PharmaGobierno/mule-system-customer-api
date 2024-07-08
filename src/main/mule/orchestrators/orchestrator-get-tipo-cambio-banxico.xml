@@ -26,7 +26,7 @@ now() as String {format: "yyyy-MM-dd"}]]></ee:set-variable>
 				<ee:set-variable variableName="series_id" ><![CDATA[%dw 2.0
 output application/json
 ---
-p('client.banxico.serie.id') default "SF63528"]]></ee:set-variable>
+p('client.banxico.serie.id') default "SF343410"]]></ee:set-variable>
 				<ee:set-variable variableName="token" ><![CDATA[%dw 2.0
 output application/json
 ---
