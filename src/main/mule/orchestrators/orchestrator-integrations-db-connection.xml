@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	<sub-flow name="orchestrator-integrations-db-connection" doc:id="19a592e6-fe22-4b95-af3f-0975be06f7a2" >
+		<logger level="INFO" doc:name="Logger" doc:id="e418c6e6-c737-4f56-92ca-3b66bfe64b26" message="#[payload]"/>
+		<flow-ref doc:name="Call-clients-db-connection-integrations-get-warehouse-id" doc:id="2bdc5ad1-1425-4c9b-bdb9-9ec0b7590305" name="clients-db-connection-integrations-get-warehouse-id" />
+		<logger level="INFO" doc:name="Logger" doc:id="d6374743-bb1e-4cf6-80d7-628c15543f58" message="#[payload]"/>
+	</sub-flow>
+</mule>
