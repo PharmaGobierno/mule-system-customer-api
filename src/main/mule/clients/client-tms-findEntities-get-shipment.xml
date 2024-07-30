@@ -73,7 +73,7 @@ output application/json
 	"EntityType" : "ShipmentType"
 }&#93;&#93;&#93;></http:query-params>
 		</http:request> [STUDIO] -->
-		<system-tms-connection:find-tms-entities doc:name="find tms entities" doc:id="2895f374-0e76-4988-aa7e-5f492c000abd" config-ref="System_tms_connection_Config" client-id="#[p('client.tms.https.client_id')]" client-secret="#[p('client.tm.https.client_secret')]" target="responseShipment" entity-type='"ShipmentType"' max-rows='"999999"'/>
+		<system-tms-connection:find-tms-entities doc:name="find tms entities" doc:id="2895f374-0e76-4988-aa7e-5f492c000abd" config-ref="System_tms_connection_Config" client-id="#[p('client.tms.https.client_id')]" client-secret="#[p('client.tm.https.client_secret')]" target="responseShipment" entity-type='ShipmentType'/>
 	</sub-flow>
 	<sub-flow name="client-tms-findEntities-get-shipment-prepare-response" doc:id="b1e1a7f8-85ad-46d4-87a6-fcab6e771bb6" >
 		<ee:transform doc:name="Transform Message" doc:id="b5447c54-b309-47f3-9aa5-ffce214ec1b9" >
