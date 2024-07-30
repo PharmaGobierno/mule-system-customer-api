@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:traxion-s-logger="http://www.mulesoft.org/schema/mule/traxion-s-logger" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
-	xmlns:http="http://www.mulesoft.org/schema/mule/http"
-	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+<mule xmlns:system-tms-connection="http://www.mulesoft.org/schema/mule/system-tms-connection" xmlns:traxion-s-logger="http://www.mulesoft.org/schema/mule/traxion-s-logger"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
-http://www.mulesoft.org/schema/mule/traxion-s-logger http://www.mulesoft.org/schema/mule/traxion-s-logger/current/mule-traxion-s-logger.xsd">
+http://www.mulesoft.org/schema/mule/traxion-s-logger http://www.mulesoft.org/schema/mule/traxion-s-logger/current/mule-traxion-s-logger.xsd
+http://www.mulesoft.org/schema/mule/system-tms-connection http://www.mulesoft.org/schema/mule/system-tms-connection/current/mule-system-tms-connection.xsd">
+	<system-tms-connection:config name="System_tms_connection_Config" doc:name="System-tms-connection Config" doc:id="1eef6516-1d1a-44fc-bead-b400fe6d0708" property_host="${client.system.tms-connection.http.host}" property_port="${client.system-tms-connection.http.port}" property_basePath="/api" property_protocol="HTTPS" property_responseTimeout="${client.system.tms-connection.http.response.timeout}" >
+		<expiration-policy maxIdleTime="${client.system-tms-connection.http.connection.idle.timeout}" timeUnit="MILLISECONDS" />
+	</system-tms-connection:config>
 	<sub-flow name="client-tms-findEntities-get-shipment-main" doc:id="b7cf9e6b-fa1a-4951-aa68-bb904af9745f" >
 		<flow-ref doc:name="client-tms-findEntities-get-shipment-prepare-request" doc:id="83f6a11f-580a-4967-8373-97723a907a85" name="client-tms-findEntities-get-shipment-prepare-request"/>
 		<flow-ref doc:name="client-tms-findEntities-get-shipment-call-api-system-find-entities" doc:id="b06fef29-68fe-4490-b77c-09604d327ca5" name="client-tms-findEntities-get-shipment-call-api-system-find-entities"/>
@@ -53,22 +57,23 @@ output application/json
 		</ee:transform>
 	</sub-flow>
 	<sub-flow name="client-tms-findEntities-get-shipment-call-api-system-find-entities" doc:id="d1874eba-5c5f-4e91-987f-bf3ee0c249d6" >
-		<http:request method="POST" doc:name="call system tms connection" doc:id="60ce57d3-b022-4cb9-a4c8-84dabd6511d5" config-ref="Http_request_system-tms-findentities" path="${client.system-tms-connection.http.path.findentities}" target="responseShipment">
+		<!-- [STUDIO:"call system tms connection"]<http:request method="POST" doc:name="call system tms connection" doc:id="60ce57d3-b022-4cb9-a4c8-84dabd6511d5" config-ref="Http_request_system-tms-findentities" path="${client.system-tms-connection.http.path.findentities}" target="responseShipment">
 			<http:headers ><![CDATA[#[output application/java
----
+&#45;&#45;-
 {
 	"client_id": p('client.tms.https.client_id'),
 	"client_secret": p('client.tm.https.client_secret')
-}]]]></http:headers>
+}&#93;&#93;&#93;></http:headers>
 			<http:query-params ><![CDATA[#[output application/java
----
+&#45;&#45;-
 {
 	"StartAtRow" : 0,
 	"MaxRows" : "999999",
 	"TotalRowCount" : 0,
 	"EntityType" : "ShipmentType"
-}]]]></http:query-params>
-		</http:request>
+}&#93;&#93;&#93;></http:query-params>
+		</http:request> [STUDIO] -->
+		<system-tms-connection:find-tms-entities doc:name="find tms entities" doc:id="2895f374-0e76-4988-aa7e-5f492c000abd" config-ref="System_tms_connection_Config" client-id="#[p('client.tms.https.client_id')]" client-secret="#[p('client.tm.https.client_secret')]" target="responseShipment" entity-type='"ShipmentType"' max-rows='"999999"'/>
 	</sub-flow>
 	<sub-flow name="client-tms-findEntities-get-shipment-prepare-response" doc:id="b1e1a7f8-85ad-46d4-87a6-fcab6e771bb6" >
 		<ee:transform doc:name="Transform Message" doc:id="b5447c54-b309-47f3-9aa5-ffce214ec1b9" >
@@ -83,18 +88,19 @@ vars.responseShipment.findEntitiesResponse.body.findEntitiesResponse.Entity.Ship
 		</ee:transform>
 	</sub-flow>
 	<sub-flow name="client-tms-findEntities-get-shipment-call-api-system-find-load" doc:id="30585fc3-e261-4962-862b-3b4890837d07" >
-		<http:request method="GET" doc:name="call system tms connection" doc:id="4cbc91eb-81a3-4e27-baec-1c1dec080d0c" config-ref="Http_request_system-tms-findentities" path="${client.system-tms-connection.http.path.load}">
+		<!-- [STUDIO:"call system tms connection"]<http:request method="GET" doc:name="call system tms connection" doc:id="4cbc91eb-81a3-4e27-baec-1c1dec080d0c" config-ref="Http_request_system-tms-findentities" path="${client.system-tms-connection.http.path.load}">
 			<http:headers ><![CDATA[#[output application/java
----
+&#45;&#45;-
 {
 	"client_id": p('client.tms.https.client_id'),
 	"client_secret": p('client.tm.https.client_secret')
-}]]]></http:headers>
+}&#93;&#93;&#93;></http:headers>
 			<http:query-params ><![CDATA[#[output application/java
----
+&#45;&#45;-
 {
 	"load_id" : vars.loadId
-}]]]></http:query-params>
-		</http:request>
+}&#93;&#93;&#93;></http:query-params>
+		</http:request> [STUDIO] -->
+		<system-tms-connection:get-load doc:name="Get load request" doc:id="0d8e3fd4-199d-40cd-94b7-0b811060161f" config-ref="System_tms_connection_Config" client-id="#[p('client.tms.https.client_id')]" client-secret="#[p('client.tm.https.client_secret')]" load-id="#[vars.loadId]"/>
 	</sub-flow>
 </mule>
