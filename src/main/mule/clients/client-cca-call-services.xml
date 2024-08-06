@@ -12,7 +12,7 @@ http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/cu
 	</http:request-config>
 	<sub-flow name="client-cca-call-services-get-order-remision" doc:id="ec19fe54-08e9-4fea-8454-6cc2ec8082e3" >
 		<logger level="INFO" doc:name="Logger" doc:id="1d2450f6-d3b6-48f8-b9cb-31517a47a88e" message="#[payload]"/>
-		<http:request method="GET" doc:name="Request" doc:id="d313d774-6ace-49b5-b99d-7f2c3e4cc4dd" url="https://ppsai-abasto.imss.gob.mx/msportprov-orden/v1/ordenes/50030399">
+		<http:request method="GET" doc:name="Request" doc:id="d313d774-6ace-49b5-b99d-7f2c3e4cc4dd" url="https://ppsai-abasto.imss.gob.mx/msportprov-orden/v1/ordenes/{vars.orden}">
 			<http:query-params ><![CDATA[#[output application/java
 ---
 {
