@@ -3,7 +3,7 @@
     <http:listener-config name="system-customer-api-httpListenerConfig">
         <http:listener-connection host="0.0.0.0" port="8082" protocol="HTTPS" tlsContext="TLS_Context" />
     </http:listener-config>
-    <apikit:config name="system-customer-api-config" api="resource::ab8117f6-d718-4307-b5f7-03262d589cd0:system-customer-api:1.0.41:raml:zip:system-customer-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <apikit:config name="system-customer-api-config" api="resource::ab8117f6-d718-4307-b5f7-03262d589cd0:system-customer-api:1.0.43:raml:zip:system-customer-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
     <flow name="system-customer-api-main">
         <http:listener config-ref="system-customer-api-httpListenerConfig" path="/api/*">
             <http:response statusCode="#[vars.httpStatus default 200]">
@@ -405,17 +405,20 @@ attributes.queryParams.customer_name]]></ee:set-variable>
         </ee:transform>
         <flow-ref doc:name="Call-orchestrator-post-wms-order" doc:id="e403a64e-b12d-4fcc-ab32-cca42e0d353a" name="orchestrator-post-wms-order" />
     </flow>
-    <flow name="get:\cca\order\remision:system-customer-api-config">
-        <ee:transform doc:name="Transform Message" doc:id="9ed5c0e9-aecb-4243-baa3-2657d98358f0">
+    <flow name="get:\cca\order\remision\(orden):system-customer-api-config">
+        <ee:transform doc:name="Transform Message" doc:id="5522c0ab-ca4e-42a8-bf14-1cf8f656fd43">
             <ee:message />
             <ee:variables>
                 <ee:set-variable variableName="clasPtal"><![CDATA[%dw 2.0
 output application/json
 ---
 attributes.queryParams.clasPtal]]></ee:set-variable>
+                <ee:set-variable variableName="orden"><![CDATA[attributes.uriParams.orden]]></ee:set-variable>
+                <ee:set-variable variableName="contrato"><![CDATA[attributes.queryParams.contrato]]></ee:set-variable>
+                <ee:set-variable variableName="password"><![CDATA[attributes.queryParams.password]]></ee:set-variable>
             </ee:variables>
         </ee:transform>
-        <flow-ref doc:name="orchestrator-get-order-remisions-main" doc:id="2e729156-c5be-4d0d-9643-1a20c4b93738" name="orchestrator-get-order-remisions-main" />
+        <flow-ref doc:name="orchestrator-get-order-remisions-main" doc:id="f64cb831-73c1-4bb6-94ee-ac64edc05c16" name="orchestrator-get-order-remisions-main" />
     </flow>
     <flow name="post:\cca\order\confirmation:application\json:system-customer-api-config">
         <flow-ref doc:name="Call-orchestrator-get-cca-oder-confirmation" doc:id="784672e9-e74f-4372-8535-f7ce689c5f66" name="orchestrator-get-cca-oder-confirmation" />
