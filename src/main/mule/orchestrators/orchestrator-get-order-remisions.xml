@@ -5,23 +5,6 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
 	<sub-flow name="orchestrator-get-order-remisions-main" doc:id="0f04d81a-6165-4b3a-bc6e-b1a9fc949804" >
-		<flow-ref doc:name="orchestrator-get-order-remisions-prepare-vars" doc:id="806b1587-a52e-4bbd-99df-7b61f260fc32" name="orchestrator-get-order-remisions-prepare-vars"/>
 		<flow-ref doc:name="client-cca-call-services-get-order-remision" doc:id="88f52be1-e97b-4e87-8672-66749a17334c" name="client-cca-call-services-get-order-remision"/>
-	</sub-flow>
-	<sub-flow name="orchestrator-get-order-remisions-prepare-vars" doc:id="68004d29-f692-4e20-8c3b-55349d89f1d4" >
-		<ee:transform doc:name="Transform Message" doc:id="55088dad-ba8b-49f0-adb5-cdd7550db6db" >
-			<ee:message >
-			</ee:message>
-			<ee:variables >
-				<ee:set-variable variableName="contrato" ><![CDATA[%dw 2.0
-output application/json
----
-attributes.queryParams.contrato]]></ee:set-variable>
-				<ee:set-variable variableName="password" ><![CDATA[%dw 2.0
-output application/json
----
-attributes.queryParams.password]]></ee:set-variable>
-			</ee:variables>
-		</ee:transform>
 	</sub-flow>
 </mule>
