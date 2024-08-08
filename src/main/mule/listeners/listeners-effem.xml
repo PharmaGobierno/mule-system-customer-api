@@ -19,6 +19,7 @@ payload.system_load_id]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
 		<flow-ref doc:name="client-tms-findEntities-get-shipment-call-api-system-find-load" doc:id="bb90842f-bc0f-472f-823a-291c68a5ecba" name="client-tms-findEntities-get-shipment-call-api-system-find-load" target="marsLoad" targetValue="#[payload.loads[0].ShipmentLeg.ShipmentDescription]"/>
+		<logger level="INFO" doc:name="Logger" doc:id="9fde4a5c-1910-48e6-96de-d09cccce8efd" message="#['Mars - load: ' ++ (vars.loadId default 'No se encopntro load') ++ ' - reference: ' ++ (vars.marsLoad default 'No se encontro referencia')]"/>
 		<choice doc:name="Choice" doc:id="9b0cdc05-6da6-4551-8d2e-b46828053e47" >
 			<when expression='#[payload.operation_name == "changeTender"]'>
 				<flow-ref doc:name="client-uber-freigth-get-token" doc:id="e0fa9a6e-d785-4331-bef4-ff65cebb9232" name="client-uber-freigth-get-token" target="token"/>
@@ -88,16 +89,16 @@ payload.status match{
 output application/json
 ---
 {
-  loadId: vars.loadId,
+  loadId: vars.marsLoad,
   scac: "LOAL",
   shipmentLookupReferenceName: "SHIP ID",
-  shipmentLookupReferenceValue: vars.loadId,
+  shipmentLookupReferenceValue: vars.marsLoad,
   checkCalls: [{
       stopSequenceNumber: vars.codes.stopSequenceNumber,
       "type": vars.codes.typeCode,
       statusCode: vars.codes.statusCode,
       reasonCode: "NS",
-      dateTime: (payload.recordDate default payload.record_date_time)  as String {format: "yyyy-MM-dd HH:mm"}
+      dateTime: (payload.record_date_time as DateTime) as String { format: "yyyy-MM-dd HH:mm:ss" }
     }
   ]
 }]]></ee:set-payload>
