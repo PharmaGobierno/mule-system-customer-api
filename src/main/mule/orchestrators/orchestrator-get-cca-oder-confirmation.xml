@@ -1,11 +1,88 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
 	<sub-flow name="orchestrator-get-cca-oder-confirmation" doc:id="4d56571a-0040-4326-b700-39814f4fc973" >
 		<logger level="INFO" doc:name="Visualize payload request" doc:id="7f3c15e4-fb76-45eb-b166-89576cffb8d4" message="#[payload]"/>
-		<flow-ref doc:name="Call-client-cca-call-services-get-order-confirmation" doc:id="607a0ac0-0753-42b8-ac96-b7a994594a3f" name="client-cca-call-services-get-order-confirmation"/>
+		<flow-ref doc:name="orchestrator-get-cca-oder-confirmation-validate-status-order" doc:id="693dd79d-ff54-46f0-b866-aabb349cfebf" name="orchestrator-get-cca-oder-confirmation-validate-status-order"/>
+		<flow-ref doc:name="orchestrator-get-cca-oder-confirmation-prepare-request-confirmation-orders" doc:id="607a0ac0-0753-42b8-ac96-b7a994594a3f" name="orchestrator-get-cca-oder-confirmation-prepare-request-confirmation-orders"/>
 		<logger level="INFO" doc:name="Visualize payload response" doc:id="1285267f-8e8e-48ed-92bd-2df64e4e312b" message="#[payload]"/>
+	</sub-flow>
+	<sub-flow name="orchestrator-get-cca-oder-confirmation-validate-status-order" doc:id="d656b12f-7e91-4a12-ac12-73b6bf55c728" >
+		<ee:transform doc:name="Transform Message" doc:id="d1d3abe7-c08a-4e57-ab8a-b339a1fb00d1" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="orders" ><![CDATA[%dw 2.0
+output application/json
+---
+[]]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<foreach doc:name="For Each" doc:id="fd3557a8-d09d-4feb-b504-54ada7b8b238" collection="#[payload]">
+			<ee:transform doc:name="prepare vars for query" doc:id="f4ce52c3-b0e7-436a-91b1-d825f00e61bb">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="clasPtal"><![CDATA[%dw 2.0
+output application/json
+---
+payload.clasPtalDist]]></ee:set-variable>
+				<ee:set-variable variableName="contrato"><![CDATA[%dw 2.0
+output application/java
+---
+payload.noContrato]]></ee:set-variable>
+				<ee:set-variable variableName="password"><![CDATA[%dw 2.0
+output application/json
+---
+if(payload.clasPtalDist == "098322150905") "kyb374A2" else "Heg75t4a"]]></ee:set-variable>
+				<ee:set-variable variableName="orden"><![CDATA[%dw 2.0
+output application/json
+---
+payload.noRep]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+			<logger level="INFO" doc:name="Logger" doc:id="f494a880-721e-4d9b-829e-a542af3addeb" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"order": vars.orden,&#10;	"clasPtal" : vars.clasPtal,&#10;	"contrato" : vars.contrato,&#10;	"password" : vars.password&#10;}]' category="REQUEST BUSQUEDA"/>
+			<flow-ref doc:name="client-cca-call-services-get-order-remision" doc:id="c36a72fa-6f75-4adc-a4f4-6b3348abc7b5" name="client-cca-call-services-get-order-remision" target="responseOrder"/>
+			<ee:transform doc:name="Transform Message" doc:id="785c551f-d303-45b3-9253-2a059123fe71" >
+				<ee:message >
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="orders" ><![CDATA[%dw 2.0
+output application/json
+---
+vars.orders + {
+"orderConfirmation": payload,
+"orderDetail": vars.responseOrder
+}]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</foreach>
+	</sub-flow>
+	<sub-flow name="orchestrator-get-cca-oder-confirmation-prepare-request-confirmation-orders" doc:id="579ff716-722d-4f51-a251-675ed3073a6e" >
+		<logger level="INFO" doc:name="Logger" doc:id="73889ee4-5d50-4785-b88d-ad016d8a55cf" message='#[%dw 2.0&#10;output application/json&#10;---&#10;vars.orders filter ((item) -&gt; item.orderDetail.estatusOrden == "2")]'/>
+		<set-payload value='#[(vars.orders filter ((item) -&gt; item.orderDetail.estatusOrden != "2")) map $.orderConfirmation]' doc:name="Set Payload" doc:id="6c2e161b-df34-45e4-b244-defaa44a3651" />
+		<choice doc:name="Choice" doc:id="170006a1-3e2c-481b-ad4b-1162452d8608" >
+			<when expression="!isEmpty(payload)">
+				<flow-ref doc:name="client-cca-call-services-get-order-confirmation" doc:id="4a1f950d-20b1-4e80-808b-61b5606b65db" name="client-cca-call-services-get-order-confirmation" />
+				<flow-ref doc:name="client-cca-call-services-validation-206" doc:id="4fadebcd-6701-4bb0-a660-05409ac3d2f1" name="client-cca-call-services-validation-206" />
+			</when>
+		</choice>
+		<ee:transform doc:name="Transform Message" doc:id="0a38cc29-3843-4812-bb68-f1c1f43d1c17">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "traxion_response": {
+    "completed_succesfully": "true",
+    "messages": "successful"
+  }
+}
+]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
 	</sub-flow>
 </mule>

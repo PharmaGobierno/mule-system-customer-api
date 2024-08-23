@@ -1,0 +1,17 @@
+%dw 2.0
+
+type auto_d656b12f_7e91_4a12_ac12_73b6bf55c728_Output_Payload = {
+  traxion_response: {
+    response: {
+      data?: String | Null, 
+      message: String, 
+      _?: Any
+    } {"label": "Response",
+    "description": "It contains the message and data response."}, 
+    completed_succesfully: String, 
+    _?: Any
+  } {"label": "Traxion_response",
+  "description": "Object that contains the response."}, 
+  _?: Any
+} {"description": "Data type tms shipment order create response."}
+
