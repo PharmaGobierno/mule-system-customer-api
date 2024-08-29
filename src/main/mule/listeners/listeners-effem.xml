@@ -31,7 +31,7 @@ output application/json
 {
   "action": "ACCEPT",
   "scac": "LOAL",
-  "loadId": vars.loadId
+  "loadId": vars.marsLoad
 }]]></ee:set-payload>
 					</ee:message>
 				</ee:transform>
