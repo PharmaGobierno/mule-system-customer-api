@@ -219,5 +219,13 @@ output application/json
 			</otherwise>
 		</choice>
 	</sub-flow>
+	<flow name="listeners-effem-messages-queue" doc:id="6e1fce0a-251a-4db8-8e53-36a4d723335d" >
+		<jms:listener doc:name="On New Message" doc:id="2527082d-57dd-4998-9531-d0c4ca9f9ac5" config-ref="JMS_Config" destination="${jms.settings.queue.system.tms.to.effem}">
+			<jms:consumer-type >
+				<jms:queue-consumer />
+			</jms:consumer-type>
+		</jms:listener>
+		<logger level="INFO" doc:name="Logger" doc:id="5dfcb651-0035-4613-9476-41af0d365d5a" message="Removing message from Queue system.tms.to.effem"/>
+	</flow>
 	
 </mule>
