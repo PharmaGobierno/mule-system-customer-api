@@ -46,9 +46,12 @@ output application/json
 					<ee:variables >
 						<ee:set-variable variableName="codes" ><![CDATA[%dw 2.0
 output application/json
-var ssn = payload.stop_sequence_number == "1" default "1"
+var ssn = payload.stop_sequence_number == "1" default true
 ---
 payload.status match{
+	case "transit" -> 				{typeCode: "CHECK_CALL",
+											statusCode: "X6",
+											stopSequenceNumber: null}
 	case "check_in" -> 				{typeCode: "ARRIVAL",
 											statusCode: if(ssn) "X3" else "X1",
 											stopSequenceNumber: if(ssn) 1 else 99}
@@ -94,7 +97,7 @@ output application/json
   shipmentLookupReferenceName: "SHIP ID",
   shipmentLookupReferenceValue: vars.marsLoad,
   checkCalls: [{
-      stopSequenceNumber: vars.codes.stopSequenceNumber,
+      (stopSequenceNumber: vars.codes.stopSequenceNumber) if(!isEmpty(vars.codes.stopSequenceNumber)),
       "type": vars.codes.typeCode,
       statusCode: vars.codes.statusCode,
       reasonCode: "NS",
