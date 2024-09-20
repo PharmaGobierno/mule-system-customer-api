@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="orchestrator-update-status-order-main" doc:id="469af959-a488-4b68-af5b-6d24fc02a4ca" >
+		<flow-ref doc:name="orchestrator-update-status-order-prepare-payload-params" doc:id="c5183ef8-3242-469e-af51-4faf3a796eea" name="orchestrator-update-status-order-prepare-payload-params"/>
+		<flow-ref doc:name="clients-db-update-status-order" doc:id="96cf3850-5527-45f3-9190-d6c4e1b52188" name="clients-db-update-status-order"/>
+	</sub-flow>
+	<sub-flow name="orchestrator-update-status-order-prepare-payload-params" doc:id="25cfc1e2-afcf-49d5-b696-713e7af4bfe2" >
+		<ee:transform doc:name="Transform Message" doc:id="64106dfe-24fa-4c52-a884-54357bbac64c" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"status_conection": payload.status_conection,
+    "reason_conection": payload.reason_conection,
+    "numero_remision": payload.numero_remision,
+    "numero_reposicion": payload.numero_reposicion,
+    "date_transaction": now() as String {format: "uuuuMMddKKmmss"},
+    "status_transaction": payload.status_transaction,
+    "message_transaction": payload.message_transaction,
+    "request": payload.request,
+    "response": payload.response
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+</mule>

@@ -159,4 +159,96 @@ vars.dbResponse]]></ee:set-payload>
 		</ee:transform>
 		<logger level="INFO" doc:name="Visualize response transformation" doc:id="3a66e732-62bd-4b76-ac11-5b5a96366094" message="#[payload]"/>
 	</sub-flow>
+	<sub-flow name="clients-db-update-status-order" doc:id="88a6ec14-e3e1-45c9-97cb-32e2307c2268" >
+		<ee:transform doc:name="Create query" doc:id="4a9d0cb1-c60b-4478-a7cf-082669fbdb76" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="query_status" ><![CDATA[%dw 2.0
+output application/json
+var schema = p('database.wms.blueyonder.schema')
+---
+"Insert into
+  "++ schema ++".uc_log_ws (
+    status_conection,
+    reason_conection,
+    ordnum,
+    generic1,
+    generic2,
+    generic3,
+    generic4,
+    generic5,
+    date_event,
+    status_transaction,
+    message_transaction,
+    request,
+    response,
+    wh_id,
+    client_id,
+    event,
+    event_data_sequence,
+    system
+  )
+values
+  (
+    :status_conection,
+    :reason_conection,
+    :numero_remision,
+    :numero_reposicion,
+    '',
+    '',
+    '',
+    '',
+    :date_transaction,
+    :status_transaction,
+    :message_transaction,
+    :request,
+    :response,
+    'ORDINARIO',
+    '----',
+    'INV-RCV',
+    '',
+    'IMSS CCA'
+  );"]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="111d9b09-ddcc-43d3-925a-4fc6d27abb0c" message="#[vars.query_status]"/>
+		<db:insert doc:name="Insert" doc:id="22156563-401a-41cd-90bf-bcaa745e164c" config-ref="Database_Config_Wms_Blueyonder">
+			<db:sql ><![CDATA[#[vars.query_status]]]></db:sql>
+			<db:input-parameters ><![CDATA[#[payload]]]></db:input-parameters>
+		</db:insert>
+	</sub-flow>
+	<sub-flow name="clients-db-get-orders-status-pending-or-empty" doc:id="9d8fd874-08f0-4a94-8169-dca6536bd341" >
+		<ee:transform doc:name="Create Query" doc:id="34bd6e27-fc53-47f1-a66b-b3a143334a12" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="query_orders" ><![CDATA[%dw 2.0
+output application/java
+var schema = p('database.wms.blueyonder.schema')
+---
+"SELECT DISTINCT
+  rim_h.invnum,
+  rim_h.waybil,
+  ( SELECT MAX(inv_attr_str10) FROM "++ schema ++".rimlin WHERE invnum = rim_h.invnum AND ROWNUM < 2 ) AS clave_presupuestal_origen
+FROM 
+  "++ schema ++".rimhdr rim_h
+  JOIN "++ schema ++".rcvinv ON rcvinv.invnum = rim_h.invnum
+  JOIN "++ schema ++".rcvtrk ON rcvtrk.trknum = rcvinv.trknum
+  JOIN "++ schema ++".trlr ON trlr.trlr_id = rcvtrk.trlr_id
+  LEFT JOIN (SELECT ordnum, MAX(date_event) AS max_date FROM "++ schema ++".uc_log_ws GROUP BY ordnum ) latest_log ON latest_log.ordnum = rim_h.invnum
+  LEFT JOIN "++ schema ++".uc_log_ws log_ws ON log_ws.ordnum = rim_h.invnum
+  AND log_ws.date_event = latest_log.max_date
+WHERE
+  trlr.trlr_stat = 'D'
+  AND rim_h.wh_id = 'ORDINARIO'
+  AND ( log_ws.status_transaction = 'PENDING_SUCCESS' OR log_ws.status_transaction IS NULL )
+  AND NOT EXISTS ( SELECT 1 FROM "++ schema ++".uc_log_ws log_success WHERE log_success.ordnum = rim_h.invnum AND log_success.status_transaction = 'SUCCESS')"]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="c7111ee1-cbed-401c-ac73-2321ea45202c" message="#[vars.query_orders]"/>
+		<db:select doc:name="Select" doc:id="b490552a-455a-4da0-94f8-60c4841f75d2" config-ref="Database_Config_Wms_Blueyonder">
+			<db:sql ><![CDATA[#[vars.query_orders]]]></db:sql>
+		</db:select>
+	</sub-flow>
 </mule>

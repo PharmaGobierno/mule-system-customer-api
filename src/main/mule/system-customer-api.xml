@@ -3,7 +3,7 @@
     <http:listener-config name="system-customer-api-httpListenerConfig">
         <http:listener-connection host="0.0.0.0" port="8082" protocol="HTTPS" tlsContext="TLS_Context" />
     </http:listener-config>
-    <apikit:config name="system-customer-api-config" api="resource::ab8117f6-d718-4307-b5f7-03262d589cd0:system-customer-api:1.0.44:raml:zip:system-customer-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <apikit:config name="system-customer-api-config" api="resource::ab8117f6-d718-4307-b5f7-03262d589cd0:system-customer-api:1.0.46:raml:zip:system-customer-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
     <flow name="system-customer-api-main">
         <http:listener config-ref="system-customer-api-httpListenerConfig" path="/api/*">
             <http:response statusCode="#[vars.httpStatus default 200]">
@@ -177,8 +177,7 @@ output application/json
 			"system_error_description": read(error.description,"application/json")
 		}
 	}
-}
-]]></ee:set-payload>
+}]]></ee:set-payload>
                     </ee:message>
                     <ee:variables>
                         <ee:set-variable variableName="httpStatus"><![CDATA[%dw 2.0
@@ -187,7 +186,7 @@ output application/json
 400]]></ee:set-variable>
                     </ee:variables>
                 </ee:transform>
-            </on-error-propagate>            
+            </on-error-propagate>
             <!-- [STUDIO:"On Error Propagate"]<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="110b66f9-31f8-42a4-86ac-6eb49affdef8" type="CCA:ERROR">
                 <ee:transform doc:name="Transform Message" doc:id="58ca8027-c5df-4486-a8b0-2003935f7d7f">
                     <ee:message>
@@ -464,7 +463,7 @@ attributes.queryParams.clavePresFin]]></ee:set-variable>
         </ee:transform>
         <flow-ref doc:name="Call-orchestrator-integrations-db-connection" doc:id="5c37dba5-8272-43a0-ab6a-34112cc6b498" name="orchestrator-integrations-db-connection" />
     </flow>
-	<flow name="get:\cca\wms\getCcaKeyFromWmsKey:system-customer-api-config">
+    <flow name="get:\cca\wms\getCcaKeyFromWmsKey:system-customer-api-config">
         <ee:transform doc:name="Transform Message" doc:id="fc808d9f-49b3-4998-8f01-b62f4504a527">
             <ee:message />
             <ee:variables>
@@ -488,10 +487,32 @@ attributes.queryParams.rfc]]></ee:set-variable>
         </ee:transform>
         <flow-ref doc:name="Call-orchestrator-get-supnum-from-rfc-cca" doc:id="cb01d8e3-b9bb-45fb-913b-fde5bc6397e1" name="orchestrator-get-supnum-from-rfc-cca" />
     </flow>
-	<flow name="get:\banxico\exchange-rate:system-customer-api-config">
+    <flow name="get:\banxico\exchange-rate:system-customer-api-config">
         <flow-ref doc:name="orchestrator-get-tipo-cambio-banxico-main" doc:id="feab1ec4-0346-4ba4-9e14-aa6915c0f770" name="orchestrator-get-tipo-cambio-banxico-main" />
     </flow>
     <flow name="post:\customer\mars\statusUpdate:application\json:system-customer-api-config" doc:id="21b38a53-ca72-45b7-8621-d67e7ad48f92">
         <flow-ref doc:name="listeners-effem-update-status" doc:id="def7e0f2-4712-42dc-ad27-9b5019d67136" name="listeners-effem-update-status" />
+    </flow>
+    <flow name="patch:\wms\order:application\json:system-customer-api-config">
+        <flow-ref doc:name="orchestrator-update-status-order-main" doc:id="36809b07-b8e5-4c98-8240-2635dc0dc527" name="orchestrator-update-status-order-main"/>
+		<ee:transform doc:name="Transform Message">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  traxion_response: {
+    completed_succesfully: "true",
+    response: {
+      operation: "The record has been update successfully",
+      data: {}
+    }
+  }
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+    <flow name="get:\wms\order:system-customer-api-config">
+        <flow-ref doc:name="orchestrator-get-orders-wms-main" doc:id="1660ab04-53eb-479f-ba5d-ee9824ba1e22" name="orchestrator-get-orders-wms-main"/>
     </flow>
 </mule>

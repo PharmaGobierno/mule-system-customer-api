@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="orchestrator-get-orders-wms-main" doc:id="f0e795df-675e-41fc-a590-bef5b7942ea4" >
+		<flow-ref doc:name="clients-db-get-orders-status-pending-or-empty" doc:id="d086682e-a269-4596-928d-be059d2290c9" name="clients-db-get-orders-status-pending-or-empty"/>
+		<flow-ref doc:name="orchestrator-get-orders-wms-prepare-response" doc:id="90d39590-0a52-458c-b370-fe02a5496579" name="orchestrator-get-orders-wms-prepare-response"/>
+	</sub-flow>
+	<sub-flow name="orchestrator-get-orders-wms-prepare-response" doc:id="3959214f-7ed8-44a1-aae1-8b3a67f20b04" >
+		<ee:transform doc:name="Transform Message" doc:id="12597aeb-d4f0-4953-9be5-a0a9747bac7a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+</mule>
