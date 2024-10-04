@@ -46,5 +46,6 @@ import * from dw::core::Strings
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="73f32f0b-89a5-44f0-969a-e9903e69df62" message="#[payload]"/>
 	</sub-flow>
 </mule>
