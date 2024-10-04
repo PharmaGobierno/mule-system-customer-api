@@ -242,23 +242,7 @@ output application/json
 		"error": {
 			"error_type": error.errorType.asString,
 			"user_error_description": error.description,
-			"system_error_description": {
-				"payload": {
-					"traxion_response": {
-						"error": {
-							"error_type": error.errorType.identifier,
-							"user_error_description": error.detailedDescription ++ " - " ++ error.dslSource,
-							"system_error_description": {
-								"payload": {
-									"error": true,
-									"message": error.muleMessage.typedValue,
-									"errorType": ""
-								}
-							}
-						}
-					}
-				}
-			}
+			"system_error_description": error.muleMessage.typedValue
 		}
 	}
 }]]></ee:set-payload>
