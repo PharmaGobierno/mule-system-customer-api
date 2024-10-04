@@ -30,6 +30,7 @@ output application/json
 			</ee:variables>
 		</ee:transform>
 		<flow-ref doc:name="Call-client-wms-blueyonder-login" doc:id="5b668ad3-6c67-4dc1-8ae1-f5c9c2eb20ca" name="client-wms-blueyonder-login"/>
+		<flow-ref doc:name="Call-client-wms-blueyonder-service-api" doc:id="00959777-482a-4120-8b99-ec825071aee6" name="client-wms-blueyonder-service-api"/>
 		<logger level="INFO" doc:name="Visualize response payload" doc:id="56987e50-48a1-4056-8ca6-f126f51fedf3" message="#[payload]"/>
 	</sub-flow>
 </mule>
