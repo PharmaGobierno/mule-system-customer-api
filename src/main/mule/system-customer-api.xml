@@ -505,7 +505,7 @@ output application/json
     completed_succesfully: "true",
     response: {
       operation: "The record has been update successfully",
-      data: {}
+      data: payload.downloadSequence
     }
   }
 }]]></ee:set-payload>

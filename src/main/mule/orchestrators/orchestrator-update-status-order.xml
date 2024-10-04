@@ -5,7 +5,8 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
 	<sub-flow name="orchestrator-update-status-order-main" doc:id="469af959-a488-4b68-af5b-6d24fc02a4ca" >
-		<flow-ref doc:name="orchestrator-update-status-order-prepare-payload-params" doc:id="c5183ef8-3242-469e-af51-4faf3a796eea" name="orchestrator-update-status-order-prepare-payload-params"/>
+		<flow-ref doc:name="Call to client-wms-blueyonder-login" doc:id="3388bcc5-0ade-4b59-9823-a5b939bf3264" name="client-wms-blueyonder-login" target="loginResponse"/>
+		<flow-ref doc:name="orchestrator-update-status-order-prepare-payload-params" doc:id="c5183ef8-3242-469e-af51-4faf3a796eea" name="orchestrator-update-status-order-prepare-payload-params" />
 		<flow-ref doc:name="Call to client-wms-blueyonder-service-log-order-api" doc:id="96cf3850-5527-45f3-9190-d6c4e1b52188" name="client-wms-blueyonder-service-log-order-api"/>
 	</sub-flow>
 	<sub-flow name="orchestrator-update-status-order-prepare-payload-params" doc:id="25cfc1e2-afcf-49d5-b696-713e7af4bfe2" >
@@ -31,13 +32,13 @@ import * from dw::core::Strings
                 GENERIC4: "",
                 GENERIC5: "",
                 DATE_EVENT: payload.date_transaction,
-                STATUS_TRANSACTION: payload.status_transaction,
+                STATUS_TRANSACTION: payload.status_transaction default 0,
                 MESSAGE_TRANSACTION: payload.message_transaction,
                 REQUEST: payload.request,
                 RESPONSE: payload.response,
-                WH_ID: "ORDINARIO/BIENESTAR",
+                WH_ID: "ORDINARIO",
                 CLIENT_ID: "----",
-                EVENT: "",
+                EVENT: "INV-RCV",
                 EVENT_DATA_SEQUENCE: "",
                 SYSTEM: "IMSS CCA",
             }
