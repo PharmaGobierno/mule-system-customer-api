@@ -1,4 +1,0 @@
-%dw 2.0
-
-type auto_c4e3c836_6844_4bf2_82d8_9b421623faf2_Output_Variables_access_token = Any
-

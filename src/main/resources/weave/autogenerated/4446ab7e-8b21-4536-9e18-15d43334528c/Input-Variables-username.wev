@@ -1,4 +1,0 @@
-%dw 2.0
-
-type auto_4446ab7e_8b21_4536_9e18_15d43334528c_Input_Variables_username = String
-

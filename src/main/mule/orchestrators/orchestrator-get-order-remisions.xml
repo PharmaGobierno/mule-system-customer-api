@@ -5,6 +5,13 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
 	<sub-flow name="orchestrator-get-order-remisions-main" doc:id="0f04d81a-6165-4b3a-bc6e-b1a9fc949804" >
-		<flow-ref doc:name="client-cca-call-services-get-order-remision" doc:id="88f52be1-e97b-4e87-8672-66749a17334c" name="client-cca-call-services-get-order-remision"/>
+		<choice doc:name="Choice" doc:id="b786fa31-2d4b-4db2-a232-d8bfc6e97d3d" >
+			<when expression="#[attributes.queryParams.bienestar]">
+				<flow-ref doc:name="Call to client-cca-call-services-get-order-remision-bienestar" doc:id="df9df12e-58fc-44eb-a82c-cece664055a5" name="client-cca-call-services-get-order-remision-bienestar"/>
+			</when>
+			<otherwise >
+				<flow-ref doc:name="client-cca-call-services-get-order-remision" doc:id="88f52be1-e97b-4e87-8672-66749a17334c" name="client-cca-call-services-get-order-remision" />
+			</otherwise>
+		</choice>
 	</sub-flow>
 </mule>

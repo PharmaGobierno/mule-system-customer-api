@@ -7,13 +7,15 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
 http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd
 http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
-	<http:request-config name="cca-connection-HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="2ecfd3e5-1f8e-4bae-bc9e-e17e7a4a23b6" responseTimeout="${http.request.cca.api.timeout}">
-		<http:request-connection protocol="HTTPS" host="${http.request.cca.api.host}" port="#[vars.port]"/>
-	</http:request-config>
 	<sub-flow name="client-cca-call-services-get-order-remision" doc:id="ec19fe54-08e9-4fea-8454-6cc2ec8082e3" >
 		<logger level="INFO" doc:name="Logger" doc:id="1d2450f6-d3b6-48f8-b9cb-31517a47a88e" message="#[payload]"/>
-		<try doc:name="Try" doc:id="1dfdd28d-f0ff-410d-bcac-76e12ee437d2" >
-			<http:request method="GET" doc:name="Request" doc:id="d313d774-6ace-49b5-b99d-7f2c3e4cc4dd" url="https://ppsai-abasto.imss.gob.mx/msportprov-orden/v1/ordenes/{orden}">
+			<try doc:name="Try" doc:id="cca68d64-0533-4543-b725-c52921100323" >
+			<http:request method="GET" doc:name="Request" doc:id="fc6f1876-9dc1-4ecf-bbc8-0e47b7803e25" config-ref="Http_request_CCA" path="${https.request.cca.api.get.order.remision}">
+			<http:headers><![CDATA[#[output application/java
+---
+{
+	"Host" : p('https.request.cca.api.host')
+}]]]></http:headers>
 			<http:uri-params><![CDATA[#[output application/java
 ---
 {
@@ -28,16 +30,16 @@ http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/cu
 }]]]></http:query-params>
 		</http:request>
 			<error-handler >
-				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="8254d1b5-f724-49df-b217-76e30d419efe" >
-					<ee:transform doc:name="Transform Message" doc:id="ac92ff4a-6f22-417e-bcf7-8c0e96ec91c5" >
-						<ee:message >
+				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="8254d1b5-f724-49df-b217-76e30d419efe">
+					<ee:transform doc:name="Transform Message" doc:id="ac92ff4a-6f22-417e-bcf7-8c0e96ec91c5">
+						<ee:message>
 						</ee:message>
-						<ee:variables >
-							<ee:set-variable variableName="errorCode" ><![CDATA[%dw 2.0
+						<ee:variables>
+							<ee:set-variable variableName="errorCode"><![CDATA[%dw 2.0
 output application/json
 ---
 error.errorMessage.payload.code]]></ee:set-variable>
-							<ee:set-variable variableName="errorMessage" ><![CDATA[%dw 2.0
+							<ee:set-variable variableName="errorMessage"><![CDATA[%dw 2.0
 output application/json
 ---
 write(error.errorMessage.payload,"application/json")]]></ee:set-variable>
@@ -67,17 +69,85 @@ payload ++ validateStatus(payload.estatusOrden)]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
 	</sub-flow>
+	<sub-flow name="client-cca-call-services-get-order-remision-bienestar" doc:id="b79be803-f372-4b15-a094-3469394b2a43" >
+		<logger level="INFO" doc:name="Logger" doc:id="32851433-eaa8-4952-9f4c-b217781147fe" message="#[payload]"/>
+		<try doc:name="Try" doc:id="00c26735-4575-4609-8325-c3c976922b08" >
+			<http:request method="GET" doc:name="Request" doc:id="3f71df19-978a-47e3-8307-a73548a04448" config-ref="Http_request_CCA_Bienestar" path="${https.request.cca.bienestar.api.get.order.remision}">
+			<http:headers><![CDATA[#[output application/java
+---
+{
+	"Host" : p('https.request.cca.bienestar.api.host')
+}]]]></http:headers>
+			<http:uri-params><![CDATA[#[output application/java
+---
+{
+	"orden" : vars.orden
+}]]]></http:uri-params>
+			<http:query-params><![CDATA[#[output application/java
+---
+{
+	"clasPtal" : vars.clasPtal,
+	"contrato" : vars.contrato,
+	"password" : vars.password
+}]]]></http:query-params>
+		</http:request>
+			<error-handler >
+				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="666ea41c-bcf8-4763-b8de-3d1408045ae6" >
+					<ee:transform doc:name="Transform Message" doc:id="025bcbf2-de9a-4b73-a49f-4c2d5c571c0b" >
+						<ee:message />
+						<ee:variables >
+							<ee:set-variable variableName="errorCode" ><![CDATA[%dw 2.0
+output application/json
+---
+error.errorMessage.payload.code]]></ee:set-variable>
+							<ee:set-variable variableName="errorMessage" ><![CDATA[%dw 2.0
+output application/json
+---
+write(error.errorMessage.payload,"application/json")]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+					<validation:is-false doc:name="Is false" doc:id="bce938ab-9bfa-4ddf-b187-748195bf15bb" expression='#[vars.errorCode == "409"]' message="#[vars.errorMessage]" >
+						<error-mapping sourceType="VALIDATION:INVALID_BOOLEAN" targetType="CCA:BAD_REQUEST" />
+					</validation:is-false>
+				</on-error-continue>
+			</error-handler>
+		</try>
+		<logger level="INFO" doc:name="Logger" doc:id="145d0464-1543-41b3-a9a4-cf1a841dfc0f" message="#[payload]"/>
+	</sub-flow>
 	<sub-flow name="client-cca-call-services-get-order-confirmation" doc:id="93809432-409f-4b12-b995-26a263a938a4" >
 		<logger level="INFO" doc:name="Logger" doc:id="fced381f-8cb9-47ba-9ad5-337179b99590" message="#[payload]"/>
-		<http:request method="POST" doc:name="Request" doc:id="8cc5325d-88e3-4bbf-870c-1de232e2d6ac" url="https://ppsai-abasto.imss.gob.mx/msportprov-entrada/v1/entradas">
+		<http:request method="POST" doc:name="Request" doc:id="8cc5325d-88e3-4bbf-870c-1de232e2d6ac" config-ref="Http_request_CCA" path="${https.request.cca.api.post.create.remision}">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Host" : p('https.request.cca.api.host')
+}]]]></http:headers>
 		</http:request>
+		<ee:transform doc:name="Catch http status 206" doc:id="6149e312-9df5-442a-8742-5c565e877b77">
+				<ee:message>
+				</ee:message>
+				<ee:variables>
+				<ee:set-variable variableName="codeErrorCca" ><![CDATA[attributes.statusCode]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		<validation:is-false doc:name="Is false" doc:id="0dc049da-ed2f-416e-82b2-b2b60e51edc8" expression="#[(!isEmpty(payload[0].erroresM)) or (!isEmpty(payload[0].erroresD))]" message='#[write(flatten(payload.erroresM ++ payload.erroresD),"application/json")]' >
+			<error-mapping sourceType="VALIDATION:INVALID_BOOLEAN" targetType="CCA:BAD_REQUEST" />
+		</validation:is-false>
 		<logger level="INFO" doc:name="Logger" doc:id="142d806b-46a3-4c03-8ff6-e65eaf084b15" message="#[payload]"/>
 	</sub-flow>
-	<sub-flow name="client-cca-call-services-validation-206" doc:id="ebc220e6-61ce-4ede-b316-f873cdf590fc" >
- <ee:transform doc:name="Catch http status 206" doc:id="025b9a2f-59ba-486c-bc65-977a8998be3d">
-                <ee:message>
-                </ee:message>
-                <ee:variables>
+	<sub-flow name="client-cca-call-services-get-order-confirmation-bienestar" doc:id="b9fa3fd7-65a2-4a2a-b9d2-2eaad2452500" >
+		<logger level="INFO" doc:name="Logger" doc:id="fdd2a906-56e1-4344-a9b7-74f65352d347" message="#[payload]"/>
+		<http:request method="POST" doc:name="Request" doc:id="7a241a90-c547-4b74-9134-d3bb2750901b" config-ref="Http_request_CCA_Bienestar" path="${https.request.cca.bienestar.api.post.create.remision}">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Host" : p('https.request.cca.bienestar.api.host')
+}]]]></http:headers>
+		</http:request>
+		<ee:transform doc:name="Catch http status 206" doc:id="d5ad94ff-605d-4938-bdde-27150c84e5c1">
+				<ee:message>
+				</ee:message>
+				<ee:variables>
 				<ee:set-variable variableName="codeErrorCca" ><![CDATA[attributes.statusCode]]></ee:set-variable>
                 </ee:variables>
             </ee:transform>
@@ -85,5 +155,6 @@ payload ++ validateStatus(payload.estatusOrden)]]></ee:set-payload>
 			<error-mapping sourceType="VALIDATION:INVALID_BOOLEAN" targetType="CCA:BAD_REQUEST" />
 		</validation:is-false>
 		<logger level="INFO" doc:name="Logger" doc:id="b0a9fc5c-af14-4524-b80e-c1f605a5af59" message="#[payload]"/>		
+
 	</sub-flow>
 </mule>

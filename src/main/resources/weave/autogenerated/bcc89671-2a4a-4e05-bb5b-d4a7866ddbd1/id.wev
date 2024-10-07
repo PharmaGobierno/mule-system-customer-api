@@ -1,4 +1,0 @@
-%dw 2.0
-
-type auto_bcc89671_2a4a_4e05_bb5b_d4a7866ddbd1_Output_Variables_series_id = String
-

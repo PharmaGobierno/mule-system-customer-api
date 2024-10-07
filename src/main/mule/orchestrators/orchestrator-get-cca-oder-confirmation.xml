@@ -6,8 +6,14 @@
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
 	<sub-flow name="orchestrator-get-cca-oder-confirmation" doc:id="4d56571a-0040-4326-b700-39814f4fc973" >
 		<logger level="INFO" doc:name="Visualize payload request" doc:id="7f3c15e4-fb76-45eb-b166-89576cffb8d4" message="#[payload]"/>
-		<flow-ref doc:name="orchestrator-get-cca-oder-confirmation-validate-status-order" doc:id="693dd79d-ff54-46f0-b866-aabb349cfebf" name="orchestrator-get-cca-oder-confirmation-validate-status-order"/>
-		<flow-ref doc:name="orchestrator-get-cca-oder-confirmation-prepare-request-confirmation-orders" doc:id="607a0ac0-0753-42b8-ac96-b7a994594a3f" name="orchestrator-get-cca-oder-confirmation-prepare-request-confirmation-orders"/>
+		<choice doc:name="Choice" doc:id="c0609c57-8626-4476-8822-bda409d0f468" >
+			<when expression="#[attributes.queryParams.bienestar]">
+				<flow-ref doc:name="Call to client-cca-call-services-get-order-confirmation-bienestar" doc:id="607a0ac0-0753-42b8-ac96-b7a994594a3f" name="client-cca-call-services-get-order-confirmation-bienestar" />
+			</when>
+			<otherwise >
+				<flow-ref doc:name="Call-client-cca-call-services-get-order-confirmation" doc:id="277c5e7a-2b8b-45d0-8111-45d087239bd9" name="client-cca-call-services-get-order-confirmation" />
+			</otherwise>
+		</choice>
 		<logger level="INFO" doc:name="Visualize payload response" doc:id="1285267f-8e8e-48ed-92bd-2df64e4e312b" message="#[payload]"/>
 	</sub-flow>
 	<sub-flow name="orchestrator-get-cca-oder-confirmation-validate-status-order" doc:id="d656b12f-7e91-4a12-ac12-73b6bf55c728" >
@@ -67,7 +73,6 @@ vars.orders + {
 		<choice doc:name="Choice" doc:id="170006a1-3e2c-481b-ad4b-1162452d8608" >
 			<when expression="!isEmpty(payload)">
 				<flow-ref doc:name="client-cca-call-services-get-order-confirmation" doc:id="4a1f950d-20b1-4e80-808b-61b5606b65db" name="client-cca-call-services-get-order-confirmation" />
-				<flow-ref doc:name="client-cca-call-services-validation-206" doc:id="4fadebcd-6701-4bb0-a660-05409ac3d2f1" name="client-cca-call-services-validation-206" />
 			</when>
 		</choice>
 		<ee:transform doc:name="Transform Message" doc:id="0a38cc29-3843-4812-bb68-f1c1f43d1c17">

@@ -74,5 +74,11 @@ http://www.mulesoft.org/schema/mule/x12 http://www.mulesoft.org/schema/mule/x12/
 	</http:request-config>
 	<http:request-config name="Http_request_Redpack_ccp_send" doc:name="HTTP Request configuration" doc:id="80c8fe2d-adcc-42d2-aaf5-544f765b9d47" >
 		<http:request-connection protocol="HTTPS" host="${client.redpack.ccp.http.host}" port="${client.redpack.ccp.http.port}" maxConnections="${client.redpack.ccp.http.max.connections}" connectionIdleTimeout="${client.redpack.ccp.http.connection.idle.timeout}" responseBufferSize="${client.redpack.ccp.response.buffer.size}" />
-	</http:request-config>	
+	</http:request-config>
+	<http:request-config name="Http_request_CCA" doc:name="HTTP Request configuration" doc:id="1fff9825-7e0a-4832-ab3c-ca541dfb2a05" enableCookies="false">
+		<http:request-connection protocol="HTTPS" host="${https.request.cca.api.host}" maxConnections="${https.request.cca.api.max.connections}" connectionIdleTimeout="${https.request.cca.api.connection.idle.timeout}" responseBufferSize="${https.request.cca.api.response.buffer.size}" usePersistentConnections="false"/>
+	</http:request-config>
+	<http:request-config name="Http_request_CCA_Bienestar" doc:name="HTTP Request configuration" doc:id="1b927618-830a-435c-89a3-66b001d17748" enableCookies="false">
+		<http:request-connection protocol="HTTPS" host="${https.request.cca.bienestar.api.host}" maxConnections="${https.request.cca.bienestar.api.max.connections}" connectionIdleTimeout="${https.request.cca.bienestar.api.connection.idle.timeout}" responseBufferSize="${https.request.cca.bienestar.api.response.buffer.size}" usePersistentConnections="false" port="${https.request.cca.bienestar.api.port}"/>
+	</http:request-config>
 </mule>
