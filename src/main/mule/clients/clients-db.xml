@@ -227,23 +227,20 @@ values
 output application/java
 var schema = p('database.wms.blueyonder.schema')
 ---
-"SELECT DISTINCT
-  rim_h.invnum,
-  rim_h.waybil,
-  ( SELECT MAX(inv_attr_str10) FROM "++ schema ++".rimlin WHERE invnum = rim_h.invnum AND ROWNUM < 2 ) AS clave_presupuestal_origen
-FROM 
-  "++ schema ++".rimhdr rim_h
-  JOIN "++ schema ++".rcvinv ON rcvinv.invnum = rim_h.invnum
-  JOIN "++ schema ++".rcvtrk ON rcvtrk.trknum = rcvinv.trknum
-  JOIN "++ schema ++".trlr ON trlr.trlr_id = rcvtrk.trlr_id
-  LEFT JOIN (SELECT ordnum, MAX(date_event) AS max_date FROM "++ schema ++".uc_log_ws GROUP BY ordnum ) latest_log ON latest_log.ordnum = rim_h.invnum
-  LEFT JOIN "++ schema ++".uc_log_ws log_ws ON log_ws.ordnum = rim_h.invnum
-  AND log_ws.date_event = latest_log.max_date
-WHERE
-  trlr.trlr_stat = 'D'
-  AND rim_h.wh_id = 'ORDINARIO'
-  AND ( log_ws.status_transaction = 'PENDING_SUCCESS' OR log_ws.status_transaction IS NULL )
-  AND NOT EXISTS ( SELECT 1 FROM "++ schema ++".uc_log_ws log_success WHERE log_success.ordnum = rim_h.invnum AND log_success.status_transaction = 'SUCCESS')"]]></ee:set-variable>
+"SELECT DISTINCT rim_h.invnum,
+        rim_h.waybil,
+        rim_h.sadnum,
+        (SELECT MAX(inv_attr_str10) FROM "++ schema ++".rimlin WHERE invnum = rim_h.invnum AND ROWNUM < 2) AS clave_presupuestal_origen
+   FROM "++ schema ++".rimhdr rim_h
+   JOIN "++ schema ++".rcvinv ON rcvinv.invnum = rim_h.invnum
+   JOIN "++ schema ++".rcvtrk ON rcvtrk.trknum = rcvinv.trknum
+   JOIN "++ schema ++".trlr ON trlr.trlr_id = rcvtrk.trlr_id
+   LEFT JOIN (SELECT ordnum, MAX(date_event) AS max_date FROM "++ schema ++".uc_log_ws GROUP BY ordnum) latest_log ON latest_log.ordnum = rim_h.invnum
+   LEFT JOIN "++ schema ++".uc_log_ws log_ws ON log_ws.ordnum = rim_h.invnum AND log_ws.date_event = latest_log.max_date 
+   WHERE trlr.trlr_stat = 'D'
+   AND rim_h.wh_id = 'ORDINARIO'
+   AND (log_ws.status_transaction = 'PENDING_SUCCESS' OR log_ws.status_transaction IS NULL)
+   AND NOT EXISTS(SELECT 1 FROM "++ schema ++".uc_log_ws log_success WHERE log_success.ordnum = rim_h.invnum AND log_success.status_transaction = 'SUCCESS')"]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
 		<logger level="INFO" doc:name="Logger" doc:id="c7111ee1-cbed-401c-ac73-2321ea45202c" message="#[vars.query_orders]"/>
