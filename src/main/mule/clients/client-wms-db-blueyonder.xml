@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<sub-flow name="client-bd-connection-cca-key-from-wms-key" doc:id="faeb6b03-0e8e-4795-a99b-c6aea5576481">
+		<ee:transform doc:name="Set query" doc:id="5fe9a9a4-a618-41a6-bd43-c3e34263d13c">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="wmsQuery" ><![CDATA[%dw 2.0
+output application/json
+var schema = p('database.wms.blueyonder.schema')
+---
+"SELECT
+	ALT.ALT_PRTNUM CLAVE_CCA
+FROM
+	"++ schema ++".ALT_PRTMST ALT
+JOIN "++ schema ++".PRTMST PRT ON
+	PRT.PRTNUM = ALT.PRTNUM
+WHERE
+	PRT.PRTNUM IN ('"++ (vars.prtNumPl default "") ++"')"
+
+//"SELECT input_1
+//FROM prodtxlintegra.generic_xconfiguration
+//WHERE
+//input_1 = '"++ (vars.prtNumPl default "") ++"';"]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<logger level="INFO" doc:name="Visualize query variable" doc:id="ea6fe840-0caa-4338-95ed-4f21117d0b38" message="#[vars.ccaKeyFrmWms]"/>
+		<flow-ref doc:name="Call to client-wms-db-blueyonderSub_Flow" doc:id="b8b6a1ae-136c-46e4-924c-905d3fe6c105" name="client-wms-db-blueyonderSub_Flow"/>
+		<!-- [STUDIO:"Query wms"]<db:select doc:name="Query wms" doc:id="6cb5eedf-6487-4de3-ab22-d0fc365e2e57" config-ref="Database_Config_Wms_Blueyonder" target="dbResponse">
+			<db:sql><![CDATA[#[vars.ccaKeyFrmWms&#93;&#93;&#93;></db:sql>
+			<db:parameter-types />
+		</db:select> [STUDIO] -->
+		<!-- [STUDIO:"Query prod integra"]<db:select doc:name="Query prod integra" doc:id="5eb593ef-10c4-4820-9382-46ff6e2a063d" config-ref="Database_Config_prodIntegra" target="dbResponse">
+			<db:sql><![CDATA[#[vars.ccaKeyFrmWms&#93;&#93;&#93;></db:sql>
+			<db:parameter-types />
+		</db:select> [STUDIO] -->
+		<ee:transform doc:name="Transform java response to json" doc:id="d4ef7638-c828-45b2-97f1-fd5a1f1363a2" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+vars.dbResponse]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Visualize response transformation" doc:id="5ed0cac2-2240-4ed2-b5b6-a81230961f0f" message="#[payload]"/>
+	</sub-flow>
+	<sub-flow name="client-wms-db-blueyonderSub_Flow" doc:id="3083a74f-350c-4189-8455-60dfcbefcd68" >
+		<db:select doc:name="Query wms" doc:id="ce91feac-107e-409b-9f24-1363b3ce1d24" config-ref="Database_Config_Wms_Blueyonder" target="dbResponse" >
+			<db:sql ><![CDATA[#[vars.wmsQuery]]]></db:sql>
+			<db:parameter-types />
+		</db:select>
+	</sub-flow>
+	<sub-flow name="clients-db-connection-get-supnum-from-rfc-cca" doc:id="2f51b4cc-1de3-4123-9984-ba34f4081ac4" >
+		<ee:transform doc:name="Set query" doc:id="202074d3-4a17-47af-b3e6-f42211f9687e" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="wmsQuery" ><![CDATA[%dw 2.0
+output application/json
+var schema = p('database.wms.blueyonder.schema')
+---
+ "SELECT
+	SPN.SUPNUM
+FROM
+	"++ schema ++".ADRMST RF
+JOIN "++ schema ++".SUPMST SPN
+ ON
+	RF.ADR_ID = SPN.ADR_ID
+WHERE
+	RF.FAXNUM IN('"++ (vars.rfc default "") ++"')"]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<logger level="INFO" doc:name="Visualize query variable" doc:id="2bd4cc0d-255e-48ad-b7d2-dc732b066de0" message="#[vars.getSupnumFromRfc]"/>
+		<!-- [STUDIO:"Select"]<db:select doc:name="Select" doc:id="1bca678f-6610-4ab6-9f55-41a51b9d0f0c" target="dbResponse" config-ref="Database_Config_Wms_Blueyonder">
+			<db:sql ><![CDATA[#[vars.getSupnumFromRfc&#93;&#93;&#93;></db:sql>
+		</db:select> [STUDIO] -->
+		<flow-ref doc:name="Call to client-wms-db-blueyonderSub_Flow" doc:id="27365e29-debd-4f45-94a3-a944e8c201e1" name="client-wms-db-blueyonderSub_Flow"/>
+		<logger level="INFO" doc:name="Visualize payload dbresponse" doc:id="98743dfc-27f1-45d5-bc47-fb957a19777c" message="#[%dw 2.0&#10;output application/json&#10;---&#10;vars.dbResponse]"/>
+		<ee:transform doc:name="Transform java response to json" doc:id="b9945a86-94a1-4c83-a337-adfc2846f4fa" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+vars.dbResponse]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Visualize response transformation" doc:id="80e748e5-86db-47c6-bfe8-cd625fe3bc42" message="#[payload]"/>
+	</sub-flow>
+	<sub-flow name="clients-db-connection-get-wms-clues" doc:id="fb577aa2-2e91-43cd-b80c-a358ef5e726b" >
+		<ee:transform doc:name="Set query" doc:id="d5178b12-1075-4a3a-8bd1-1398c2735c37" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="wmsQuery" ><![CDATA[%dw 2.0
+output application/json
+var schema = p('database.wms.blueyonder.schema')
+---
+"SELECT *
+   FROM "++ schema ++".cstmst
+  WHERE cstnum IN('"++ (vars.clues default "") ++"')"]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<logger level="INFO" doc:name="Visualize query variable" doc:id="e9dad75e-b5c3-40b1-ae25-196a0eccbe91" message="#[vars.getSupnumFromRfc]"/>
+		<!-- [STUDIO:"Select"]<db:select doc:name="Select" doc:id="0d6588cb-cf80-4e98-b1af-c60ddfde0cd1" target="dbResponse" config-ref="Database_Config_Wms_Blueyonder">
+			<db:sql ><![CDATA[#[vars.getSupnumFromRfc&#93;&#93;&#93;></db:sql>
+		</db:select> [STUDIO] -->
+		<flow-ref doc:name="Call to client-wms-db-blueyonderSub_Flow" doc:id="045bbb55-ec2f-48fc-990a-b2a4ed03baf2" name="client-wms-db-blueyonderSub_Flow"/>
+		<logger level="INFO" doc:name="Visualize payload dbresponse" doc:id="7f0f752d-48ae-4bdf-a80f-8fea533a4d8c" message="#[%dw 2.0&#10;output application/json&#10;---&#10;vars.dbResponse]"/>
+		<ee:transform doc:name="Transform java response to json" doc:id="802197c3-1b26-4f36-988c-658837cfa80a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+vars.dbResponse]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Visualize response transformation" doc:id="b3dbd60d-ed76-45ba-a82f-b4f1dd00ab60" message="#[payload]"/>
+	</sub-flow>
+	<sub-flow name="clients-db-connection-integrations-get-warehouse-id" doc:id="fde11215-291a-4cd1-a206-953b3b4ebf47" >
+		<ee:transform doc:name="Set query" doc:id="dd3cd92f-67e8-46e7-a7d7-1a87eb83c2a7" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="wmsQuery" ><![CDATA[%dw 2.0
+output application/json
+var schema = p('database.integrations.schema')
+---
+"SELECT
+	input_2
+FROM
+	"++ schema ++".generic_xconfiguration
+WHERE
+	xconfiguration_type = 'cca_client_master'
+	AND input_1 = '"++ (vars.clavePresFin default "") ++"'"]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<logger level="INFO" doc:name="Visualize query variable" doc:id="89b12b4b-474c-42b9-9c05-5fadbcd7a0a1" />
+		<!-- [STUDIO:"Select"]<db:select doc:name="Select" doc:id="abc2dd2c-dff1-494a-89d7-6c0fee789742" config-ref="Database_Config_prodIntegra" target="dbResponse">
+			<db:sql ><![CDATA[#[vars.wareHouseId&#93;&#93;&#93;></db:sql>
+		</db:select> [STUDIO] -->
+		<flow-ref doc:name="Call to client-wms-db-blueyonderSub_Flow" doc:id="85a3524b-ed0a-4616-8d15-8f0dae7c29a1" name="client-wms-db-blueyonderSub_Flow"/>
+		<logger level="INFO" doc:name="Logger" doc:id="a0b15b5a-551a-4ac9-9211-b7816bfc6c9d" message="#[vars.dbResponse]"/>
+		<ee:transform doc:name="Transform java response to json" doc:id="4f5b2f49-131f-4836-882c-974d4e996bf7" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+vars.dbResponse]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Visualize response transformation" doc:id="2c5d25c8-7473-478f-9198-9bf2084990c3" message="#[payload]"/>
+	</sub-flow>
+	<sub-flow name="clients-db-update-status-order" doc:id="f0682ef7-4969-4b1a-a5a6-ba0d75d8f7a1" >
+		<ee:transform doc:name="Create query" doc:id="4322444a-171b-4be8-9b5a-ef1b81f8eecc" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="query_status" ><![CDATA[%dw 2.0
+output application/json
+var schema = p('database.wms.blueyonder.schema')
+---
+"Insert into
+  "++ schema ++".uc_log_ws (
+    status_conection,
+    reason_conection,
+    ordnum,
+    generic1,
+    generic2,
+    generic3,
+    generic4,
+    generic5,
+    date_event,
+    status_transaction,
+    message_transaction,
+    request,
+    response,
+    wh_id,
+    client_id,
+    event,
+    event_data_sequence,
+    system
+  )
+values
+  (
+    :status_conection,
+    :reason_conection,
+    :numero_remision,
+    :numero_reposicion,
+    '',
+    '',
+    '',
+    '',
+    :date_transaction,
+    :status_transaction,
+    :message_transaction,
+    :request,
+    :response,
+    'ORDINARIO',
+    '----',
+    'INV-RCV',
+    '',
+    'IMSS CCA'
+  );"]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="89108350-7916-46b8-b86c-718a4fb1fd5e" message="#[vars.query_status]"/>
+		<db:insert doc:name="Insert" doc:id="0a3608f2-4d4c-4365-a759-ce58fed8f243" config-ref="Database_Config_Wms_Blueyonder">
+			<db:sql ><![CDATA[#[vars.query_status]]]></db:sql>
+			<db:input-parameters ><![CDATA[#[payload]]]></db:input-parameters>
+		</db:insert>
+	</sub-flow>
+	<sub-flow name="clients-db-get-orders-status-pending-or-empty" doc:id="856bad4a-12cc-40a5-a6e9-a16d2ba812a4" >
+		<ee:transform doc:name="Create Query" doc:id="c88816cb-549d-4a18-a972-aef4e67ad2b3" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="wmsQuery" ><![CDATA[%dw 2.0
+output application/java
+var schema = p('database.wms.blueyonder.schema')
+---
+"SELECT DISTINCT rim_h.invnum,
+        rim_h.waybil,
+        rim_h.sadnum,
+        (SELECT MAX(inv_attr_str10) FROM "++ schema ++".rimlin WHERE invnum = rim_h.invnum AND ROWNUM < 2) AS clave_presupuestal_origen
+   FROM "++ schema ++".rimhdr rim_h
+   JOIN "++ schema ++".rcvinv ON rcvinv.invnum = rim_h.invnum
+   JOIN "++ schema ++".rcvtrk ON rcvtrk.trknum = rcvinv.trknum
+   JOIN "++ schema ++".trlr ON trlr.trlr_id = rcvtrk.trlr_id
+   LEFT JOIN (SELECT ordnum, MAX(date_event) AS max_date FROM "++ schema ++".uc_log_ws GROUP BY ordnum) latest_log ON latest_log.ordnum = rim_h.invnum
+   LEFT JOIN "++ schema ++".uc_log_ws log_ws ON log_ws.ordnum = rim_h.invnum AND log_ws.date_event = latest_log.max_date 
+   WHERE trlr.trlr_stat = 'D'
+   AND rim_h.wh_id = 'ORDINARIO'
+   AND (log_ws.status_transaction = 'PENDING_SUCCESS' OR log_ws.status_transaction IS NULL)
+   AND NOT EXISTS(SELECT 1 FROM "++ schema ++".uc_log_ws log_success WHERE log_success.ordnum = rim_h.invnum AND log_success.status_transaction = 'SUCCESS')"]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="ebdb6e9d-dec3-47c4-846a-949aba300289" message="#[vars.query_orders]"/>
+		<flow-ref doc:name="Call to client-wms-db-blueyonderSub_Flow" doc:id="13ff027b-5659-44b9-829a-2337462ece7a" name="client-wms-db-blueyonderSub_Flow"/>
+		<!-- [STUDIO:"Select"]<db:select doc:name="Select" doc:id="917328f8-8194-4cfa-831f-62a59e90f28e" config-ref="Database_Config_Wms_Blueyonder">
+			<db:sql ><![CDATA[#[vars.query_orders&#93;&#93;&#93;></db:sql>
+		</db:select> [STUDIO] -->
+	</sub-flow>
+</mule>

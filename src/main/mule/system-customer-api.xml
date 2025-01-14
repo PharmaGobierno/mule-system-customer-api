@@ -3,7 +3,7 @@
     <http:listener-config name="system-customer-api-httpListenerConfig">
         <http:listener-connection host="0.0.0.0" port="8082" protocol="HTTPS" tlsContext="TLS_Context" />
     </http:listener-config>
-    <apikit:config name="system-customer-api-config" api="resource::ab8117f6-d718-4307-b5f7-03262d589cd0:system-customer-api:1.0.46:raml:zip:system-customer-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <apikit:config name="system-customer-api-config" api="resource::ab8117f6-d718-4307-b5f7-03262d589cd0:system-customer-api:1.0.52:raml:zip:system-customer-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
     <flow name="system-customer-api-main">
         <http:listener config-ref="system-customer-api-httpListenerConfig" path="/api/*">
             <http:response statusCode="#[vars.httpStatus default 200]">
@@ -478,8 +478,8 @@ attributes.queryParams.rfc]]></ee:set-variable>
         <flow-ref doc:name="listeners-effem-update-status" doc:id="def7e0f2-4712-42dc-ad27-9b5019d67136" name="listeners-effem-update-status" />
     </flow>
     <flow name="patch:\wms\order:application\json:system-customer-api-config">
-        <flow-ref doc:name="orchestrator-update-status-order-main" doc:id="36809b07-b8e5-4c98-8240-2635dc0dc527" name="orchestrator-update-status-order-main"/>
-		<ee:transform doc:name="Transform Message">
+        <flow-ref doc:name="orchestrator-update-status-order-main" doc:id="36809b07-b8e5-4c98-8240-2635dc0dc527" name="orchestrator-update-status-order-main" />
+        <ee:transform doc:name="Transform Message">
             <ee:message>
                 <ee:set-payload><![CDATA[%dw 2.0
 output application/json
@@ -497,6 +497,36 @@ output application/json
         </ee:transform>
     </flow>
     <flow name="get:\wms\order:system-customer-api-config">
-        <flow-ref doc:name="orchestrator-get-orders-wms-main" doc:id="1660ab04-53eb-479f-ba5d-ee9824ba1e22" name="orchestrator-get-orders-wms-main"/>
+        <flow-ref doc:name="orchestrator-get-orders-wms-main" doc:id="1660ab04-53eb-479f-ba5d-ee9824ba1e22" name="orchestrator-get-orders-wms-main" />
+    </flow>
+    <flow name="get:\cca\wms\clues:system-customer-api-config">
+        <ee:transform doc:name="Set query parameter variable" doc:id="fc72f732-897e-478c-9f02-68235a9979eb" >
+			<ee:message />
+			<ee:variables >
+				<ee:set-variable variableName="clues" ><![CDATA[%dw 2.0
+output application/json
+---
+attributes.queryParams.clues]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="Call to clients-db-connection-get-wms-clues" doc:id="a7982390-f1d1-49bf-a4b9-1a7b63e26751" name="clients-db-connection-get-wms-clues"/>
+    </flow>
+    <flow name="get:\cca\wms\supplier:system-customer-api-config">
+		<ee:transform doc:name="Set query parameter variable" doc:id="1913bf3b-f494-4ce9-846e-7324acc18da4" >
+			<ee:message />
+			<ee:variables >
+				<ee:set-variable variableName="rfc" ><![CDATA[%dw 2.0
+output application/json
+---
+attributes.queryParams.rfc]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="Call-orchestrator-get-supnum-from-rfc-cca" doc:id="342746fe-845e-4dce-97b3-247ec3f2423f" name="orchestrator-get-supnum-from-rfc-cca" />
+    </flow>
+    <flow name="get:\gepp\travel:system-customer-api-config">
+        <logger level="INFO" message="get:\gepp\travel:system-customer-api-config" />
+    </flow>
+    <flow name="post:\gepp\travel:system-customer-api-config">
+        <logger level="INFO" message="post:\gepp\travel:system-customer-api-config" />
     </flow>
 </mule>
