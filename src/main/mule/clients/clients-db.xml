@@ -57,4 +57,38 @@ payload]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
 	</sub-flow>
+	<sub-flow name="clients-db-connection-integrations-get-warehouse-id" doc:id="836ffcf1-f9a9-46d8-a855-a93fdd684647" >
+		<ee:transform doc:name="Set query" doc:id="5c77f00c-98b1-438d-813c-cc5117290fd1" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="wareHouseId" ><![CDATA[%dw 2.0
+output application/json
+var schema = p('database.integrations.schema')
+---
+"SELECT
+	input_2
+FROM
+	"++ schema ++".generic_xconfiguration
+WHERE
+	xconfiguration_type = 'cca_client_master'
+	AND input_1 = '"++ (vars.clavePresFin default "") ++"'"]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<logger level="INFO" doc:name="Visualize query variable" doc:id="98460a9f-c1ba-42c3-ba9b-54b8bb3feb86" />
+		<db:select doc:name="Select" doc:id="48e29444-8242-4dca-9da7-6c8b0d89533d" config-ref="Database_Config_prodIntegra" target="dbResponse">
+			<db:sql ><![CDATA[#[vars.wareHouseId]]]></db:sql>
+		</db:select>
+		<!-- [STUDIO:"Call to client-wms-db-blueyonderSub_Flow"]<flow-ref doc:name="Call to client-wms-db-blueyonderSub_Flow" doc:id="e9d04cba-be74-4316-b2c8-dc9f94dcb61d" name="client-wms-db-blueyonderSub_Flow"/> [STUDIO] -->
+		<logger level="INFO" doc:name="Logger" doc:id="e67625b4-484f-4f54-90f7-c5c6296f9ab7" message="#[vars.dbResponse]"/>
+		<ee:transform doc:name="Transform java response to json" doc:id="1b1bc668-3adf-4cb7-9787-68f37d4646c4" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+vars.dbResponse]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Visualize response transformation" doc:id="5cfc14fa-e06d-4034-a62b-f9e09062554e" message="#[payload]"/>
+	</sub-flow>
 </mule>

@@ -123,40 +123,6 @@ vars.dbResponse]]></ee:set-payload>
 		</ee:transform>
 		<logger level="INFO" doc:name="Visualize response transformation" doc:id="b3dbd60d-ed76-45ba-a82f-b4f1dd00ab60" message="#[payload]"/>
 	</sub-flow>
-	<sub-flow name="clients-db-connection-integrations-get-warehouse-id" doc:id="fde11215-291a-4cd1-a206-953b3b4ebf47" >
-		<ee:transform doc:name="Set query" doc:id="dd3cd92f-67e8-46e7-a7d7-1a87eb83c2a7" >
-			<ee:message >
-			</ee:message>
-			<ee:variables >
-				<ee:set-variable variableName="wmsQuery" ><![CDATA[%dw 2.0
-output application/json
-var schema = p('database.integrations.schema')
----
-"SELECT
-	input_2
-FROM
-	"++ schema ++".generic_xconfiguration
-WHERE
-	xconfiguration_type = 'cca_client_master'
-	AND input_1 = '"++ (vars.clavePresFin default "") ++"'"]]></ee:set-variable>
-			</ee:variables>
-		</ee:transform>
-		<logger level="INFO" doc:name="Visualize query variable" doc:id="89b12b4b-474c-42b9-9c05-5fadbcd7a0a1" />
-		<!-- [STUDIO:"Select"]<db:select doc:name="Select" doc:id="abc2dd2c-dff1-494a-89d7-6c0fee789742" config-ref="Database_Config_prodIntegra" target="dbResponse">
-			<db:sql ><![CDATA[#[vars.wareHouseId&#93;&#93;&#93;></db:sql>
-		</db:select> [STUDIO] -->
-		<flow-ref doc:name="Call to client-wms-db-blueyonderSub_Flow" doc:id="85a3524b-ed0a-4616-8d15-8f0dae7c29a1" name="client-wms-db-blueyonderSub_Flow"/>
-		<logger level="INFO" doc:name="Logger" doc:id="a0b15b5a-551a-4ac9-9211-b7816bfc6c9d" message="#[vars.dbResponse]"/>
-		<ee:transform doc:name="Transform java response to json" doc:id="4f5b2f49-131f-4836-882c-974d4e996bf7" >
-			<ee:message >
-				<ee:set-payload ><![CDATA[%dw 2.0
-output application/json
----
-vars.dbResponse]]></ee:set-payload>
-			</ee:message>
-		</ee:transform>
-		<logger level="INFO" doc:name="Visualize response transformation" doc:id="2c5d25c8-7473-478f-9198-9bf2084990c3" message="#[payload]"/>
-	</sub-flow>
 	<sub-flow name="clients-db-update-status-order" doc:id="f0682ef7-4969-4b1a-a5a6-ba0d75d8f7a1" >
 		<ee:transform doc:name="Create query" doc:id="4322444a-171b-4be8-9b5a-ef1b81f8eecc" >
 			<ee:message >
