@@ -40,7 +40,7 @@ import * from dw::core::Strings
                 CLIENT_ID: "----",
                 EVENT: "INV-RCV",
                 EVENT_DATA_SEQUENCE: "",
-                SYSTEM: "IMSS CCA",
+                SYSTEM: payload.system,
             }
         }
 	}
