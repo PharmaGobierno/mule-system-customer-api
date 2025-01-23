@@ -41,6 +41,8 @@ import * from dw::core::Strings
                 EVENT: "INV-RCV",
                 EVENT_DATA_SEQUENCE: "",
                 SYSTEM: payload.system,
+                GENERIC2: payload.order_number default "",
+                GENERIC3: payload.status default ""
             }
         }
 	}
