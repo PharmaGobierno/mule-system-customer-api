@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_1f0f58d0_9e03_48af_ac78_e30b505aff65_Output_Variables_wmsQuery = String
+

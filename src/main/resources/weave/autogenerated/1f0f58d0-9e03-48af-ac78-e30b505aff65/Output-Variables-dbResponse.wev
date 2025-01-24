@@ -1,0 +1,11 @@
+%dw 2.0
+
+type auto_1f0f58d0_9e03_48af_ac78_e30b505aff65_Output_Variables_dbResponse = Array<{ _?: java_lang_Object {"class": "java.lang.Object",
+  "typeAlias": "Object",
+  "typeId": "java.lang.Object"} }>
+type java_lang_Object = {|  |} {"class": "java.lang.Object",
+"typeAlias": "Object",
+"typeId": "java.lang.Object"}
+
+
+

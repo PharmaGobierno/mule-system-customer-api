@@ -3,7 +3,7 @@
     <http:listener-config name="system-customer-api-httpListenerConfig">
         <http:listener-connection host="0.0.0.0" port="8082" protocol="HTTPS" tlsContext="TLS_Context" />
     </http:listener-config>
-    <apikit:config name="system-customer-api-config" api="resource::ab8117f6-d718-4307-b5f7-03262d589cd0:system-customer-api:1.0.54:raml:zip:system-customer-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <apikit:config name="system-customer-api-config" api="resource::ab8117f6-d718-4307-b5f7-03262d589cd0:system-customer-api:1.0.55:raml:zip:system-customer-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
     <flow name="system-customer-api-main">
         <http:listener config-ref="system-customer-api-httpListenerConfig" path="/api/*">
             <http:response statusCode="#[vars.httpStatus default 200]">
@@ -528,5 +528,18 @@ attributes.queryParams.rfc]]></ee:set-variable>
     </flow>
     <flow name="post:\gepp\travel:system-customer-api-config">
         <logger level="INFO" message="post:\gepp\travel:system-customer-api-config" />
+    </flow>
+    <flow name="get:\cca\wms\item_key:system-customer-api-config">
+        <ee:transform doc:name="Transform Message">
+            <ee:message>
+            </ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="clave" ><![CDATA[%dw 2.0
+output application/json
+---
+attributes.queryParams.item_key]]></ee:set-variable>
+			</ee:variables>
+        </ee:transform>
+		<flow-ref doc:name="client-wms-db-blueyonder-get-clave-main" doc:id="e84d3f29-991a-4674-a8c0-f356a6627f4e" name="client-wms-db-blueyonder-get-clave-main"/>
     </flow>
 </mule>

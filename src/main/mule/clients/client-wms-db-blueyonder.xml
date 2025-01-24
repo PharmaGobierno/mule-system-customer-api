@@ -123,6 +123,32 @@ vars.dbResponse]]></ee:set-payload>
 		</ee:transform>
 		<logger level="INFO" doc:name="Visualize response transformation" doc:id="b3dbd60d-ed76-45ba-a82f-b4f1dd00ab60" message="#[payload]"/>
 	</sub-flow>
+	<sub-flow name="client-wms-db-blueyonder-get-clave-main" doc:id="1f0f58d0-9e03-48af-ac78-e30b505aff65" >
+		<ee:transform doc:name="Set query" doc:id="9fe3dad7-a5b2-4345-adb6-7ea5503ea3bd" >
+			<ee:message />
+			<ee:variables >
+				<ee:set-variable variableName="wmsQuery" ><![CDATA[%dw 2.0
+output application/json
+var schema = p('database.wms.blueyonder.schema')
+---
+"SELECT *
+   FROM "++ schema ++".prtmst
+  WHERE prtnum IN('"++ (vars.clave default "") ++"')"]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<logger level="INFO" doc:name="Visualize query variable" doc:id="c940cdec-ed56-4c9b-9fbe-e67b3cc9a2e3" message="#[vars.getSupnumFromRfc]" />
+		<flow-ref doc:name="Call to client-wms-db-blueyonderSub_Flow" doc:id="31e87053-a425-47d3-bbc4-6080a3b67cc4" name="client-wms-db-blueyonderSub_Flow" />
+		<logger level="INFO" doc:name="Visualize payload dbresponse" doc:id="4b39b3f6-7a73-4d60-9225-060ca6517da3" message="#[%dw 2.0&#10;output application/json&#10;---&#10;vars.dbResponse]" />
+		<ee:transform doc:name="Transform java response to json" doc:id="6f229d55-341c-4dac-98ed-828e86cecab6" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+vars.dbResponse]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Visualize response transformation" doc:id="25234c84-5916-4674-a280-a132d50848aa" message="#[payload]" />
+	</sub-flow>
 	<sub-flow name="clients-db-update-status-order" doc:id="f0682ef7-4969-4b1a-a5a6-ba0d75d8f7a1" >
 		<ee:transform doc:name="Create query" doc:id="4322444a-171b-4be8-9b5a-ef1b81f8eecc" >
 			<ee:message >
