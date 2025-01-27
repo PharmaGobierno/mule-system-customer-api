@@ -27,8 +27,8 @@ import * from dw::core::Strings
                 REASON_CONECTION: payload.reason_conection,
                 ORDNUM: payload.remission_number,
                 GENERIC1: payload.reposition_number,
-                GENERIC2: "",
-                GENERIC3: "",
+                GENERIC2: payload.order_number default "",
+                GENERIC3: payload.status default "",
                 GENERIC4: "",
                 GENERIC5: "",
                 DATE_EVENT: payload.date_transaction,
@@ -40,9 +40,7 @@ import * from dw::core::Strings
                 CLIENT_ID: "----",
                 EVENT: "INV-RCV",
                 EVENT_DATA_SEQUENCE: "",
-                SYSTEM: payload.system,
-                GENERIC2: payload.order_number default "",
-                GENERIC3: payload.status default ""
+                SYSTEM: payload.system
             }
         }
 	}
