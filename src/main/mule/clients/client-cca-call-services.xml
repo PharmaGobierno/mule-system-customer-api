@@ -10,7 +10,8 @@ http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/cu
 	<sub-flow name="client-cca-call-services-get-order-remision" doc:id="ec19fe54-08e9-4fea-8454-6cc2ec8082e3" >
 		<logger level="INFO" doc:name="Logger" doc:id="1d2450f6-d3b6-48f8-b9cb-31517a47a88e" message="#[payload]"/>
 			<try doc:name="Try" doc:id="cca68d64-0533-4543-b725-c52921100323" >
-			<http:request method="GET" doc:name="Request" doc:id="fc6f1876-9dc1-4ecf-bbc8-0e47b7803e25" config-ref="Http_request_CCA" path="${https.request.cca.api.get.order.remision}">
+			<until-successful maxRetries="5" doc:name="Until Successful" doc:id="1fcf1678-803b-4ba5-910e-0f0a966a806b" millisBetweenRetries="30000">
+				<http:request method="GET" doc:name="Request" doc:id="fc6f1876-9dc1-4ecf-bbc8-0e47b7803e25" config-ref="Http_request_CCA" path="${https.request.cca.api.get.order.remision}">
 			<http:headers><![CDATA[#[output application/java
 ---
 {
@@ -29,6 +30,7 @@ http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/cu
 	"password" : vars.password
 }]]]></http:query-params>
 		</http:request>
+			</until-successful>
 			<error-handler >
 				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="8254d1b5-f724-49df-b217-76e30d419efe">
 					<ee:transform doc:name="Transform Message" doc:id="ac92ff4a-6f22-417e-bcf7-8c0e96ec91c5">
@@ -72,7 +74,8 @@ payload ++ validateStatus(payload.estatusOrden)]]></ee:set-payload>
 	<sub-flow name="client-cca-call-services-get-order-remision-bienestar" doc:id="b79be803-f372-4b15-a094-3469394b2a43" >
 		<logger level="INFO" doc:name="Logger" doc:id="32851433-eaa8-4952-9f4c-b217781147fe" message="#[payload]"/>
 		<try doc:name="Try" doc:id="00c26735-4575-4609-8325-c3c976922b08" >
-			<http:request method="GET" doc:name="Request" doc:id="3f71df19-978a-47e3-8307-a73548a04448" config-ref="Http_request_CCA_Bienestar" path="${https.request.cca.bienestar.api.get.order.remision}">
+			<until-successful maxRetries="5" doc:name="Until Successful" doc:id="ef5ba55f-711d-4d5b-a7c6-3f2a6bb0c0b7" millisBetweenRetries="30000">
+				<http:request method="GET" doc:name="Request" doc:id="3f71df19-978a-47e3-8307-a73548a04448" config-ref="Http_request_CCA_Bienestar" path="${https.request.cca.bienestar.api.get.order.remision}">
 			<http:headers><![CDATA[#[output application/java
 ---
 {
@@ -91,6 +94,7 @@ payload ++ validateStatus(payload.estatusOrden)]]></ee:set-payload>
 	"password" : vars.password
 }]]]></http:query-params>
 		</http:request>
+			</until-successful>
 			<error-handler >
 				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="666ea41c-bcf8-4763-b8de-3d1408045ae6" >
 					<ee:transform doc:name="Transform Message" doc:id="025bcbf2-de9a-4b73-a49f-4c2d5c571c0b" >
@@ -116,13 +120,15 @@ write(error.errorMessage.payload,"application/json")]]></ee:set-variable>
 	</sub-flow>
 	<sub-flow name="client-cca-call-services-get-order-confirmation" doc:id="93809432-409f-4b12-b995-26a263a938a4" >
 		<logger level="INFO" doc:name="Logger" doc:id="fced381f-8cb9-47ba-9ad5-337179b99590" message="#[payload]"/>
-		<http:request method="POST" doc:name="Request" doc:id="8cc5325d-88e3-4bbf-870c-1de232e2d6ac" config-ref="Http_request_CCA" path="${https.request.cca.api.post.create.remision}">
-			<http:headers ><![CDATA[#[output application/java
+		<until-successful maxRetries="5" doc:name="Until Successful" doc:id="5955c611-8fa2-489b-8fe0-07132c6a5c99" millisBetweenRetries="30000">
+			<http:request method="POST" doc:name="Request" doc:id="8cc5325d-88e3-4bbf-870c-1de232e2d6ac" config-ref="Http_request_CCA" path="${https.request.cca.api.post.create.remision}">
+			<http:headers><![CDATA[#[output application/java
 ---
 {
 	"Host" : p('https.request.cca.api.host')
 }]]]></http:headers>
 		</http:request>
+		</until-successful>
 		<ee:transform doc:name="Catch http status 206" doc:id="6149e312-9df5-442a-8742-5c565e877b77">
 				<ee:message>
 				</ee:message>
@@ -137,13 +143,15 @@ write(error.errorMessage.payload,"application/json")]]></ee:set-variable>
 	</sub-flow>
 	<sub-flow name="client-cca-call-services-get-order-confirmation-bienestar" doc:id="b9fa3fd7-65a2-4a2a-b9d2-2eaad2452500" >
 		<logger level="INFO" doc:name="Logger" doc:id="fdd2a906-56e1-4344-a9b7-74f65352d347" message="#[payload]"/>
-		<http:request method="POST" doc:name="Request" doc:id="7a241a90-c547-4b74-9134-d3bb2750901b" config-ref="Http_request_CCA_Bienestar" path="${https.request.cca.bienestar.api.post.create.remision}">
-			<http:headers ><![CDATA[#[output application/java
+		<until-successful maxRetries="5" doc:name="Until Successful" doc:id="1ea75314-87f9-4fb6-b08d-c7f85e1e3ac9" millisBetweenRetries="30000">
+			<http:request method="POST" doc:name="Request" doc:id="7a241a90-c547-4b74-9134-d3bb2750901b" config-ref="Http_request_CCA_Bienestar" path="${https.request.cca.bienestar.api.post.create.remision}">
+			<http:headers><![CDATA[#[output application/java
 ---
 {
 	"Host" : p('https.request.cca.bienestar.api.host')
 }]]]></http:headers>
 		</http:request>
+		</until-successful>
 		<ee:transform doc:name="Catch http status 206" doc:id="d5ad94ff-605d-4938-bdde-27150c84e5c1">
 				<ee:message>
 				</ee:message>
