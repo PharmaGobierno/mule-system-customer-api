@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+<mule xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
 	xmlns:ftp="http://www.mulesoft.org/schema/mule/ftp"
-	xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
-	xmlns:x12="http://www.mulesoft.org/schema/mule/x12" xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+	xmlns:jms="http://www.mulesoft.org/schema/mule/jms" xmlns:x12="http://www.mulesoft.org/schema/mule/x12"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
 http://www.mulesoft.org/schema/mule/ftp http://www.mulesoft.org/schema/mule/ftp/current/mule-ftp.xsd 
 http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-http://www.mulesoft.org/schema/mule/x12 http://www.mulesoft.org/schema/mule/x12/current/mule-x12.xsd">
+http://www.mulesoft.org/schema/mule/x12 http://www.mulesoft.org/schema/mule/x12/current/mule-x12.xsd
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd">
 	<!--  <x12:config name="X12_EDI_Config" doc:name="X12 EDI Config" doc:id="9c53de1e-0064-4be7-b796-a4c2f8d9dcd4" interchangeIdQualifierSelf="02" interchangeIdQualifierPartner="ZZ" interchangeIdSelf="LOAL" interchangeIdPartner="TRANSPLACE" requireUniqueInterchanges="false" initialInterchangeNumber="0" groupIdSelf="LOAL" groupIdPartner="TRANSPLACE" truncateExceedingMaxLength="true" ackAllSets="true" acknowledgmentSchemaPath="/x12/004010/997.esl" componentSeparator="`" batchDefaultUsageIndicator="T" batchComponentSeparator="`">
 		<x12:schemas >
 			<x12:schema value="/x12/004010/204.esl" />
@@ -80,6 +81,9 @@ http://www.mulesoft.org/schema/mule/x12 http://www.mulesoft.org/schema/mule/x12/
 			<reconnection >
 				<reconnect frequency="10000" count="3" blocking="false" />
 			</reconnection>
+			<tls:context >
+				<tls:trust-store insecure="true" />
+			</tls:context>
 		</http:request-connection>
 	</http:request-config>
 	<http:request-config name="Http_request_CCA_Bienestar" doc:name="HTTP Request configuration" doc:id="1b927618-830a-435c-89a3-66b001d17748" enableCookies="false">
