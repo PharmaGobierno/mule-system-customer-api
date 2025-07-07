@@ -32,7 +32,7 @@ http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/cu
 		</http:request>
 			</until-successful>
 			<error-handler >
-				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="8254d1b5-f724-49df-b217-76e30d419efe">
+				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="8254d1b5-f724-49df-b217-76e30d419efe" type="CCA:BAD_REQUEST, HTTP:BAD_REQUEST, HTTP:INTERNAL_SERVER_ERROR">
 					<ee:transform doc:name="Transform Message" doc:id="ac92ff4a-6f22-417e-bcf7-8c0e96ec91c5">
 						<ee:message>
 						</ee:message>
@@ -50,6 +50,53 @@ write(error.errorMessage.payload,"application/json")]]></ee:set-variable>
 					<validation:is-false doc:name="Is false" doc:id="0517bea4-463d-4e40-babf-8a2a3fd6bfac" expression='#[vars.errorCode == "409"]' message="#[vars.errorMessage]">
 						<error-mapping sourceType="VALIDATION:INVALID_BOOLEAN" targetType="CCA:BAD_REQUEST" />
 					</validation:is-false>
+				</on-error-continue>
+				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="0b0f0159-ebb9-496e-98bb-9ffe61c8012d" type="HTTP:CLIENT_SECURITY, HTTP:CONNECTIVITY, HTTP:FORBIDDEN, HTTP:RETRY_EXHAUSTED, HTTP:SERVICE_UNAVAILABLE, HTTP:TIMEOUT, HTTP:UNAUTHORIZED">
+					<ee:transform doc:name="Transform Message" doc:id="1f2ba610-cb64-4963-8d5b-95ab03c74f97">
+						<ee:message />
+						<ee:variables>
+							<ee:set-variable variableName="causeby"><![CDATA[%dw 2.0
+output application/json
+---
+error.description]]></ee:set-variable>
+							<ee:set-variable variableName="main_error"><![CDATA[%dw 2.0
+output application/json
+---
+error.errorType]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+					<ee:transform doc:name="set payload error" doc:id="69f0a3ec-c899-4667-9770-18add8eaedea">
+						<ee:message>
+							<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  traxion_response: {
+    completed_succesfully: "false",
+    error: {
+      error_type: "CCA:" ++ (vars.main_error.identifier default "ERROR"),
+      payload: {
+      	event: correlationId
+      },
+      user_error_description: "error en comunicacion con CCA",
+      system_error_description: vars.causeby
+    }
+  }
+}]]></ee:set-payload>
+						</ee:message>
+						<ee:variables>
+							<ee:set-variable variableName="slackChannel"><![CDATA[%dw 2.0
+output application/json
+---
+p('slack.connection.channel.connectivity.error')]]></ee:set-variable>
+							<ee:set-variable variableName="messageProvider"><![CDATA[%dw 2.0
+output application/json
+---
+"ERROR PROVENIENTE DE WMS BLUEYONDER"]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+					<flow-ref doc:name="orchestrator-send-message-to-slack-main" doc:id="e98f0606-0bb2-419c-920e-e0b539bbaf1d" name="orchestrator-send-message-to-slack-main" />
+					<raise-error doc:name="Raise error" doc:id="33195c12-c054-439a-b25c-2a362e5a5f62" type="CCA:ERROR" description="#[vars.causeby]" />
 				</on-error-continue>
 			</error-handler>
 		</try>
@@ -96,7 +143,7 @@ payload ++ validateStatus(payload.estatusOrden)]]></ee:set-payload>
 		</http:request>
 			</until-successful>
 			<error-handler >
-				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="666ea41c-bcf8-4763-b8de-3d1408045ae6" >
+				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="666ea41c-bcf8-4763-b8de-3d1408045ae6" type="CCA:BAD_REQUEST, HTTP:BAD_REQUEST, HTTP:INTERNAL_SERVER_ERROR">
 					<ee:transform doc:name="Transform Message" doc:id="025bcbf2-de9a-4b73-a49f-4c2d5c571c0b" >
 						<ee:message />
 						<ee:variables >
@@ -114,13 +161,61 @@ write(error.errorMessage.payload,"application/json")]]></ee:set-variable>
 						<error-mapping sourceType="VALIDATION:INVALID_BOOLEAN" targetType="CCA:BAD_REQUEST" />
 					</validation:is-false>
 				</on-error-continue>
+				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="a435a066-08b6-44ea-a5b1-761b7efbe58a" type="HTTP:CLIENT_SECURITY, HTTP:CONNECTIVITY, HTTP:FORBIDDEN, HTTP:RETRY_EXHAUSTED, HTTP:SERVICE_UNAVAILABLE, HTTP:TIMEOUT, HTTP:UNAUTHORIZED">
+					<ee:transform doc:name="Transform Message" doc:id="63b95141-8484-4004-be5d-88c8b4ad6139" >
+						<ee:message />
+						<ee:variables >
+							<ee:set-variable variableName="causeby" ><![CDATA[%dw 2.0
+output application/json
+---
+error.description]]></ee:set-variable>
+							<ee:set-variable variableName="main_error" ><![CDATA[%dw 2.0
+output application/json
+---
+error.errorType]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+					<ee:transform doc:name="set payload error" doc:id="0093bff5-d249-44b8-98bd-1b43eb79903b" >
+						<ee:message >
+							<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  traxion_response: {
+    completed_succesfully: "false",
+    error: {
+      error_type: "CCA:" ++ (vars.main_error.identifier default "ERROR"),
+      payload: {
+      	event: correlationId
+      },
+      user_error_description: "error en comunicacion con CCA",
+      system_error_description: vars.causeby
+    }
+  }
+}]]></ee:set-payload>
+						</ee:message>
+						<ee:variables >
+							<ee:set-variable variableName="slackChannel" ><![CDATA[%dw 2.0
+output application/json
+---
+p('slack.connection.channel.connectivity.error')]]></ee:set-variable>
+							<ee:set-variable variableName="messageProvider" ><![CDATA[%dw 2.0
+output application/json
+---
+"ERROR PROVENIENTE DE WMS BLUEYONDER"]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+					<flow-ref doc:name="orchestrator-send-message-to-slack-main" doc:id="bc55115a-920b-4f16-bd16-b55c088ab098" name="orchestrator-send-message-to-slack-main" />
+					<raise-error doc:name="Raise error" doc:id="b553101a-a0a1-4a63-83e0-eb6d969bdced" type="CCA:ERROR" description="#[vars.causeby]" />
+				</on-error-continue>
 			</error-handler>
 		</try>
 		<logger level="INFO" doc:name="Logger" doc:id="145d0464-1543-41b3-a9a4-cf1a841dfc0f" message="#[payload]"/>
 	</sub-flow>
 	<sub-flow name="client-cca-call-services-get-order-confirmation" doc:id="93809432-409f-4b12-b995-26a263a938a4" >
 		<logger level="INFO" doc:name="Logger" doc:id="fced381f-8cb9-47ba-9ad5-337179b99590" message="#[payload]"/>
-		<until-successful maxRetries="5" doc:name="Until Successful" doc:id="5955c611-8fa2-489b-8fe0-07132c6a5c99" millisBetweenRetries="30000">
+		<try doc:name="Try" doc:id="5f2b6c32-bd43-4e3b-b94c-0a13db5a5c60" >
+			<until-successful maxRetries="5" doc:name="Until Successful" doc:id="5955c611-8fa2-489b-8fe0-07132c6a5c99" millisBetweenRetries="30000">
 			<http:request method="POST" doc:name="Request" doc:id="8cc5325d-88e3-4bbf-870c-1de232e2d6ac" config-ref="Http_request_CCA" path="${https.request.cca.api.post.create.remision}">
 			<http:headers><![CDATA[#[output application/java
 ---
@@ -129,6 +224,56 @@ write(error.errorMessage.payload,"application/json")]]></ee:set-variable>
 }]]]></http:headers>
 		</http:request>
 		</until-successful>
+			<error-handler >
+				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="617bbf96-c6bc-4c85-8c2f-deff27dd2b50" type="HTTP:CLIENT_SECURITY, HTTP:CONNECTIVITY, HTTP:FORBIDDEN, HTTP:RETRY_EXHAUSTED, HTTP:SERVICE_UNAVAILABLE, HTTP:TIMEOUT, HTTP:UNAUTHORIZED">
+					<ee:transform doc:name="Transform Message" doc:id="1af5f3f1-27ff-46dd-9d80-d932efefc308" >
+						<ee:message />
+						<ee:variables >
+							<ee:set-variable variableName="causeby" ><![CDATA[%dw 2.0
+output application/json
+---
+error.description]]></ee:set-variable>
+							<ee:set-variable variableName="main_error" ><![CDATA[%dw 2.0
+output application/json
+---
+error.errorType]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+					<ee:transform doc:name="set payload error" doc:id="72cc46d0-3c4f-472a-9ff3-2216ec7af509" >
+						<ee:message >
+							<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  traxion_response: {
+    completed_succesfully: "false",
+    error: {
+      error_type: "CCA:" ++ (vars.main_error.identifier default "ERROR"),
+      payload: {
+      	event: correlationId
+      },
+      user_error_description: "error en comunicacion con CCA",
+      system_error_description: vars.causeby
+    }
+  }
+}]]></ee:set-payload>
+						</ee:message>
+						<ee:variables >
+							<ee:set-variable variableName="slackChannel" ><![CDATA[%dw 2.0
+output application/json
+---
+p('slack.connection.channel.connectivity.error')]]></ee:set-variable>
+							<ee:set-variable variableName="messageProvider" ><![CDATA[%dw 2.0
+output application/json
+---
+"ERROR PROVENIENTE DE WMS BLUEYONDER"]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+					<flow-ref doc:name="orchestrator-send-message-to-slack-main" doc:id="4f4ac94d-8768-4487-942a-678c2f63c809" name="orchestrator-send-message-to-slack-main" />
+					<raise-error doc:name="Raise error" doc:id="117c8058-f02d-4714-8037-c0423470511b" type="CCA:ERROR" description="#[vars.causeby]" />
+				</on-error-continue>
+			</error-handler>
+		</try>
 		<ee:transform doc:name="Catch http status 206" doc:id="6149e312-9df5-442a-8742-5c565e877b77">
 				<ee:message>
 				</ee:message>
@@ -143,7 +288,8 @@ write(error.errorMessage.payload,"application/json")]]></ee:set-variable>
 	</sub-flow>
 	<sub-flow name="client-cca-call-services-get-order-confirmation-bienestar" doc:id="b9fa3fd7-65a2-4a2a-b9d2-2eaad2452500" >
 		<logger level="INFO" doc:name="Logger" doc:id="fdd2a906-56e1-4344-a9b7-74f65352d347" message="#[payload]"/>
-		<until-successful maxRetries="5" doc:name="Until Successful" doc:id="1ea75314-87f9-4fb6-b08d-c7f85e1e3ac9" millisBetweenRetries="30000">
+		<try doc:name="Try" doc:id="343a9642-f0e1-4163-9c1f-7899ff868260">
+				<until-successful maxRetries="5" doc:name="Until Successful" doc:id="1ea75314-87f9-4fb6-b08d-c7f85e1e3ac9" millisBetweenRetries="30000">
 			<http:request method="POST" doc:name="Request" doc:id="7a241a90-c547-4b74-9134-d3bb2750901b" config-ref="Http_request_CCA_Bienestar" path="${https.request.cca.bienestar.api.post.create.remision}">
 			<http:headers><![CDATA[#[output application/java
 ---
@@ -152,6 +298,56 @@ write(error.errorMessage.payload,"application/json")]]></ee:set-variable>
 }]]]></http:headers>
 		</http:request>
 		</until-successful>
+			<error-handler>
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="7bda275d-bc56-4a05-b7a0-e8e44e673abc" type="HTTP:CLIENT_SECURITY, HTTP:CONNECTIVITY, HTTP:FORBIDDEN, HTTP:RETRY_EXHAUSTED, HTTP:SERVICE_UNAVAILABLE, HTTP:TIMEOUT, HTTP:UNAUTHORIZED" >
+					<ee:transform doc:name="Transform Message" doc:id="a5708d62-5051-462b-8aa7-d4dd8035a0c1" >
+						<ee:message />
+						<ee:variables >
+							<ee:set-variable variableName="causeby" ><![CDATA[%dw 2.0
+output application/json
+---
+error.description]]></ee:set-variable>
+							<ee:set-variable variableName="main_error" ><![CDATA[%dw 2.0
+output application/json
+---
+error.errorType]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+					<ee:transform doc:name="set payload error" doc:id="ea5bb81e-0dfb-4b2f-b081-6a05e55da675" >
+						<ee:message >
+							<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  traxion_response: {
+    completed_succesfully: "false",
+    error: {
+      error_type: "CCA:" ++ (vars.main_error.identifier default "ERROR"),
+      payload: {
+      	event: correlationId
+      },
+      user_error_description: "error en comunicacion con CCA",
+      system_error_description: vars.causeby
+    }
+  }
+}]]></ee:set-payload>
+						</ee:message>
+						<ee:variables >
+							<ee:set-variable variableName="slackChannel" ><![CDATA[%dw 2.0
+output application/json
+---
+p('slack.connection.channel.connectivity.error')]]></ee:set-variable>
+							<ee:set-variable variableName="messageProvider" ><![CDATA[%dw 2.0
+output application/json
+---
+"ERROR PROVENIENTE DE WMS BLUEYONDER"]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+					<flow-ref doc:name="orchestrator-send-message-to-slack-main" doc:id="7fd98624-00be-4a00-982f-0e0042989147" name="orchestrator-send-message-to-slack-main" />
+					<raise-error doc:name="Raise error" doc:id="1f92693f-22c8-405d-b2c4-2359d95e8d8a" type="CCA:ERROR" description="#[vars.causeby]" />
+				</on-error-continue>
+				</error-handler>
+			</try>
 		<ee:transform doc:name="Catch http status 206" doc:id="d5ad94ff-605d-4938-bdde-27150c84e5c1">
 				<ee:message>
 				</ee:message>
