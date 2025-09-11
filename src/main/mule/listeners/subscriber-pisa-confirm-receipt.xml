@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:pubsub="http://www.mulesoft.org/schema/mule/pubsub"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:kafka="http://www.mulesoft.org/schema/mule/kafka"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/kafka http://www.mulesoft.org/schema/mule/kafka/current/mule-kafka.xsd
+http://www.mulesoft.org/schema/mule/pubsub http://www.mulesoft.org/schema/mule/pubsub/current/mule-pubsub.xsd">
+	<flow name="subscriber-pisa-confirm-receipt" doc:id="1e3610ab-e14f-45f6-87af-653d6f294dcc" >
+		<pubsub:message-listener doc:name="On message listener" doc:id="275ab696-6494-4478-a841-3515f5585a27" config-ref="Google_Pub_Sub_Configuration" projectId="${pubsub.project.id}" subscriptionName="${pubsub.subscription.confirm_receipt}"/>
+		<!-- [STUDIO:"Read payload"]<ee:transform doc:name="Read payload" doc:id="8c692c33-5698-459a-bdb2-78e5c48238e6">
+   <ee:message>
+    <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+&#45;&#45;-
+read(payload, "application/json")&#93;&#93;></ee:set-payload>
+   </ee:message>
+   <ee:variables>
+   </ee:variables>
+  </ee:transform> [STUDIO] -->
+		<!-- [STUDIO:"Read payload1"]<ee:transform doc:name="Read payload1" doc:id="744c0b13-9e33-44c0-a7c1-4e03889ff62d">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+&#45;&#45;-
+{
+	"metadata": {
+		"timestamp": "2025-08-29T13:18:46.359-06:00",
+		"source_system": "PISA",
+		"transaction_id": "RECEIPT-bdcc25e0-850c-11f0-8952-8eb87e18584e",
+		"transaction_type": "RECEIPT_CREATION",
+		"correlation_id": "bdcc25e0-850c-11f0-8952-8eb87e18584e"
+	},
+	"payload": {
+        "receipt_asn": [
+                {
+                "invoice_number": "INV-20250901-001",
+                "invoice_type": "Factura",
+                "tracking_number": "TRK123456789MX",
+                "expected_quantity": "500",
+                "product_number": "PRD-789456123",
+                "lot_number": "L2025A09",
+                "status": "En tránsito",
+                "manufacture_date": "2025-06-15",
+                "expiration_date": "2027-06-14",
+                "health_registry": "COFEPRIS-12345-2025",
+                "tender_number": "LIC-IMSS-2025-089",
+                "country_of_origin": "México",
+                "product_temperature": "2-8°C",
+                "brand": "PharmaLife",
+                "unit_case": "10",
+                "unit_pack": "50",
+                "load_number": "LD-98765"
+                },
+                {
+                "invoice_number": "INV-20250901-001",
+                "invoice_type": "Factura",
+                "tracking_number": "TRK123456789MX",
+                "expected_quantity": "500",
+                "product_number": "PRD-789456123",
+                "lot_number": "L2025A09",
+                "status": "En tránsito",
+                "manufacture_date": "2025-06-15",
+                "expiration_date": "2027-06-14",
+                "health_registry": "COFEPRIS-12345-2025",
+                "tender_number": "LIC-IMSS-2025-089",
+                "country_of_origin": "México",
+                "product_temperature": "2-8°C",
+                "brand": "PharmaLife",
+                "unit_case": "10",
+                "unit_pack": "50",
+                "load_number": "LD-98765"
+                },
+                {
+                "invoice_number": "INV-20250901-002",
+                "invoice_type": "Factura",
+                "tracking_number": "TRK123456789MX",
+                "expected_quantity": "500",
+                "product_number": "PRD-789456123",
+                "lot_number": "L2025A09",
+                "status": "En tránsito",
+                "manufacture_date": "2025-06-15",
+                "expiration_date": "2027-06-14",
+                "health_registry": "COFEPRIS-12345-2025",
+                "tender_number": "LIC-IMSS-2025-089",
+                "country_of_origin": "México",
+                "product_temperature": "2-8°C",
+                "brand": "PharmaLife",
+                "unit_case": "10",
+                "unit_pack": "50",
+                "load_number": "LD-98765"
+                }
+            &#93;
+    }
+
+}&#93;&#93;></ee:set-payload>
+			</ee:message>
+			<ee:variables />
+		</ee:transform> [STUDIO] -->
+		<logger level="INFO" doc:name="Logger2" doc:id="700a4427-d61a-42ee-826e-1f72abf04336" message="#[payload]" />
+		<!-- [STUDIO:"Call to subscriber-pisa-confirm-receipt-mapping"]<flow-ref doc:name="Call to subscriber-pisa-confirm-receipt-mapping" doc:id="dce394f5-97f8-4b7d-8b0f-ac3c159d038f" name="subscriber-pisa-confirm-receipt-mapping"/> [STUDIO] -->
+		
+		<flow-ref doc:name="Call to subscriber-orchestrator-pisa-confirm-receipt" doc:id="984c04c4-0597-4c67-994e-09676bddc419" name="subscriber-orchestrator-pisa-confirm-receipt"/>
+		<logger level="INFO" doc:name="Logger" doc:id="641bb89c-0c46-41d7-bc8f-c21c1446a0b7" message="#[payload]" />
+		<logger level="INFO" doc:name="Logger1" doc:id="5793444b-803d-4188-b1e1-56a9c27003f9" message="#[payload]" />
+	</flow>
+	<sub-flow name="subscriber-pisa-confirm-receipt-mapping" doc:id="42469382-750b-46f0-a9a0-73b54acbb4ee" >
+		<ee:transform doc:name="Transform Message" doc:id="fc6b7a7c-81bb-4806-8747-490abd0d8891" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json  encoding= "UTF-8"
+import * from dw::core::Strings
+var ramdomNumber = randomInt(89) + 10 //vars.consecNum
+fun noAlt(clasP, rem, num) = (substring(clasP, 3, 6) as String) ++ "-" ++ num as String ++ rem as Number default ""
+fun formDate(date) = (substring(date, 0, 4) as String) ++ (substring(date, 5, 7) as String) ++ 
+			(substring(date, 8, 10) as String) ++ (substring(date, 11, 13) as String) ++ 
+			(substring(date, 14, 16) as String) ++ (substring(date, 17, 19))
+---
+{
+	RA_INB_IFD: {
+		CTRL_SEG: payload.payload.receipt_asn groupBy $.invoice_number pluck $ map (invoice, index)->{
+			TRNNAM:"RA_TRAN",
+            TRNVER:"2017.1V0",
+			WHSE_ID: "PISA", //PISA nueva instancia
+			HEADER_SEG: {
+				SEGNAM: "RECEIPT INVOICE",
+				TRNTYP: "A",
+                INVNUM: "",         // invoice_number
+                SUPNUM: "00123462",///De momento fijo
+				CLIENT_ID: "----",///Cambio en otra instancia
+                RIMST: "OPEN", 
+				INVTYP: "ISEM", //Cambio en otra instancia
+                INVDTE: formDate(now()), 
+				LINE_SEG: invoice map  (remision, index)-> {////por cada item que salga de agrupar
+					SEGNAM: "LINE_SEG",
+					INVLIN: leftPad((index + 1) as String, 4, "0"),
+					INVSLN: leftPad((index + 1) as String, 4, "0"),
+                    EXPQTY: remision.expected_quantity,
+                    PRTNUM: remision.product_number,
+					LOTNUM: remision.lot_number,
+                    RCVSTS: remision.status,
+                    MANDTE: formDate(remision.manufacture_date),
+					EXPIRE_DTE: formDate(remision.expiration_date),
+					INV_ATTR_STR3: remision.health_registry,
+					INV_ATTR_STR9: remision.tender_number,
+					INV_ATTR_STR11: remision.country_of_origin,
+                    INV_ATTR_STR15: remision.product_temperature,
+					INV_ATTR_STR16: remision.brand
+				} 
+			}
+		}
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="subscriber-orchestrator-pisa-confirm-receipt" doc:id="c96ad591-be39-494a-affa-aa17114cba4b" >
+		<flow-ref doc:name="Call to client-pisa-login" doc:id="5230d95a-7189-4d63-9eb7-e7a01a238636" name="client-pisa-login" target="loginResponse"/>
+		<flow-ref doc:name="Call to clients-post-pisa-confirm-receipt" doc:id="3b894bfb-c112-48e0-b091-d31defc6db94" name="clients-post-pisa-confirm-receipt"/>
+	</sub-flow>
+</mule>

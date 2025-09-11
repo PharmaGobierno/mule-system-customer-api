@@ -10,21 +10,7 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
 http://www.mulesoft.org/schema/mule/kinesis http://www.mulesoft.org/schema/mule/kinesis/current/mule-kinesis.xsd
 http://www.mulesoft.org/schema/mule/traxion-s-logger http://www.mulesoft.org/schema/mule/traxion-s-logger/current/mule-traxion-s-logger.xsd
-http://www.mulesoft.org/schema/mule/kafka http://www.mulesoft.org/schema/mule/kafka/current/mule-kafka.xsd">
-	
-	<kafka:consumer-config name="Traxion_Kafka_OMS_Inbound" doc:name="Apache Kafka Consumer configuration" doc:id="8a9acefc-1af0-430e-a576-0980744168d9" >
-		<kafka:consumer-sasl-plain-connection groupId="${kafka.settings.customer.group.id}" username="${kafka.settings.user}" password="${kafka.settings.password}" endpointIdentificationAlgorithm="https">
-			<tls:context >
-				<tls:trust-store insecure="true" />
-			</tls:context>
-			<kafka:bootstrap-servers >
-				<kafka:bootstrap-server value="localhost:9092" />
-			</kafka:bootstrap-servers>
-			<kafka:topic-patterns >
-				<kafka:topic-pattern value="${kafka.settings.oms.inbound}" />
-			</kafka:topic-patterns>
-		</kafka:consumer-sasl-plain-connection>
-	</kafka:consumer-config>	
+http://www.mulesoft.org/schema/mule/kafka http://www.mulesoft.org/schema/mule/kafka/current/mule-kafka.xsd">	
 	<kafka:producer-config name="Apache_Kafka_Producer_configuration" doc:name="Apache Kafka Producer configuration" doc:id="67584073-a9e8-47f0-b757-6ac3eb0fa3ea" >
 		<kafka:producer-plaintext-connection >
 			<kafka:bootstrap-servers >

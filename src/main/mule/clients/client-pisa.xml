@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:pubsub="http://www.mulesoft.org/schema/mule/pubsub"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/pubsub http://www.mulesoft.org/schema/mule/pubsub/current/mule-pubsub.xsd">
+	<sub-flow name="client-pisa-login" doc:id="632cf071-2076-4d37-895b-62d234fb3c6b" >
+		<flow-ref doc:name="Call to client-pisa-vars" doc:id="2c1af516-cdce-431e-947b-e2884e54715a" name="client-pisa-token-vars" />
+		<http:request method="POST" doc:name="Request" doc:id="f44474a8-3557-47f6-bf02-ca763deb9619" config-ref="HTTP_Request_configuration_PISA_Token" path="${https.pisa.token.api.get.token}">
+			<http:body ><![CDATA[#[vars.requestLogin]]]></http:body>
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Authorization" : vars.authorization
+}]]]></http:headers>
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"grant_type" : vars.grant_type
+}]]]></http:query-params>
+		</http:request>
+		<logger level="INFO" doc:name="Logger" doc:id="c36e3f50-c581-4467-a770-0276dea421f0" message="#[payload]"/>
+		<flow-ref doc:name="Call to client-pisa-save-token" doc:id="683cfb80-2720-4cac-9477-e4f77801f8d1" name="client-pisa-save-token"/>
+	</sub-flow>
+	<flow name="client-pisaFlow" doc:id="92470052-b846-4df9-8e37-6c8f60daea35" >
+		<!-- [STUDIO:"Scheduler"]<scheduler doc:name="Scheduler" doc:id="4ffb4200-48e7-4ebc-a98b-cdea6a9a9bb3" >
+			<scheduling-strategy >
+				<fixed-frequency timeUnit="MINUTES"/>
+			</scheduling-strategy>
+		</scheduler> [STUDIO] -->
+		<!-- [STUDIO:"Call to client-pisa-login"]<flow-ref doc:name="Call to client-pisa-login" doc:id="a189e0e7-1453-44c5-9c8c-3ee812819055" name="client-pisa-login"/> [STUDIO] -->
+		<!-- [STUDIO:"Call to clients-post-pisa-confirm-receipt"]<flow-ref doc:name="Call to clients-post-pisa-confirm-receipt" doc:id="9c6e36c6-8634-4c35-8de1-98aff1e3e777" name="clients-post-pisa-confirm-receipt" target="loginResponse" /> [STUDIO] -->
+		<!-- [STUDIO:"Transform Message"]<ee:transform doc:name="Transform Message" doc:id="266b8fd7-d178-409b-ab84-4e0be528af66" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+&#45;&#45;-
+{
+	"campo": "Prueba Mule"
+}&#93;&#93;></ee:set-payload>
+			</ee:message>
+		</ee:transform> [STUDIO] -->
+		<ee:transform doc:name="Transform Message" doc:id="3fc444c7-2f3a-441c-bbfe-ba1583de1d42" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"campo": "Prueba Mulesoft"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<pubsub:publish-message doc:name="Publish Message" doc:id="2f5387a7-0c70-4300-87c0-62e1183e140e" config-ref="Google_Pub_Sub_Configuration" projectId="${pubsub.project.id}" topicName="${pubsub.topic.confirm_receipt}">
+			<pubsub:message><![CDATA[#[payload]]]></pubsub:message>
+			<pubsub:attributes><![CDATA[#[output application/java
+---
+{
+	"project" : p('pubsub.project.confirm_receipt'),
+	"version" : p('pubsub.version.confirm_receipt')
+}]]]></pubsub:attributes>
+		</pubsub:publish-message>
+		<logger level="INFO" doc:name="Logger" doc:id="44f36639-6fd2-4c58-a4dc-7237ae322cfb" message="TRANSACTION_ID: #[payload]"/>
+	</flow>
+	<sub-flow name="client-pisa-token-vars" doc:id="e08e204d-235c-4fcf-8008-2c6e304c534e" >
+		<set-variable value="${https.pisa.token.api.authorization}" doc:name="Set authorization" doc:id="959d23cd-8322-42fe-a836-3b649978dbe0" variableName="authorization"/>
+		<set-variable value="${https.pisa.token.api.grant.type}" doc:name="Set grant type" doc:id="b267fad4-524b-4edd-8ca8-cb7c6918d05d" variableName="grant_type" />
+	</sub-flow>
+	<sub-flow name="client-pisa-save-token" doc:id="3d6c30a3-d70a-46dc-936f-be99c103e36a" >
+		<set-variable value="#[payload.access_token]" doc:name="Set access token" doc:id="7e37905a-b19f-492d-a2cf-de70bbe859aa" variableName="access_token"/>
+	</sub-flow>
+	<sub-flow name="clients-post-pisa-confirm-receipt" doc:id="09d5fdd2-8cff-4e1f-9f91-240f11e9f670" >
+		<logger level="INFO" doc:name="Visualize payload" doc:id="05f6396e-add4-4f3d-91b2-31f11a525adb" message="PAYLOAD ENTRADA: #[payload]"/>
+		<http:request method="POST" doc:name="Request" doc:id="5a1299d2-4c24-4994-bd7f-b81979cb097a" config-ref="HTTP_Request_configuration_PISA" path="${https.pisa.api.post.confirm_receipt}">
+			<http:body ><![CDATA[#[vars.backUpPayload]]]></http:body>
+			<http:headers ><![CDATA[#[%dw 2.0
+output application/xml
+---
+{
+	"Content-Type" : "application/json",
+	"Authorization": "Bearer " ++ vars.access_token
+}]]]></http:headers>
+		</http:request>
+		<logger level="INFO" doc:name="Logger" doc:id="4d671180-80b4-4e01-b035-81e14338e698" message="PAYLOAD SALIDA: #[payload]"/>
+	</sub-flow>
+	<sub-flow name="client-pisa-service-log-order-api" doc:id="4174cd2f-7c70-44b3-bd34-13d23c997a4d" >
+		<!-- [STUDIO:"Request"]<http:request method="POST" doc:name="Request" doc:id="7020eb3e-fec3-4c82-a252-7b436e202209" config-ref="HTTP_Request_configuration-pisa-connection" path="${client.wms.blueyonder.https.path.wms.post.imss.log}">
+			<http:headers ><![CDATA[#[%dw 2.0
+output application/xml
+&#45;&#45;-
+{
+	"Content-Type" : "application/xml"
+}&#93;&#93;&#93;></http:headers>
+		</http:request> [STUDIO] -->
+		<logger level="INFO" doc:name="Visualize payload" doc:id="4166ce6d-3858-451e-b2c4-c7d0fc2bb903" message="#[payload]" />
+	</sub-flow>
+</mule>
