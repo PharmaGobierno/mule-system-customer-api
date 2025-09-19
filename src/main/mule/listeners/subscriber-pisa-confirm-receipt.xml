@@ -9,7 +9,7 @@ http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/cu
 http://www.mulesoft.org/schema/mule/kafka http://www.mulesoft.org/schema/mule/kafka/current/mule-kafka.xsd
 http://www.mulesoft.org/schema/mule/pubsub http://www.mulesoft.org/schema/mule/pubsub/current/mule-pubsub.xsd">
 	<flow name="subscriber-pisa-confirm-receipt" doc:id="1e3610ab-e14f-45f6-87af-653d6f294dcc" >
-		<pubsub:message-listener doc:name="On message listener" doc:id="275ab696-6494-4478-a841-3515f5585a27" config-ref="Google_Pub_Sub_Configuration" projectId="${pubsub.project.id}" subscriptionName="${pubsub.subscription.confirm_receipt}"/>
+		<pubsub:message-listener doc:name="wms.receipt_events" doc:id="275ab696-6494-4478-a841-3515f5585a27" config-ref="Google_Pub_Sub_Configuration" projectId="${pubsub.project.id}" subscriptionName="${pubsub.subscription.confirm_outbound}"/>
 		<!-- [STUDIO:"Read payload"]<ee:transform doc:name="Read payload" doc:id="8c692c33-5698-459a-bdb2-78e5c48238e6">
    <ee:message>
     <ee:set-payload><![CDATA[%dw 2.0
@@ -100,14 +100,21 @@ output application/json
 			<ee:variables />
 		</ee:transform> [STUDIO] -->
 		<logger level="INFO" doc:name="Logger2" doc:id="700a4427-d61a-42ee-826e-1f72abf04336" message="#[payload]" />
-		<!-- [STUDIO:"Call to subscriber-pisa-confirm-receipt-mapping"]<flow-ref doc:name="Call to subscriber-pisa-confirm-receipt-mapping" doc:id="dce394f5-97f8-4b7d-8b0f-ac3c159d038f" name="subscriber-pisa-confirm-receipt-mapping"/> [STUDIO] -->
+		<flow-ref doc:name="Call to subscriber-pisa-confirm-receipt-mapping" doc:id="dce394f5-97f8-4b7d-8b0f-ac3c159d038f" name="subscriber-pisa-confirm-receipt-mapping"/>
 		
 		<flow-ref doc:name="Call to subscriber-orchestrator-pisa-confirm-receipt" doc:id="984c04c4-0597-4c67-994e-09676bddc419" name="subscriber-orchestrator-pisa-confirm-receipt"/>
 		<logger level="INFO" doc:name="Logger" doc:id="641bb89c-0c46-41d7-bc8f-c21c1446a0b7" message="#[payload]" />
-		<logger level="INFO" doc:name="Logger1" doc:id="5793444b-803d-4188-b1e1-56a9c27003f9" message="#[payload]" />
 	</flow>
 	<sub-flow name="subscriber-pisa-confirm-receipt-mapping" doc:id="42469382-750b-46f0-a9a0-73b54acbb4ee" >
-		<ee:transform doc:name="Transform Message" doc:id="fc6b7a7c-81bb-4806-8747-490abd0d8891" >
+		<ee:transform doc:name="Transform Message" doc:id="6a67de9e-35c6-4982-9f7a-753ea740a360" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+read(payload, "application/json")]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Transform Message1" doc:id="c8896927-df10-4242-8c85-70b6c6ef967e" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
 output application/json  encoding= "UTF-8"
@@ -119,39 +126,27 @@ fun formDate(date) = (substring(date, 0, 4) as String) ++ (substring(date, 5, 7)
 			(substring(date, 14, 16) as String) ++ (substring(date, 17, 19))
 ---
 {
-	RA_INB_IFD: {
-		CTRL_SEG: payload.payload.receipt_asn groupBy $.invoice_number pluck $ map (invoice, index)->{
-			TRNNAM:"RA_TRAN",
-            TRNVER:"2017.1V0",
-			WHSE_ID: "PISA", //PISA nueva instancia
-			HEADER_SEG: {
-				SEGNAM: "RECEIPT INVOICE",
-				TRNTYP: "A",
-                INVNUM: "",         // invoice_number
-                SUPNUM: "00123462",///De momento fijo
-				CLIENT_ID: "----",///Cambio en otra instancia
-                RIMST: "OPEN", 
-				INVTYP: "ISEM", //Cambio en otra instancia
-                INVDTE: formDate(now()), 
-				LINE_SEG: invoice map  (remision, index)-> {////por cada item que salga de agrupar
-					SEGNAM: "LINE_SEG",
-					INVLIN: leftPad((index + 1) as String, 4, "0"),
-					INVSLN: leftPad((index + 1) as String, 4, "0"),
-                    EXPQTY: remision.expected_quantity,
-                    PRTNUM: remision.product_number,
-					LOTNUM: remision.lot_number,
-                    RCVSTS: remision.status,
-                    MANDTE: formDate(remision.manufacture_date),
-					EXPIRE_DTE: formDate(remision.expiration_date),
-					INV_ATTR_STR3: remision.health_registry,
-					INV_ATTR_STR9: remision.tender_number,
-					INV_ATTR_STR11: remision.country_of_origin,
-                    INV_ATTR_STR15: remision.product_temperature,
-					INV_ATTR_STR16: remision.brand
-				} 
-			}
-		}
-	}
+  "confirm_receipt": payload.payload.confirm_receipt map ((item) -> 
+    {
+      "invoice_number": item.INVOICE_NUMBER,
+      "invoice_type": item.INVOICE_TYPE,
+      "tracking_number": item.ORGREF,
+      "receipt_quantity": item.RECEIPT_QUANTITY,
+      "lot_number": item.LOT_NUMBER,
+      "product_number": item.PRODUCT_NUMBER,
+      "status": item.STATUS,
+      "manufacture_date": item.MANUFACTURE_DATE,
+      "expiration_date": item.EXPIRATION_DATE,
+      "health_registry": item.HEALTH_REGISTRY,
+      "product_temperature": item.PRODUCT_TEMPERATURE,
+      "brand": item.BRAND,
+      "load_number": item.LOAD_NUMBER default "",
+      "origin_warehouse": item.ORIGIN_WAREHOUSE
+     // "country_of_origin": item.COUNTRY_OF_ORIGIN,
+     // "tender_number": item.TENDER_NUMBER,
+     // "client_id": item.CLIENT_ID,
+    }
+  )
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>

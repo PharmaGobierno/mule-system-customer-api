@@ -53,15 +53,15 @@ output application/json
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
-		<pubsub:publish-message doc:name="Publish Message" doc:id="2f5387a7-0c70-4300-87c0-62e1183e140e" config-ref="Google_Pub_Sub_Configuration" projectId="${pubsub.project.id}" topicName="${pubsub.topic.confirm_receipt}">
-			<pubsub:message><![CDATA[#[payload]]]></pubsub:message>
+		<!-- [STUDIO:"Publish Message"]<pubsub:publish-message doc:name="Publish Message" doc:id="2f5387a7-0c70-4300-87c0-62e1183e140e" config-ref="Google_Pub_Sub_Configuration" projectId="${pubsub.project.id}" topicName="${pubsub.topic.confirm_receipt}">
+			<pubsub:message><![CDATA[#[payload&#93;&#93;&#93;></pubsub:message>
 			<pubsub:attributes><![CDATA[#[output application/java
----
+&#45;&#45;-
 {
 	"project" : p('pubsub.project.confirm_receipt'),
 	"version" : p('pubsub.version.confirm_receipt')
-}]]]></pubsub:attributes>
-		</pubsub:publish-message>
+}&#93;&#93;&#93;></pubsub:attributes>
+		</pubsub:publish-message> [STUDIO] -->
 		<logger level="INFO" doc:name="Logger" doc:id="44f36639-6fd2-4c58-a4dc-7237ae322cfb" message="TRANSACTION_ID: #[payload]"/>
 	</flow>
 	<sub-flow name="client-pisa-token-vars" doc:id="e08e204d-235c-4fcf-8008-2c6e304c534e" >
@@ -74,26 +74,40 @@ output application/json
 	<sub-flow name="clients-post-pisa-confirm-receipt" doc:id="09d5fdd2-8cff-4e1f-9f91-240f11e9f670" >
 		<logger level="INFO" doc:name="Visualize payload" doc:id="05f6396e-add4-4f3d-91b2-31f11a525adb" message="PAYLOAD ENTRADA: #[payload]"/>
 		<http:request method="POST" doc:name="Request" doc:id="5a1299d2-4c24-4994-bd7f-b81979cb097a" config-ref="HTTP_Request_configuration_PISA" path="${https.pisa.api.post.confirm_receipt}">
-			<http:body ><![CDATA[#[vars.backUpPayload]]]></http:body>
 			<http:headers ><![CDATA[#[%dw 2.0
 output application/xml
 ---
 {
 	"Content-Type" : "application/json",
-	"Authorization": "Bearer " ++ vars.access_token
+	"Authorization": "Bearer " ++ vars.loginResponse.access_token
 }]]]></http:headers>
 		</http:request>
 		<logger level="INFO" doc:name="Logger" doc:id="4d671180-80b4-4e01-b035-81e14338e698" message="PAYLOAD SALIDA: #[payload]"/>
 	</sub-flow>
-	<sub-flow name="client-pisa-service-log-order-api" doc:id="4174cd2f-7c70-44b3-bd34-13d23c997a4d" >
-		<!-- [STUDIO:"Request"]<http:request method="POST" doc:name="Request" doc:id="7020eb3e-fec3-4c82-a252-7b436e202209" config-ref="HTTP_Request_configuration-pisa-connection" path="${client.wms.blueyonder.https.path.wms.post.imss.log}">
+	<sub-flow name="clients-post-pisa-inventory-change" doc:id="d21639f1-6a49-40a3-b61b-9bf44e8b4797" >
+		<logger level="INFO" doc:name="Visualize payload" doc:id="135ff1b9-0098-4306-800f-eefb886300d8" message="PAYLOAD ENTRADA: #[payload]"/>
+		<http:request method="POST" doc:name="Request" doc:id="d9bf9ea9-6504-4f06-aa17-4f67dbb200a5" config-ref="HTTP_Request_configuration_PISA" path="${https.pisa.api.post.inventory_status}">
 			<http:headers ><![CDATA[#[%dw 2.0
 output application/xml
-&#45;&#45;-
+---
 {
-	"Content-Type" : "application/xml"
-}&#93;&#93;&#93;></http:headers>
-		</http:request> [STUDIO] -->
-		<logger level="INFO" doc:name="Visualize payload" doc:id="4166ce6d-3858-451e-b2c4-c7d0fc2bb903" message="#[payload]" />
+	"Content-Type" : "application/json",
+	"Authorization": "Bearer " ++ vars.loginResponse.access_token
+}]]]></http:headers>
+		</http:request>
+		<logger level="INFO" doc:name="Logger" doc:id="931a7e62-dff0-4861-98c6-9229c3a2aa7b" message="PAYLOAD SALIDA: #[payload]"/>
+	</sub-flow>
+	<sub-flow name="clients-post-pisa-confirm-outbound" doc:id="c7c2a84f-5557-4a36-b4cc-a9b32703b45f" >
+		<logger level="INFO" doc:name="Visualize payload" doc:id="749cd5ba-6540-42b0-b1e1-4f3927e87da5" message="PAYLOAD ENTRADA: #[payload]"/>
+		<http:request method="POST" doc:name="Request" doc:id="7e2dfdeb-4552-4880-b680-5b4d67776486" config-ref="HTTP_Request_configuration_PISA" path="${https.pisa.api.post.confirm_outbound}">
+			<http:headers ><![CDATA[#[%dw 2.0
+output application/xml
+---
+{
+	"Content-Type" : "application/json",
+	"Authorization": "Bearer " ++ vars.loginResponse.access_token
+}]]]></http:headers>
+		</http:request>
+		<logger level="INFO" doc:name="Logger" doc:id="6c1ad9e3-1cdf-4fb4-80dc-c3b2a4d2ea4d" message="PAYLOAD SALIDA: #[payload]"/>
 	</sub-flow>
 </mule>

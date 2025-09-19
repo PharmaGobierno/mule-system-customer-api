@@ -5,21 +5,21 @@
 	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/kafka http://www.mulesoft.org/schema/mule/kafka/current/mule-kafka.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
-	<flow name="orchestrator-kafka-listenersFlow" doc:id="e3c64639-ac9d-4129-9536-d2a73c4e74f3" >
-		<!-- [STUDIO:"Message listener"]<kafka:message-listener doc:name="Message listener" doc:id="3635d32c-0cc3-439d-b3c2-1b327314ef1f" config-ref="Traxion_Kafka_OMS_Inbound"/> [STUDIO] -->
-		<logger level="INFO" doc:name="Logger" doc:id="6d50ec94-e33f-48f4-86cc-17ac226d6774" message="#[payload]"/>
+	<!-- [STUDIO:"orchestrator-kafka-listenersFlow"]<flow name="orchestrator-kafka-listenersFlow" doc:id="e3c64639-ac9d-4129-9536-d2a73c4e74f3" >
+		<kafka:message-listener doc:name="Message listener" doc:id="3635d32c-0cc3-439d-b3c2-1b327314ef1f" config-ref="Traxion_Kafka_OMS_Inbound"/>
+		<logger level="INFO" doc:name="Logger" doc:id="6d50ec94-e33f-48f4-86cc-17ac226d6774" message="#[payload&#93;"/>
 		<choice doc:name="Choice" doc:id="77a69c95-82f0-44fe-8314-86a3235eeb34" >
-			<when expression="#['REMISSION_CREATION' == payload.metadata.transaction_type]">
+			<when expression="#['REMISSION_CREATION' == payload.metadata.transaction_type&#93;">
 				<ee:transform doc:name="Transform Message" doc:id="d37415bb-f1aa-43bb-88c2-94bed5ed6ecb" >
 					<ee:message >
 						<ee:set-payload ><![CDATA[%dw 2.0
 output application/java
----
+&#45;&#45;-
 {
-}]]></ee:set-payload>
+}&#93;&#93;></ee:set-payload>
 					</ee:message>
 				</ee:transform>
 			</when>
 		</choice>
-	</flow>
+	</flow> [STUDIO] -->
 </mule>

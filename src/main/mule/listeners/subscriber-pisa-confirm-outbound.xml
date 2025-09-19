@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:pubsub="http://www.mulesoft.org/schema/mule/pubsub"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:kafka="http://www.mulesoft.org/schema/mule/kafka"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/kafka http://www.mulesoft.org/schema/mule/kafka/current/mule-kafka.xsd
+http://www.mulesoft.org/schema/mule/pubsub http://www.mulesoft.org/schema/mule/pubsub/current/mule-pubsub.xsd">
+	<flow name="subscriber-pisa-confirm-outbound" doc:id="1e3610ab-e14f-45f6-87af-653d6f294dcc" >
+		<pubsub:message-listener doc:name="wms.receipt_events" doc:id="275ab696-6494-4478-a841-3515f5585a27" config-ref="Google_Pub_Sub_Configuration" projectId="${pubsub.project.id}" subscriptionName="${pubsub.subscription.confirm_receipt}"/>
+		<logger level="INFO" doc:name="Logger2" doc:id="700a4427-d61a-42ee-826e-1f72abf04336" message="#[payload]" />
+		<flow-ref doc:name="Call to subscriber-pisa-confirm-outbound-mapping" doc:id="dce394f5-97f8-4b7d-8b0f-ac3c159d038f" name="subscriber-pisa-confirm-outbound-mapping"/>
+		
+		<flow-ref doc:name="Call to subscriber-orchestrator-pisa-confirm-outbound" doc:id="984c04c4-0597-4c67-994e-09676bddc419" name="subscriber-orchestrator-pisa-confirm-outbound"/>
+		<logger level="INFO" doc:name="Logger" doc:id="641bb89c-0c46-41d7-bc8f-c21c1446a0b7" message="#[payload]" />
+	</flow>
+	<sub-flow name="subscriber-pisa-confirm-outbound-mapping" doc:id="42469382-750b-46f0-a9a0-73b54acbb4ee" >
+		<ee:transform doc:name="Transform Message" doc:id="fc6b7a7c-81bb-4806-8747-490abd0d8891" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+read(payload, "application/json")]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Transform Message1" doc:id="128cefe9-15db-4922-b565-d9b1754047c3" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+    create_order: payload.payload.metadata.items map ((item) -> {
+        order_number: payload.payload.remission.order_number,
+        order_type: payload.payload.remission.order_type,
+        customer_id: payload.context.remission.delivery_destination.customer,
+        address_id: payload.context.remission.delivery_destination.id,
+        product_number: item.sku,
+        order_quantity: item.quantity,
+        institution_number: payload.context.remission.institution_number,
+        max_delivery_date:payload.context.remission.delivery_date,
+        issuance_date:"",
+        load_number: "",
+        origin_warehouse: item.origin_warehouse
+    })     
+}
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="subscriber-orchestrator-pisa-confirm-outbound" doc:id="c96ad591-be39-494a-affa-aa17114cba4b" >
+		<flow-ref doc:name="Call to client-pisa-login" doc:id="5230d95a-7189-4d63-9eb7-e7a01a238636" name="client-pisa-login" target="loginResponse"/>
+		<flow-ref doc:name="Call to clients-post-pisa-confirm-outbound" doc:id="3b894bfb-c112-48e0-b091-d31defc6db94" name="clients-post-pisa-confirm-outbound"/>
+	</sub-flow>
+</mule>
