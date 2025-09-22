@@ -32,19 +32,19 @@ output application/json
 ---
 {
     "inventory_status_change": {
-        "product_number": payload.inventory_status_change.PRODUCT_NUMBER,
-        "quantity": payload.inventory_st_changeatus.QUANTITY,
-        "lot_number": payload.inventory_st_changeatus.LOT_NUMBER,
-        "expiration_date": payload.inventory_st_changeatus.EXPIRATION_DATE,
-        "manufacture_date": payload.inventory_st_changeatus.MANUFACTURE_DATE,
-        "origin_inventory_status": payload.inventory_st_changeatus.ORIGIN_INVENTORY_STATUS,
-        "destination_inventory_status": payload.inventory_st_changeatus.DESTINATION_INVENTORY_STATUS,
-        "event_timestamp": payload.inventory_st_changeatus.EVENT_TIMESTAMP,
-        "load_number": payload.inventory_st_changeatus.LOAD_NUMBER,
-        "health_registry": payload.inventory_st_changeatus.HEALTH_REGISTRY,
-        "product_temperature": payload.inventory_st_changeatus.PRODUCT_TEMPERATURE,
-        "brand": payload.inventory_st_changeatus.BRAND,
-        "origin_warehouse": payload.inventory_st_changeatus.ORIGIN_WAREHOUSE
+        "product_number": payload.payload.inventory_status_change.PRODUCT_NUMBER,
+        "quantity": payload.payload.inventory_status_change.QUANTITY,
+        "lot_number": payload.payload.inventory_status_change.LOT_NUMBER,
+        "expiration_date": payload.payload.inventory_status_change.EXPIRATION_DATE,
+        "manufacture_date": payload.payload.inventory_status_change.MANUFACTURE_DATE,
+        "origin_inventory_status": payload.payload.inventory_status_change.ORIGIN_INVENTORY_STATUS,
+        "destination_inventory_status": payload.payload.inventory_status_change.DESTINATION_INVENTORY_STATUS,
+        "event_timestamp": payload.payload.inventory_status_change.EVENT_TIMESTAMP,
+        "load_number": payload.payload.inventory_status_change.LOAD_NUMBER,
+        "health_registry": payload.payload.inventory_status_change.HEALTH_REGISTRY,
+        "product_temperature": payload.payload.inventory_status_change.PRODUCT_TEMPERATURE,
+        "brand": payload.payload.inventory_status_change.BRAND,
+        "origin_warehouse": payload.payload.inventory_status_change.ORIGIN_WAREHOUSE
     }
 }
 
