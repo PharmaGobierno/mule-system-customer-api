@@ -114,6 +114,7 @@ output application/json
 read(payload, "application/json")]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="9370ea2f-34bc-4b39-84a1-7eed778bd3ad" message="#[payload]"/>
 		<ee:transform doc:name="Transform Message1" doc:id="c8896927-df10-4242-8c85-70b6c6ef967e" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
@@ -141,7 +142,8 @@ fun formDate(date) = (substring(date, 0, 4) as String) ++ (substring(date, 5, 7)
       "product_temperature": item.PRODUCT_TEMPERATURE,
       "brand": item.BRAND,
       "load_number": item.LOAD_NUMBER default "",
-      "origin_warehouse": item.ORIGIN_WAREHOUSE
+      "origin_warehouse": item.ORIGIN_WAREHOUSE,
+       "supplier": item.SUPPLIER
      // "country_of_origin": item.COUNTRY_OF_ORIGIN,
      // "tender_number": item.TENDER_NUMBER,
      // "client_id": item.CLIENT_ID,
@@ -150,6 +152,7 @@ fun formDate(date) = (substring(date, 0, 4) as String) ++ (substring(date, 5, 7)
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="bf8d7cb3-f976-46e0-893e-860ba4f55117" message="#[payload]"/>
 	</sub-flow>
 	<sub-flow name="subscriber-orchestrator-pisa-confirm-receipt" doc:id="c96ad591-be39-494a-affa-aa17114cba4b" >
 		<flow-ref doc:name="Call to client-pisa-login" doc:id="5230d95a-7189-4d63-9eb7-e7a01a238636" name="client-pisa-login" target="loginResponse"/>

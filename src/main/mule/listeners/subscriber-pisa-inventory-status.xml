@@ -25,6 +25,7 @@ output application/json
 read(payload, "application/json")]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="8969282e-5832-4a53-b49a-66bdc21f1d8a" message="#[payload]"/>
 		<ee:transform doc:name="Transform Message1" doc:id="128cefe9-15db-4922-b565-d9b1754047c3" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
@@ -44,13 +45,21 @@ output application/json
         "health_registry": payload.payload.inventory_status_change.HEALTH_REGISTRY,
         "product_temperature": payload.payload.inventory_status_change.PRODUCT_TEMPERATURE,
         "brand": payload.payload.inventory_status_change.BRAND,
-        "origin_warehouse": payload.payload.inventory_status_change.ORIGIN_WAREHOUSE
+        "origin_warehouse": payload.payload.inventory_status_change.ORIGIN_WAREHOUSE,
+        "destination_center": payload.payload.inventory_status_change.DESTINATION_CENTER,
+        "order_details": payload.payload.inventory_status_change.ORDER_DETAILS map(ord) ->
+            {
+                    "SKU": ord.SKU,
+                    "lot": ord.LOT,
+                    "quantity": ord.QUANITY
+                }
     }
 }
 
 ]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="bcc32260-cfe5-482e-82c0-910502228d01" message="#[payload]"/>
 	</sub-flow>
 	<sub-flow name="subscriber-orchestrator-pisa-inventory-status" doc:id="c96ad591-be39-494a-affa-aa17114cba4b" >
 		<flow-ref doc:name="Call to client-pisa-login" doc:id="5230d95a-7189-4d63-9eb7-e7a01a238636" name="client-pisa-login" target="loginResponse"/>
