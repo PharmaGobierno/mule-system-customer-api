@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:pubsub="http://www.mulesoft.org/schema/mule/pubsub"
-	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
-	xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+<mule xmlns:validation="http://www.mulesoft.org/schema/mule/validation"
+	xmlns:pubsub="http://www.mulesoft.org/schema/mule/pubsub" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
-http://www.mulesoft.org/schema/mule/pubsub http://www.mulesoft.org/schema/mule/pubsub/current/mule-pubsub.xsd">
+http://www.mulesoft.org/schema/mule/pubsub http://www.mulesoft.org/schema/mule/pubsub/current/mule-pubsub.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd">
 	<sub-flow name="client-pisa-login" doc:id="632cf071-2076-4d37-895b-62d234fb3c6b" >
 		<flow-ref doc:name="Call to client-pisa-vars" doc:id="2c1af516-cdce-431e-947b-e2884e54715a" name="client-pisa-token-vars" />
 		<http:request method="POST" doc:name="Request" doc:id="f44474a8-3557-47f6-bf02-ca763deb9619" config-ref="HTTP_Request_configuration_PISA_Token" path="${https.pisa.token.api.get.token}">
@@ -72,9 +73,10 @@ output application/json
 		<set-variable value="#[payload.access_token]" doc:name="Set access token" doc:id="7e37905a-b19f-492d-a2cf-de70bbe859aa" variableName="access_token"/>
 	</sub-flow>
 	<sub-flow name="clients-post-pisa-confirm-receipt" doc:id="09d5fdd2-8cff-4e1f-9f91-240f11e9f670" >
-		<logger level="INFO" doc:name="Visualize payload" doc:id="05f6396e-add4-4f3d-91b2-31f11a525adb" message="PAYLOAD ENTRADA: #[payload]"/>
-		<http:request method="POST" doc:name="Request" doc:id="5a1299d2-4c24-4994-bd7f-b81979cb097a" config-ref="HTTP_Request_configuration_PISA" path="${https.pisa.api.post.confirm_receipt}">
-			<http:headers ><![CDATA[#[%dw 2.0
+		<try doc:name="Try" doc:id="7c4296c3-df2f-4227-926b-7cd9a8a8ff80" >
+			<logger level="INFO" doc:name="Visualize payload" doc:id="05f6396e-add4-4f3d-91b2-31f11a525adb" message="PAYLOAD ENTRADA: #[payload]" />
+			<http:request method="POST" doc:name="Request" doc:id="5a1299d2-4c24-4994-bd7f-b81979cb097a" config-ref="HTTP_Request_configuration_PISA" path="${https.pisa.api.post.confirm_receipt}">
+			<http:headers><![CDATA[#[%dw 2.0
 output application/xml
 ---
 {
@@ -82,12 +84,63 @@ output application/xml
 	"Authorization": "Bearer " ++ vars.loginResponse.access_token
 }]]]></http:headers>
 		</http:request>
-		<logger level="INFO" doc:name="Logger" doc:id="4d671180-80b4-4e01-b035-81e14338e698" message="PAYLOAD SALIDA: #[payload]"/>
+			<logger level="INFO" doc:name="Logger" doc:id="4d671180-80b4-4e01-b035-81e14338e698" message="PAYLOAD SALIDA: #[payload]" />
+			<error-handler >
+				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue1" doc:id="8bce4ea0-5a55-479c-8cc5-cd716a18aa16" type="HTTP:CLIENT_SECURITY, HTTP:CONNECTIVITY, HTTP:FORBIDDEN, HTTP:RETRY_EXHAUSTED, HTTP:SERVICE_UNAVAILABLE, HTTP:TIMEOUT, HTTP:UNAUTHORIZED" >
+					<ee:transform doc:name="Transform Message" doc:id="51edc43c-7f09-4d2a-b4dd-49a018c0d3bb" >
+						<ee:message />
+						<ee:variables >
+							<ee:set-variable variableName="causeby" ><![CDATA[%dw 2.0
+output application/json
+---
+error.description]]></ee:set-variable>
+							<ee:set-variable variableName="main_error" ><![CDATA[%dw 2.0
+output application/json
+---
+error.errorType]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+					<ee:transform doc:name="set payload error" doc:id="1f6bc6e1-d643-4a8b-85f2-79df632d2a9d" >
+						<ee:message >
+							<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  traxion_response: {
+    completed_succesfully: "false",
+    error: {
+      error_type: "PISA:" ++ (vars.main_error.identifier default "ERROR"),
+      payload: {
+      	event: correlationId
+      },
+      user_error_description: "error en comunicacion con PISA",
+      system_error_description: vars.causeby
+    }
+  }
+}]]></ee:set-payload>
+						</ee:message>
+						<ee:variables >
+							<ee:set-variable variableName="slackChannel" ><![CDATA[%dw 2.0
+output application/json
+---
+p('slack.connection.channel.connectivity.pisa.error')]]></ee:set-variable>
+							<ee:set-variable variableName="messageProvider" ><![CDATA[%dw 2.0
+output application/json
+---
+"ERROR PROVENIENTE DE PISA"]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+					<flow-ref doc:name="orchestrator-send-message-to-slack-main" doc:id="f55c410b-a7ed-4693-8a3d-5eebafb2e8b7" name="orchestrator-send-message-to-slack-main" />
+					<raise-error doc:name="Raise error" doc:id="077241f1-b6f0-48aa-8e77-255acd5728b4" type="CCA:ERROR" description="#[vars.causeby]" />
+				</on-error-continue>
+			</error-handler>
+		</try>
 	</sub-flow>
 	<sub-flow name="clients-post-pisa-inventory-change" doc:id="d21639f1-6a49-40a3-b61b-9bf44e8b4797" >
-		<logger level="INFO" doc:name="Visualize payload" doc:id="135ff1b9-0098-4306-800f-eefb886300d8" message="PAYLOAD ENTRADA: #[payload]"/>
-		<http:request method="POST" doc:name="Request" doc:id="d9bf9ea9-6504-4f06-aa17-4f67dbb200a5" config-ref="HTTP_Request_configuration_PISA" path="${https.pisa.api.post.inventory_status}">
-			<http:headers ><![CDATA[#[%dw 2.0
+		<try doc:name="Try" doc:id="369c3bf8-dba3-4d51-83d3-ae5893b74aaf" >
+			<logger level="INFO" doc:name="Visualize payload" doc:id="135ff1b9-0098-4306-800f-eefb886300d8" message="PAYLOAD ENTRADA: #[payload]" />
+			<http:request method="POST" doc:name="Request" doc:id="d9bf9ea9-6504-4f06-aa17-4f67dbb200a5" config-ref="HTTP_Request_configuration_PISA" path="${https.pisa.api.post.inventory_status}">
+			<http:headers><![CDATA[#[%dw 2.0
 output application/xml
 ---
 {
@@ -95,12 +148,63 @@ output application/xml
 	"Authorization": "Bearer " ++ vars.loginResponse.access_token
 }]]]></http:headers>
 		</http:request>
-		<logger level="INFO" doc:name="Logger" doc:id="931a7e62-dff0-4861-98c6-9229c3a2aa7b" message="PAYLOAD SALIDA: #[payload]"/>
+			<logger level="INFO" doc:name="Logger" doc:id="931a7e62-dff0-4861-98c6-9229c3a2aa7b" message="PAYLOAD SALIDA: #[payload]" />
+			<error-handler >
+				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="f1fd59c8-654e-4fe7-a4c3-2fee05dcd7e9" type="HTTP:CLIENT_SECURITY, HTTP:CONNECTIVITY, HTTP:FORBIDDEN, HTTP:RETRY_EXHAUSTED, HTTP:SERVICE_UNAVAILABLE, HTTP:TIMEOUT, HTTP:UNAUTHORIZED" >
+					<ee:transform doc:name="Transform Message" doc:id="a1fa27d4-8e8f-4e87-9d15-51b1ecf773f0" >
+						<ee:message />
+						<ee:variables >
+							<ee:set-variable variableName="causeby" ><![CDATA[%dw 2.0
+output application/json
+---
+error.description]]></ee:set-variable>
+							<ee:set-variable variableName="main_error" ><![CDATA[%dw 2.0
+output application/json
+---
+error.errorType]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+					<ee:transform doc:name="set payload error" doc:id="a5ac8dbe-7783-4767-b7a8-605cbb374062" >
+						<ee:message >
+							<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  traxion_response: {
+    completed_succesfully: "false",
+    error: {
+      error_type: "PISA:" ++ (vars.main_error.identifier default "ERROR"),
+      payload: {
+      	event: correlationId
+      },
+      user_error_description: "error en comunicacion con PISA",
+      system_error_description: vars.causeby
+    }
+  }
+}]]></ee:set-payload>
+						</ee:message>
+						<ee:variables >
+							<ee:set-variable variableName="slackChannel" ><![CDATA[%dw 2.0
+output application/json
+---
+p('slack.connection.channel.connectivity.pisa.error')]]></ee:set-variable>
+							<ee:set-variable variableName="messageProvider" ><![CDATA[%dw 2.0
+output application/json
+---
+"ERROR PROVENIENTE DE PISA"]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+					<flow-ref doc:name="orchestrator-send-message-to-slack-main" doc:id="7f973227-a55f-4168-bae1-e6a617f388c9" name="orchestrator-send-message-to-slack-main" />
+					<raise-error doc:name="Raise error" doc:id="67f02e79-45e6-441d-a930-dc8187773f3c" type="CCA:ERROR" description="#[vars.causeby]" />
+				</on-error-continue>
+			</error-handler>
+		</try>
 	</sub-flow>
 	<sub-flow name="clients-post-pisa-confirm-outbound" doc:id="c7c2a84f-5557-4a36-b4cc-a9b32703b45f" >
-		<logger level="INFO" doc:name="Visualize payload" doc:id="749cd5ba-6540-42b0-b1e1-4f3927e87da5" message="PAYLOAD ENTRADA: #[payload]"/>
-		<http:request method="POST" doc:name="Request" doc:id="7e2dfdeb-4552-4880-b680-5b4d67776486" config-ref="HTTP_Request_configuration_PISA" path="${https.pisa.api.post.confirm_outbound}">
-			<http:headers ><![CDATA[#[%dw 2.0
+		<try doc:name="Try" doc:id="fd8f3a07-d9c1-4b97-9f47-0ef99866e428">
+			<logger level="INFO" doc:name="Visualize payload" doc:id="749cd5ba-6540-42b0-b1e1-4f3927e87da5" message="PAYLOAD ENTRADA: #[payload]" />
+			<http:request method="POST" doc:name="Request" doc:id="7e2dfdeb-4552-4880-b680-5b4d67776486" config-ref="HTTP_Request_configuration_PISA" path="${https.pisa.api.post.confirm_outbound}">
+			<http:headers><![CDATA[#[%dw 2.0
 output application/xml
 ---
 {
@@ -108,6 +212,56 @@ output application/xml
 	"Authorization": "Bearer " ++ vars.loginResponse.access_token
 }]]]></http:headers>
 		</http:request>
-		<logger level="INFO" doc:name="Logger" doc:id="6c1ad9e3-1cdf-4fb4-80dc-c3b2a4d2ea4d" message="PAYLOAD SALIDA: #[payload]"/>
+			<logger level="INFO" doc:name="Logger" doc:id="6c1ad9e3-1cdf-4fb4-80dc-c3b2a4d2ea4d" message="PAYLOAD SALIDA: #[payload]" />
+			<error-handler>
+				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="8bac0f13-0390-408c-9db5-d9747451977a" type="HTTP:CLIENT_SECURITY, HTTP:CONNECTIVITY, HTTP:FORBIDDEN, HTTP:RETRY_EXHAUSTED, HTTP:SERVICE_UNAVAILABLE, HTTP:TIMEOUT, HTTP:UNAUTHORIZED">
+					<ee:transform doc:name="Transform Message" doc:id="43999e5f-4775-41bc-a82f-b853059b1a40">
+						<ee:message />
+						<ee:variables>
+							<ee:set-variable variableName="causeby"><![CDATA[%dw 2.0
+output application/json
+---
+error.description]]></ee:set-variable>
+							<ee:set-variable variableName="main_error"><![CDATA[%dw 2.0
+output application/json
+---
+error.errorType]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+					<ee:transform doc:name="set payload error" doc:id="5ab0efd8-add3-46bb-98d3-1ed197ea0400">
+						<ee:message>
+							<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  traxion_response: {
+    completed_succesfully: "false",
+    error: {
+      error_type: "PISA:" ++ (vars.main_error.identifier default "ERROR"),
+      payload: {
+      	event: correlationId
+      },
+      user_error_description: "error en comunicacion con PISA",
+      system_error_description: vars.causeby
+    }
+  }
+}]]></ee:set-payload>
+						</ee:message>
+						<ee:variables>
+							<ee:set-variable variableName="slackChannel"><![CDATA[%dw 2.0
+output application/json
+---
+p('slack.connection.channel.connectivity.pisa.error')]]></ee:set-variable>
+							<ee:set-variable variableName="messageProvider"><![CDATA[%dw 2.0
+output application/json
+---
+"ERROR PROVENIENTE DE PISA"]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+					<flow-ref doc:name="orchestrator-send-message-to-slack-main" doc:id="7e8a45bf-cb37-4fff-8b85-b53569fe7ed3" name="orchestrator-send-message-to-slack-main" />
+					<raise-error doc:name="Raise error" doc:id="87f64402-a64b-4bb3-92e2-f4bb88de9f36" type="CCA:ERROR" description="#[vars.causeby]" />
+				</on-error-continue>
+			</error-handler>
+		</try>
 	</sub-flow>
 </mule>
